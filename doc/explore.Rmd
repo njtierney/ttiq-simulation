@@ -20,12 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 withr::with_dir(here::here(), {
   tar_load(
     c(
-      trace_run,
-      hist_time_to_isolation,
-      tp_multiplier,
-      # given a starting R, get the R after contact tracing
-      r_start,
-      r_after_contact_tracing
+      scenario_df_run
       )
     )
 })
@@ -36,29 +31,8 @@ withr::with_dir(here::here(), {
 ## Analysis
 
 ```{r show-trace-run}
-dim(trace_run)
-trace_run[1:5, 1:5]
+scenario_df_run
 ```
-
-
-```{r print-histogram}
-# histogram of times to isolation from simulations
-hist_time_to_isolation
-```
-
-
-```{r show-tp-multiplier}
-# compute the multiplier on TP for this distribution
-tp_multiplier
-```
-
-
-```{r show-r-start}
-# given a starting R, get the R after contact tracing
-r_start
-r_after_contact_tracing
-```
-
 
 ## Reproducibility
 

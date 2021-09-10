@@ -9,7 +9,6 @@
 #' @export
 gg_hist_tti <- function(trace_run) {
 
-  
   tibble(
     time_from_infect_to_iso = c(trace_run)
     ) %>% 

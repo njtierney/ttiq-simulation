@@ -2,6 +2,11 @@
 
 Exploring scenarios around TTIQ
 
+# Contributing to this repo?
+
+If you are contributing to this repo, please create a branch or fork of the project
+and contribute via a pull request - this will avoid issues with everyone working on master at the same time.
+
 # Running analyses
 
 ## Step 1: Install `capsule`
@@ -21,7 +26,7 @@ This recreates all of the R packages used in the analysis on your computer. Impo
 ## Step 3: Run the target workflow
 
 ```r
-capsule::run(targets::tar_make(<TARGERT>))
+capsule::run(targets::tar_make())
 ```
 
 This runs our targets workflow using the R packages specified.
