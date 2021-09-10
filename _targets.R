@@ -17,20 +17,27 @@ tar_plan(
   # of Case 1 isolation.
   # Case 2 is isolated at time: inf_isol = inf_isol + isol_isol - inf_inf
   
-  # parameters of naive (untruncated) generation interval / infectiousness profile
-  gi_meanlog = 1.375738,
-  gi_sdlog = 0.5665299,
-  
   # initial time from infection to isolation
   n_iterations = 1000,
   n_chains = 50,
   # setup an object which is the number of chains and number of iterations
   trace_object = matrix(NA, nrow = n_chains, ncol = n_iterations),
+  
+  sim_tracing_default = build_sim_tracing_default(
+    mu = 1.9,
+    sigma = 2
+  ),
+  
+  # parameters of naive (untruncated) generation interval / infectiousness profile
+  gi_meanlog = 1.375738,
+  gi_sdlog = 0.5665299,
+  
   trace_run = time_to_isolation(trace_object = trace_object,
+                                sim_tracing = sim_tracing_default,
                                 meanlog = gi_meanlog,
-                                sdlog = gi_sdlog,
-                                sim_tracing_mu = 1.9,
-                                sim_tracing_sigma = 2),
+                                sdlog = gi_sdlog),
+  
+  # put all these detauls into a dataframe and iterate across the functions returning the r start and r after contact tracing
   
   # histogram of times to isolation from simulations
   hist_time_to_isolation = gg_hist_tti(trace_run),

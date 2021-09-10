@@ -11,10 +11,9 @@
 #' @author Nicholas Tierney
 #' @export
 time_to_isolation <- function(trace_object,
+                              sim_tracing,
                               meanlog,
-                              sdlog,
-                              sim_tracing_mu,
-                              sim_tracing_sigma) {
+                              sdlog) {
   n_chains <- nrow(trace_object)
   n_iterations <- ncol(trace_object)
   # times from infection to isolation for the initial cases in each chain
@@ -32,11 +31,7 @@ time_to_isolation <- function(trace_object,
     )
     # simulate the delay from isolation of case to isolation of (infected)
     # contact, which here is independent of the other random variables
-    isol_isol <- sim_tracing(
-      n = n_chains,
-      mu = sim_tracing_mu,
-      sigma = sim_tracing_sigma
-    )
+    isol_isol <- sim_tracing(n_chains) 
     # compute the infection to isolation for the (infected) contact, based on the
     # infection to isolation for the case, the generation interval, and the
     # contact tracing time
