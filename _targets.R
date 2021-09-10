@@ -6,7 +6,7 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 ## tar_plan supports drake-style targets and also tar_target()
 tar_plan(
-
+  
   # use a Gibbs Sampler to convert distributions of time from infector isolation
   # to infectee isolation into distributions of time from infection to isolation
   # of cases, and therefore reduction in transmission potential
@@ -33,16 +33,14 @@ tar_plan(
                                 sim_tracing_sigma = 2),
   
   # histogram of times to isolation from simulations
-  hist_time_to_isolation = hist(
-    trace_run,
-    breaks = 50,
-    border = "white",
-    xlab = "Time from infection to isolation",
-    main = ""
-  ),
+  hist_time_to_isolation = gg_hist_tti(trace_run),
   
   # compute the multiplier on TP for this distribution
-  tp_multiplier = tp_reduction(trace_run),
+  tp_multiplier = tp_reduction(
+    inf_isol = trace_run, 
+    meanlog = gi_meanlog,
+    sdlog = gi_sdlog
+      ),
   
   # given a starting R, get the R after contact tracing
   r_start = 7.82,

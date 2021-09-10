@@ -27,8 +27,8 @@ time_to_isolation <- function(trace_object,
     inf_inf <- sim_gi_truncated(
       n = n_chains,
       infection_to_isolation = inf_isol,
-      meanlog = gi_meanlog,
-      sdlog = gi_sdlog
+      meanlog = meanlog,
+      sdlog = sdlog
     )
     # simulate the delay from isolation of case to isolation of (infected)
     # contact, which here is independent of the other random variables

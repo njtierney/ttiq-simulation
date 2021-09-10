@@ -6,7 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = TRUE)
 ## target knits Rmds in their own session, so load libraries here.
 ## source("here::here(packages.R"))
 ```
@@ -36,7 +36,8 @@ withr::with_dir(here::here(), {
 ## Analysis
 
 ```{r show-trace-run}
-trace_run
+dim(trace_run)
+trace_run[1:5, 1:5]
 ```
 
 

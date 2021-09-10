@@ -24,8 +24,8 @@ sim_gi_truncated <- function(n,
       spec = "lnorm",
       a = 0,
       b = infection_to_isolation,
-      meanlog = gi_meanlog,
-      sdlog = gi_sdlog
+      meanlog = meanlog,
+      sdlog = sdlog
     )
   )
 }
