@@ -11,7 +11,10 @@
 #' @export
 #'
 #' @examples
-sim_gi_truncated <- function(n, infection_to_isolation) {
+sim_gi_truncated <- function(n, 
+                             infection_to_isolation,
+                             meanlog,
+                             sdlog) {
   # truncnorm is evaluating control flow in a vector of logicals to check b > a,
   # which is triggering a warning. Suppress, since we know we're never flipping
   # the intervals

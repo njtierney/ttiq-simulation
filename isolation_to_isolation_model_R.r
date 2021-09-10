@@ -67,6 +67,7 @@ inf_isol <- abs(rnorm(n_chains, 14, 5))
 # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
 # times from infection to isolation
 for (iteration in seq_len(n_iterations)) {
+  iteration = 1
   # simulate a generation interval
   inf_inf <- sim_gi_truncated(n_chains, inf_isol)
   # simulate the delay from isolation of case to isolation of (infected)

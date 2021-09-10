@@ -2,14 +2,18 @@
 #' on TP
 #'
 #' @param inf_isol 
+#' @param meanlog 
+#' @param sdlog 
 #'
 #' @return
 #' @export
-tp_reduction <- function(inf_isol) {
+tp_reduction <- function(inf_isol,
+                         meanlog,
+                         sdlog) {
   reductions <- plnorm(
     inf_isol,
-    meanlog = gi_meanlog,
-    sdlog = gi_sdlog
+    meanlog = meanlog,
+    sdlog = sdlog
   )
   mean(reductions)
 }

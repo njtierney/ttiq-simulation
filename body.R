@@ -24,7 +24,10 @@ inf_isol <- abs(rnorm(n_chains, 14, 5))
 # times from infection to isolation
 for (iteration in seq_len(n_iterations)) {
   # simulate a generation interval
-  inf_inf <- sim_gi_truncated(n_chains, inf_isol)
+  inf_inf <- sim_gi_truncated(n = n_chains, 
+                              infection_to_isolation = inf_isol,
+                              meanlog = gi_meanlog,
+                              sdlog = gi_sdlog)
   # simulate the delay from isolation of case to isolation of (infected)
   # contact, which here is independent of the other random variables
   isol_isol <- sim_tracing(n_chains, 1.9, 2)
