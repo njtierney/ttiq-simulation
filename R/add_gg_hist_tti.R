@@ -10,6 +10,6 @@
 add_gg_hist_tti <- function(scenario_df_run) {
 
   scenario_df_run %>% 
-    mutate(gg = map(time_to_isolation_sims, gg_hist_tti))
+    mutate(gg = future_map(time_to_isolation_sims, gg_hist_tti))
 
 }

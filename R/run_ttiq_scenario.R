@@ -10,7 +10,7 @@
 run_ttiq_scenario <- function(scenario_df) {
   
   scenario_df %>% 
-    mutate(time_to_isolation_sims = pmap(
+    mutate(time_to_isolation_sims = future_pmap(
       .l = list(
         n_chains = n_chains,
         n_iterations = n_iterations,
@@ -20,7 +20,7 @@ run_ttiq_scenario <- function(scenario_df) {
       ),
       .f = time_to_isolation
     ),
-    tp_multiplier = pmap_dbl(
+    tp_multiplier = future_pmap_dbl(
       .l = list(
         inf_isol = time_to_isolation_sims,
         meanlog = gi_meanlog,
