@@ -39,7 +39,7 @@ scenario_df_run %>%
 
 ```{r}
 scenario_df_run %>% 
-  mutate(sims = map(time_to_isolation_sims, c)) %>% 
+  mutate(sims = future_map(time_to_isolation_sims, c)) %>% 
   unnest(cols = sims) %>% 
   ggplot(aes(x = sims)) +
     geom_histogram(

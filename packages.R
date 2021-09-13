@@ -20,6 +20,7 @@ conflict_prefer("expand", "tidyr")
 
 library(dotenv)
 library(fs)
+library(furrr)
 library(glue)
 library(grid)
 library(greta, warn.conflicts = FALSE)

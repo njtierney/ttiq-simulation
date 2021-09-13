@@ -26,7 +26,7 @@ create_scenario_df <- function(gi_meanlog,
     sigma = sigma
   ) %>% 
     mutate(
-      sim_tracing_fun = map2(.x = mu, 
+      sim_tracing_fun = future_map2(.x = mu, 
                              .y = sigma,
                              .f = ~build_sim_tracing_default(
                                mu = .x,
