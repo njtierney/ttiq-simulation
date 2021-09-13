@@ -12,10 +12,10 @@ tar_plan(
     # what is this number in units? log(mean days generation interval) ?
     gi_meanlog = 1.375738, 
     gi_sdlog = 0.5665299, 
-    r_start = 1:8,
+    r_start = seq(from = 6, to = 8, by = 0.1),
     # parameters for sim_tracing
     # Is this also in terms of days?
-    mu = 1.9,
+    mu = seq(from = 1.5, to = 3, by = 0.25),
     sigma = 2,
     # these terms are fixed for each simulation
     n_iterations = 1000,

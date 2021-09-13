@@ -55,6 +55,27 @@ scenario_df_run %>%
     theme_minimal()
 ```
 
+```{r}
+scenario_df_run %>% 
+  select(r_after_contact_tracing,
+         tp_multiplier,
+         r_start,
+         mu) %>% 
+  ggplot(aes(x = mu,
+             y = r_after_contact_tracing,
+             colour = r_start)) +
+  geom_point()
+```
+
+
+```{r}
+ggplot(data = scenario_df_run,
+       aes(x = mu,
+           y = tp_multiplier,
+           colour = r_start)) +
+  geom_point()
+```
+
 
 ## Reproducibility
 
