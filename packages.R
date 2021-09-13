@@ -19,6 +19,7 @@ conflict_prefer("complete", "tidyr")
 conflict_prefer("expand", "tidyr")
 
 library(dotenv)
+library(distributional)
 library(fs)
 library(glue)
 library(grid)
