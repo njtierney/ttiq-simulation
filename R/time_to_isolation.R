@@ -21,8 +21,6 @@ time_to_isolation <- function(n_chains,
       # "infector isolation" to "infectee isolation" into 
       # distributions of time from "infection" to "isolation" of cases
       # and therefore reduction in transmission potential
-  # Case 1 is infected at time 0 and isolated at time "inf_isol"
-  # Case 2 is infected at time "inf_inf", drawn from a lognormal
   ## Case 1 is infected at time 0 and isolated at time "infect_isolate"
   ## Case 2 is infected at time "infect_infect", drawn from a lognormal
   # representing the naive generation interval distribution, truncated at 

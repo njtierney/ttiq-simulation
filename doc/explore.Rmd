@@ -31,49 +31,7 @@ withr::with_dir(here::here(), {
 ## Analysis
 
 ```{r show-trace-run}
-scenario_df_run %>% 
-  select(r_after_contact_tracing,
-         tp_multiplier,
-         r_start)
-```
-
-```{r}
-scenario_df_run %>% 
-  mutate(sims = map(time_to_isolation_sims, c)) %>% 
-  unnest(cols = sims) %>% 
-  ggplot(aes(x = sims)) +
-    geom_histogram(
-      bins = 50,
-      colour = "white",
-      fill = "grey"
-    ) +
-  facet_wrap(~r_start,
-             labeller = label_glue("R start = {r_start}")) +
-    labs(
-      x = "Time from infection to isolation"
-    ) +
-    theme_minimal()
-```
-
-```{r}
-scenario_df_run %>% 
-  select(r_after_contact_tracing,
-         tp_multiplier,
-         r_start,
-         mu) %>% 
-  ggplot(aes(x = mu,
-             y = r_after_contact_tracing,
-             colour = r_start)) +
-  geom_point()
-```
-
-
-```{r}
-ggplot(data = scenario_df_run,
-       aes(x = mu,
-           y = tp_multiplier,
-           colour = r_start)) +
-  geom_point()
+scenario_df_run 
 ```
 
 
