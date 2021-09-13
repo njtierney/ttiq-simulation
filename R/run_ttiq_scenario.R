@@ -9,6 +9,20 @@
 #' @export
 run_ttiq_scenario <- function(scenario_df) {
 
+  # use a Gibbs Sampler to convert distributions of time from:
+  ## "infector isolation" to "infectee isolation" into 
+  ## distributions of time from "infection" to "isolation" of cases
+  ## and therefore reduction in transmission potential
+  # Case 1 is infected at time 0 and isolated at time "inf_isol"
+  # Case 2 is infected at time "inf_inf", drawn from a lognormal
+  ## Case 1 is infected at time 0 and isolated at time "infect_isolate"
+  ## Case 2 is infected at time "infect_infect", drawn from a lognormal
+  # representing the naive generation interval distribution, truncated at 
+  # the date of Case 1 isolation.
+  # Case 2 is isolated at time: inf_isol = inf_isol + isol_isol - inf_inf
+  ## Case 2 is isolated at time: 
+  ## infect_isolate = infect_isolate + isolate_isolate - infect_infect
+  
   scenario_df %>% 
     mutate(time_to_isolation_sims = pmap(
       .l = list(
