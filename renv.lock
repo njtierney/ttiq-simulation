@@ -43,10 +43,10 @@
     },
     "R6": {
       "Package": "R6",
-      "Version": "2.5.0",
+      "Version": "2.5.1",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "b203113193e70978a696b2809525649d"
+      "Hash": "470851b6d5d0ac559e9d01bb352b4021"
     },
     "RColorBrewer": {
       "Package": "RColorBrewer",
@@ -646,10 +646,10 @@
     },
     "openssl": {
       "Package": "openssl",
-      "Version": "1.4.4",
+      "Version": "1.4.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "f4dbc5a47fd93d3415249884d31d6791"
+      "Hash": "5406fd37ef0bf9b88c8a4f264d6ec220"
     },
     "parallelly": {
       "Package": "parallelly",
@@ -860,6 +860,18 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "4079070fc210c7901c0832a3aeab894f"
+    },
+    "stickylabeller": {
+      "Package": "stickylabeller",
+      "Version": "0.0.0.9100",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "stickylabeller",
+      "RemoteUsername": "rensa",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "f22b5b3cf43c7c66d199f6d3197e702351d301b5",
+      "Hash": "6c90a3d4e201ffbb9678db30a3a9f8b3"
     },
     "stringi": {
       "Package": "stringi",

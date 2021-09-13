@@ -18,28 +18,32 @@ time_to_isolation <- function(n_chains,
                                 gi_sdlog,
                                 sim_tracing_fun) {
   # times from infection to isolation for the initial cases in each chain
-  inf_isol <- abs(rnorm(n_chains, 14, 5))
+  t_infect_isolate <- abs(rnorm(n = n_chains, 
+                                mean = 14, 
+                                sd = 5))
   
   trace_object <- matrix(NA, nrow = n_chains, ncol = n_iterations)
   # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
   # times from infection to isolation
   for (iteration in seq_len(n_iterations)) {
     # simulate a generation interval
-    inf_inf <- sim_gi_truncated(
+    t_infect_infect <- sim_gi_truncated(
       n = n_chains,
-      infection_to_isolation = inf_isol,
+      infection_to_isolation = t_infect_isolate,
       meanlog = gi_meanlog,
       sdlog = gi_sdlog
     )
     # simulate the delay from isolation of case to isolation of (infected)
     # contact, which here is independent of the other random variables
-    isol_isol <- sim_tracing_fun(n_chains) 
-    # compute the infection to isolation for the (infected) contact, based on the
-    # infection to isolation for the case, the generation interval, and the
-    # contact tracing time
-    inf_isol <- inf_isol + isol_isol - inf_inf
+    t_isolate_case_isolate_contact <- sim_tracing_fun(n_chains) 
+    # compute the infection to isolation for the (infected) contact, based on:
+      # infection to isolation for the case
+      # generation interval, and
+      # contact tracing time
+    t_infect_isolate <- 
+      t_infect_isolate + t_isolate_case_isolate_contact - t_infect_infect
     # record the time from infection to isolation in this step
-    trace_object[, iteration] <- inf_isol
+    trace_object[, iteration] <- t_infect_isolate
   }
   
   trace_object
