@@ -9,7 +9,8 @@ tar_plan(
   optimal_delay = dist_normal_truncated(mu = 0.5, sigma = 0.25, lower = 0),
   current_delay = dist_normal_truncated(mu = 2.5, sigma = 1.5, lower = 0),
   zero_delays = dist_uniform(min = 0, max = 0),
-  current_case_initiated_delay = dist_mixture(current_delay, zero_delays,
+  current_case_initiated_delay = dist_mixture(current_delay, 
+                                              zero_delays,
                                               weights = c(0.9, 0.1)),
   scenario_df = create_scenario_df(
     
@@ -21,6 +22,18 @@ tar_plan(
                          current_delay,
                          current_case_initiated_delay)
   ),
+  
+  scenario_df_run = run_ttiq_scenario(
+    scenario_df
+  ),
+  
+  # histogram of times to isolation from simulations
+  scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
+  
+  tar_render(explore, "doc/explore.Rmd")
+  
+)
+
     # change this so we can provide our own distribution
     
     ## optimal
@@ -71,21 +84,4 @@ tar_plan(
     
     # speciman collection date to earliest confirmed or probably
     
-    # date_isolate
-    # difference of these is ...
-    
     # bootstrap sample from observed
-    
-    # ideal
-  
-  scenario_df_run = run_ttiq_scenario(
-    scenario_df
-  ),
-  
-  # histogram of times to isolation from simulations
-  scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
-  
-  tar_render(explore, "doc/explore.Rmd")
-  
-
-)
