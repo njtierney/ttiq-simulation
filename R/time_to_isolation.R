@@ -30,6 +30,7 @@ time_to_isolation <- function(n_chains,
   ## infect_isolate = infect_isolate + isolate_isolate - infect_infect
   
   # times from infection to isolation for the initial cases in each chain
+  # initial values
   t_infect_isolate <- abs(rnorm(n = n_chains, 
                                 mean = 14, 
                                 sd = 5))
@@ -47,7 +48,10 @@ time_to_isolation <- function(n_chains,
     )
     # simulate the delay from isolation of case to isolation of (infected)
     # contact, which here is independent of the other random variables
-    t_isolate_case_isolate_contact <- sim_tracing_fun(n_chains) 
+    # contact trcing delay
+    # t_isolate_case_isolate_contact <- sim_tracing_fun(n_chains) 
+    t_isolate_case_isolate_contact <- generate_dbl(sim_tracing_fun, 
+                                                   times = n_chains)
     # compute the infection to isolation for the (infected) contact, based on:
       # infection to isolation for the case
       # generation interval, and

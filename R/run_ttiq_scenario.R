@@ -28,8 +28,8 @@ run_ttiq_scenario <- function(scenario_df) {
         ),
         .f = tp_reduction
       )
-    )
+    ) %>% 
   relocate(tp_multiplier,
-           .before = gi_meanlog)
+           .before = everything())
   
 }

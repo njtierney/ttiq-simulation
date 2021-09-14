@@ -10,31 +10,19 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-create_scenario_df <- function(gi_meanlog,
-                               gi_sdlog,
-                               r_start,
-                               mu,
-                               sigma,
-                               n_iterations,
-                               n_chains) {
+create_scenario_df <- function(n_iterations,
+                               n_chains,
+                               sim_tracing_funs) {
+  # parameters of naive (untruncated) generation interval / infectiousness
+  # profile
+  tibble(
+    n_iterations = n_iterations,
+    n_chains = n_chains,
+    scenario = c("optimal", "current", "current_plus_cases"),
+    sim_tracing_fun = sim_tracing_funs,
+    gi_meanlog = 1.375738,
+    gi_sdlog = 0.5665299,
+    r_start = 7.82,
+  )
   
-  expand_grid(
-    gi_meanlog = gi_meanlog,
-    gi_sdlog = gi_sdlog,
-    r_start = r_start,
-    mu = mu,
-    sigma = sigma
-  ) %>% 
-    mutate(
-      sim_tracing_fun = map2(.x = mu, 
-                             .y = sigma,
-                             .f = ~build_sim_tracing_default(
-                               mu = .x,
-                               sigma = .y
-                             )),
-      n_iterations = n_iterations,
-      n_chains = n_chains
-    )
-  
-
 }
