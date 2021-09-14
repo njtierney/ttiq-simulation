@@ -2,6 +2,12 @@
 .Rhistory
 .Rapp.history
 
+# ignore everything in the data folder
+data/
+
+# DS Store
+.DS_Store
+
 # Session Data files
 .RData
 
