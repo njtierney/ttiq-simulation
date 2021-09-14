@@ -20,7 +20,8 @@ knitr::opts_chunk$set(echo = TRUE)
 withr::with_dir(here::here(), {
   tar_load(
     c(
-      scenario_df_run
+      scenario_df_run,
+      cases_nsw_delays
       )
     )
 })
@@ -33,6 +34,38 @@ withr::with_dir(here::here(), {
 ```{r show-trace-run}
 scenario_df_run 
 ```
+
+```{r}
+
+  cases_nsw_delays %>% 
+    group_by(period) %>% 
+    summarise(
+      across(
+        .cols = c(
+          test_turnaround_time,
+          time_to_interview,
+          full_contact_delay
+          ),
+        .fns = mean
+        )
+    )
+  
+  cases_nsw_delays %>% 
+    select(test_turnaround_time,
+           time_to_interview,
+           full_contact_delay,
+           period) %>% 
+    pivot_longer(
+      cols = -period,
+      names_to = "delay_type",
+      values_to = "days"
+    ) %>% 
+    ggplot(aes(x = days)) +
+    geom_bar() + 
+    facet_grid(period~delay_type)
+  
+```
+
 
 
 ## Reproducibility

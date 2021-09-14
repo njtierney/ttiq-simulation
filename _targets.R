@@ -6,9 +6,50 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
-  tar_file(cases_nsw_path, here("data", "CASES_2021-09-12_UNSW.csv")),
+  tar_file(cases_nsw_path, here("data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx")),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
+  
+  cases_nsw_delays = cases_nsw_delays(cases_nsw),
+  
+  derive_nsw_delay_distributions = calculate_distributions(cases_nsw_delays),
+  
+  # generate samples
+  # as summarise step
+  # add delay 1 and 2 together
+  # plot these against the data
+  # also plot them as an ecdf
+  # we wanted to know the "all" (total delay time) distribution looks the same 
+  # as the expected all, which is the sum of 1 and 2
+  
+  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays),
+  
+  # analyse NSW data to get distributions of these delays (blue + yellow graphs)
+  
+  # 1. Swab
+  # 2. Notification
+  # 3. Interview
+  
+  # (assuming the infector isolates on date of swab)
+  # (assuming infectees isolate on date of interview)
+  
+  # difference of 1-2 is test turnaround time
+  # simulate random draw from this distribution
+  # difference of 2-3 is time to interview ()
+  # simulate random draw from this distribution
+  
+  # sum these random draws together
+  # this gives you the full contact tracing delay
+  # this ^^ returns what we currently have in the sim_tracing function
+  
+  ## optimal is this time period from July 2020 to Feb 2021
+  
+  ## Current is from the last month
+  
+  ## current + case initiated
+  # same as current, but we randomly set the notification to interview to 0
+  
+  # difference of 1-3 is swab to interview (full contact tracing delay)
   
   optimal_delay = dist_normal_truncated(mu = 0.5, sigma = 0.25, lower = 0),
   current_delay = dist_normal_truncated(mu = 2.5, sigma = 1.5, lower = 0),
@@ -48,33 +89,7 @@ tar_plan(
     
     ## idependent assumption
     
-    # analyse NSW data to get distributions of these delays (blue + yellow graphs)
-    
-    # 1. Swab
-    # 2. Notification
-    # 3. Interview
-    
-    # (assuming the infector isolates on date of swab)
-    # (assuming infectees isolate on date of interview)
-    
-    # difference of 1-2 is test turnaround time
-      # simulate random draw from this distribution
-    # difference of 2-3 is time to interview ()
-      # simulate random draw from this distribution
-    
-    # sum these random draws together
-    # this gives you the full contact tracing delay
-    # this ^^ returns what we currently have in the sim_tracing function
-    
-    ## optimal is this time period from July 2020 to Feb 2021
-    
-    ## Current is from the last month
-    
-    ## current + case initiated
-      # same as current, but we randomly set the notification to interview to 0
-    
-    # difference of 1-3 is swab to interview (full contact tracing delay)
-    
+   
     # delay from speciman collection to notification - this is test turaround time
     # time from notification to interview
     
