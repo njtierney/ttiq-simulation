@@ -6,6 +6,10 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
+  tar_file(cases_nsw_path, here("data", "CASES_2021-09-12_UNSW.csv")),
+  
+  cases_nsw = read_cases_nsw(cases_nsw_path),
+  
   optimal_delay = dist_normal_truncated(mu = 0.5, sigma = 0.25, lower = 0),
   current_delay = dist_normal_truncated(mu = 2.5, sigma = 1.5, lower = 0),
   zero_delays = dist_uniform(min = 0, max = 0),
