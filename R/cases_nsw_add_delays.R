@@ -7,12 +7,12 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-cases_nsw_delays <- function(cases_nsw) {
+cases_nsw_add_delays <- function(cases_nsw) {
 
   # analyse NSW data to get distributions of these delays
   
-  cases_nsw_delays <-
-  cases_nsw %>% 
+  cases_nsw_delays <- 
+    cases_nsw %>% 
     select(interview_date,
            swab_date,
            notification_date
@@ -32,8 +32,12 @@ cases_nsw_delays <- function(cases_nsw) {
         notification_date >= as_date("2020-07-01") &  notification_date <= as_date("2021-02-01") ~ "optimal",
         notification_date >= (today() - 30) ~ "current",
         TRUE ~ "outside" 
-        )
-      )
+        ),
+      .before = interview_date
+      ) %>% 
+    mutate(
+      test_to_interview = test_turnaround_time + time_to_interview
+    ) 
   
   cases_nsw_delays
   

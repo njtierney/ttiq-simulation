@@ -7,9 +7,10 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-calculate_distributions <- function(cases_nsw_delays) {
+derive_distributions <- function(cases_nsw_delays) {
   
   cases_nsw_delays %>% 
+    filter(period != "outside") %>% 
     group_by(period) %>% 
     summarise(
       across(
@@ -18,8 +19,9 @@ calculate_distributions <- function(cases_nsw_delays) {
           time_to_interview,
           full_contact_delay
         ),
-        .fns = derive_poisson_mixture
+        .fns = derive_poisson_mixture,
+        .names = "dist_{.col}"
       )
-    )
+    ) 
   
 }
