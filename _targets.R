@@ -13,7 +13,9 @@ tar_plan(
   
   cases_nsw_delays = cases_nsw_add_delays(cases_nsw),
   
-  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays),
+  cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
+  
+  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
   
   derive_nsw_delay_distributions = derive_distributions(cases_nsw_delays),
   

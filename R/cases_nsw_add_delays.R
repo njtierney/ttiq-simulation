@@ -8,36 +8,38 @@
 #' @author Nicholas Tierney
 #' @export
 cases_nsw_add_delays <- function(cases_nsw) {
-
   # analyse NSW data to get distributions of these delays
   
-  cases_nsw_delays <- 
-    cases_nsw %>% 
-    select(interview_date,
-           swab_date,
-           notification_date
-           ) %>% 
+  cases_nsw_delays <-
+    cases_nsw %>%
+    select(
+      interview_date,
+      swab_date,
+      notification_date,
+      test_turnaround_time,
+      time_to_interview,
+      full_contact_delay
+    ) %>%
     mutate(
-      test_turnaround_time = swab_date - notification_date,
-      time_to_interview = notification_date - interview_date,
-      full_contact_delay = swab_date - interview_date
-    ) %>% 
-    filter(
-      between(as.numeric(test_turnaround_time), 0, 14),
-      between(as.numeric(time_to_interview), 0, 14),
-      between(as.numeric(full_contact_delay), 0, 14)
+      across(
+        .cols = c(
+                  test_turnaround_time,
+                  time_to_interview,
+                  full_contact_delay
+                  ),
+        .fns = ~set_na_when_not_between(.x, 0, 14)
+      )
     ) %>% 
     mutate(
       period = case_when(
-        notification_date >= as_date("2020-07-01") &  notification_date <= as_date("2021-02-01") ~ "optimal",
-        notification_date >= (today() - 30) ~ "current",
-        TRUE ~ "outside" 
-        ),
+        notification_date >= as_date("2020-07-01") &
+          notification_date <= as_date("2021-02-01") ~ "optimal",
+        notification_date >= (as_date("2021-08-15")) ~ "current",
+        TRUE ~ "outside"
+      ),
       .before = interview_date
-      ) %>% 
-    mutate(
-      test_to_interview = test_turnaround_time + time_to_interview
-    ) 
+    ) %>%
+    mutate(test_to_interview = test_turnaround_time + time_to_interview)
   
   cases_nsw_delays
   
@@ -59,5 +61,5 @@ cases_nsw_add_delays <- function(cases_nsw) {
   # sum these random draws together
   # this gives you the full contact tracing delay
   # this ^^ returns what we currently have in the sim_tracing function
-
+  
 }
