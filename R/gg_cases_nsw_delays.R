@@ -10,7 +10,8 @@
 gg_cases_nsw_delays <- function(cases_nsw_delays_long) {
 
   
-  ggplot(aes(x = delay_type,
+  ggplot(cases_nsw_delays_long,
+         aes(x = delay_type,
              y = days)) + 
     geom_boxplot()
 
