@@ -40,8 +40,6 @@ tar_plan(
     nsw_delay_samples_against_data
   ),
   
-  
-  
   # plot these against the data
   # also plot them as an ecdf
   # we wanted to know the "all" (total delay time) distribution looks the same 
@@ -73,6 +71,10 @@ tar_plan(
   scenario_df_run_tp_multiplier = calculate_tp_multiplier(
     scenario_df_run
   ),
+  
+  
+  plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
+  
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
