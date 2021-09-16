@@ -21,13 +21,42 @@ withr::with_dir(here::here(), {
   tar_load(
     c(
       scenario_df_run,
-      cases_nsw_delays
+      cases_nsw_delays,
+      cases_nsw_raw_delay_long,
+      cases_nsw,
+      cases_nsw_delays_long,
+      plot_cases_nsw_delays,
+      derive_nsw_delay_distributions,
+      nsw_delay_samples,
+      nsw_delay_samples_against_data
       )
     )
 })
 # 
 # # This is not needed when using tar_make() to render the document.
 ```
+
+```{r}
+  
+  
+```
+
+
+## EDA
+
+```{r}
+cases_nsw_raw_delay_long %>% 
+    group_by(delay_type) %>% 
+    count(days, sort = TRUE) %>% 
+    mutate(prop = n / sum(n))
+  
+  
+    ggplot(aes(x = days)) + 
+    geom_histogram(binwidth = 1) + 
+    facet_wrap(~delay_type)
+```
+
+
 
 ## Analysis
 

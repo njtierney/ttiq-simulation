@@ -11,6 +11,8 @@ tar_plan(
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
+  cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw),
+  
   cases_nsw_delays = cases_nsw_add_delays(cases_nsw),
   
   cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
