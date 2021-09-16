@@ -10,8 +10,8 @@
 derive_distributions <- function(cases_nsw_delays) {
   
   cases_nsw_delays %>% 
-    filter(period != "outside") %>% 
-    group_by(period) %>% 
+    filter(scenario != "outside") %>% 
+    group_by(scenario) %>% 
     summarise(
       across(
         .cols = c(

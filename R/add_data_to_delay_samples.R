@@ -11,11 +11,11 @@
 add_data_to_delay_samples <- function(nsw_delay_samples, cases_nsw_delays) {
 
   cases_nsw_delays_renamed <- cases_nsw_delays %>% 
-    filter(period != "outside") %>% 
+    filter(scenario != "outside") %>% 
     select(-ends_with("date")) %>% 
     mutate(
       across(
-        .cols = -period,
+        .cols = -scenario,
         .fns = as.numeric
         )
     )

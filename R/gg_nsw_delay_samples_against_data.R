@@ -16,7 +16,7 @@ gg_nsw_delay_samples_against_data <- function(nsw_delay_samples_against_data) {
   
   nsw_delay_samples_against_data %>% 
     pivot_longer(
-      cols = -c(data_type, period),
+      cols = -c(data_type, scenario),
       names_to = "delay_type",
       values_to = "days"
     ) %>% 

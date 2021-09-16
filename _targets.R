@@ -26,7 +26,10 @@ tar_plan(
   
   derive_nsw_delay_distributions = derive_distributions(cases_nsw_delays),
   
-  nsw_delay_samples = generate_delay_samples(derive_nsw_delay_distributions),
+  nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
+  
+  nsw_delay_samples = generate_delay_samples(derive_nsw_delay_distributions,
+                                             n_samples = 100000),
   
   nsw_delay_samples_against_data = add_data_to_delay_samples(nsw_delay_samples,
                                                              cases_nsw_delays),
@@ -34,6 +37,8 @@ tar_plan(
   plot_nsw_delay_samples_against_data = gg_nsw_delay_samples_against_data(
     nsw_delay_samples_against_data
   ),
+  
+  
   
   # plot these against the data
   # also plot them as an ecdf
@@ -49,19 +54,22 @@ tar_plan(
   current_case_initiated_delay = dist_mixture(current_delay, 
                                               zero_delays,
                                               weights = c(0.9, 0.1)),
+  
   scenario_df = create_scenario_df(
     
     # these terms are fixed for each simulation
     n_iterations = 1000,
     n_chains = 50,
     # parameters for sim_tracing
-    sim_tracing_funs = c(optimal_delay,
-                         current_delay,
-                         current_case_initiated_delay)
+    sim_tracing_funs = nsw_delay_dist_funs
   ),
   
   scenario_df_run = run_ttiq_scenario(
     scenario_df
+  ),
+  
+  scenario_df_run_tp_multiplier = calculate_tp_multiplier(
+    scenario_df_run
   ),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)

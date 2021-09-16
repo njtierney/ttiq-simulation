@@ -38,7 +38,19 @@ withr::with_dir(here::here(), {
 
 ```{r}
   
-  
+  cases_nsw %>%
+    select(
+      interview_date,
+      swab_date,
+      notification_date,
+      test_turnaround_time,
+      time_to_interview,
+      full_contact_delay
+    )
+```
+
+```{r}
+derive_nsw_delay_distributions
 ```
 
 
@@ -67,7 +79,7 @@ scenario_df_run
 ```{r}
 
   cases_nsw_delays %>% 
-    group_by(period) %>% 
+    group_by(scenario) %>% 
     summarise(
       across(
         .cols = c(
@@ -83,15 +95,15 @@ scenario_df_run
     select(test_turnaround_time,
            time_to_interview,
            full_contact_delay,
-           period) %>% 
+           scenario) %>% 
     pivot_longer(
-      cols = -period,
+      cols = -scenario,
       names_to = "delay_type",
       values_to = "days"
     ) %>% 
     ggplot(aes(x = days)) +
     geom_bar() + 
-    facet_grid(period~delay_type)
+    facet_grid(scenario~delay_type)
   
 ```
 

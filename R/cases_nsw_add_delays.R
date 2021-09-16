@@ -31,7 +31,7 @@ cases_nsw_add_delays <- function(cases_nsw) {
       )
     ) %>% 
     mutate(
-      period = case_when(
+      scenario = case_when(
         notification_date >= as_date("2020-07-01") &
           notification_date <= as_date("2021-02-01") ~ "optimal",
         notification_date >= (as_date("2021-08-15")) ~ "current",

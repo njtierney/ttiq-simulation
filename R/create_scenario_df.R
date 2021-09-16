@@ -18,11 +18,14 @@ create_scenario_df <- function(n_iterations,
   tibble(
     n_iterations = n_iterations,
     n_chains = n_chains,
-    scenario = c("optimal", "current", "current_plus_cases"),
-    sim_tracing_fun = sim_tracing_funs,
+    scenario = c("optimal", "current"),
     gi_meanlog = 1.375738,
     gi_sdlog = 0.5665299,
     r_start = 7.82,
-  )
+  ) %>% 
+    left_join(
+      sim_tracing_funs,
+      by = "scenario"
+    )
   
 }
