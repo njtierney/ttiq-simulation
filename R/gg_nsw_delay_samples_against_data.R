@@ -38,7 +38,12 @@ gg_nsw_delay_samples_against_data <- function(nsw_delay_samples_against_data) {
                                     "swab_to_notification",
                                     "notification_to_interview",
                                     "other_delays"
-                                    )) %>% 
+                                    ),
+           scenario = as_factor(scenario),
+           scenario = fct_relevel(scenario,
+                                  "optimal",
+                                  "current",
+                                  "current_case_init")) %>% 
   ggplot(aes(x = days,
              colour = data_type)) + 
     # Don't go to positive/negative infinity

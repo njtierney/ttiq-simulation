@@ -16,17 +16,23 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     mutate(scenario = as_factor(scenario),
            scenario = fct_relevel(scenario,
                                   "optimal",
-                                  "current"),
-           tp_reduction = glue("{percent(1 - tp_multiplier)} reduction")
-    ) %>% 
-    relocate(tp_reduction)
+                                  "current"))
   
   df_annotate <- cases_tp_reduction %>% 
+    group_by(scenario) %>% 
+    mutate(avg_days = mean(time_to_isolation_sims)) %>% 
+    ungroup() %>% 
+    mutate(tp_reduction = glue("{percent(1 - tp_multiplier)} reduction"),
+           avg_days = glue("{round(avg_days)} day average"),
+           message = glue("{tp_reduction}\n{avg_days}")) %>% 
+    relocate(tp_reduction) %>% 
     select(tp_reduction,
-           scenario) %>% 
+           scenario,
+           avg_days,
+           message) %>% 
     distinct() %>% 
-    mutate(x = c(12, 4),
-           y = c(3500, 125))
+    mutate(x = c(13, 2, 2),
+           y = c(3200, 100, 100))
   
   ggplot(cases_tp_reduction,
          aes(x = time_to_isolation_sims,
@@ -48,7 +54,7 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       x = c(0,14)
     ) + 
     geom_text(data = df_annotate,
-              aes(x = x, y = y, label = tp_reduction)) +
+              aes(x = x, y = y, label = message)) +
     theme(legend.position = "none")
 
 }

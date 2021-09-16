@@ -14,7 +14,7 @@ create_dist_sim_fun <- function(derive_nsw_delay_distributions) {
     mutate(
       sim_tracing_fun = pmap(
         .l = list(d1 = dist_isol_swab,
-                  d2 =dist_test_turnaround_time,
+                  d2 = dist_test_turnaround_time,
                   d3 = dist_time_to_interview),
         .f = get_sim_fun
         )

@@ -26,7 +26,10 @@ tar_plan(
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
   
-  derive_nsw_delay_distributions = derive_distributions(cases_nsw_delays),
+  derive_nsw_delay_distributions = derive_distributions(
+    cases_nsw_delays,
+    prop_current_case_zero = 0.8
+    ),
   
   nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
   
@@ -39,21 +42,6 @@ tar_plan(
   plot_nsw_delay_samples_against_data = gg_nsw_delay_samples_against_data(
     nsw_delay_samples_against_data
   ),
-  
-  # plot these against the data
-  # also plot them as an ecdf
-  # we wanted to know the "all" (total delay time) distribution looks the same 
-  # as the expected all, which is the sum of 1 and 2
-  # then plug these into the ttiq running step
-  
-  
-  optimal_delay = dist_normal_truncated(mu = 0.5, sigma = 0.25, lower = 0),
-  current_delay = dist_normal_truncated(mu = 2.5, sigma = 1.5, lower = 0),
-  zero_delays = dist_uniform(min = 0, max = 0),
-  
-  current_case_initiated_delay = dist_mixture(current_delay, 
-                                              zero_delays,
-                                              weights = c(0.9, 0.1)),
   
   scenario_df = create_scenario_df(
     
@@ -74,6 +62,9 @@ tar_plan(
   
   
   plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
+  
+  write_plots = ggsave_these_plots(plot_nsw_delay_samples_against_data,
+                                   plot_nsw_tp_reduction),
   
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)

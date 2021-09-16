@@ -20,7 +20,7 @@ add_data_to_delay_samples <- function(nsw_delay_samples, cases_nsw_delays) {
         )
     )
   
-  nsw_delay_samples_renames <- nsw_delay_samples %>% 
+  nsw_delay_samples_renamed <- nsw_delay_samples %>% 
     rename_with(
       .fn = ~str_remove_all(.x, "samples_"),
       .cols = starts_with("samples_")
@@ -28,9 +28,9 @@ add_data_to_delay_samples <- function(nsw_delay_samples, cases_nsw_delays) {
   
   bind_rows(
     data = cases_nsw_delays_renamed,
-    samples = nsw_delay_samples_renames,
+    samples = nsw_delay_samples_renamed,
     .id = "data_type"
-  )
+  ) 
     
 
 }

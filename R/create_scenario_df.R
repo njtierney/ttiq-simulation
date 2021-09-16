@@ -15,17 +15,13 @@ create_scenario_df <- function(n_iterations,
                                sim_tracing_funs) {
   # parameters of naive (untruncated) generation interval / infectiousness
   # profile
-  tibble(
-    n_iterations = n_iterations,
-    n_chains = n_chains,
-    scenario = c("optimal", "current"),
-    gi_meanlog = 1.375738,
-    gi_sdlog = 0.5665299,
-    r_start = 7.82,
-  ) %>% 
-    left_join(
-      sim_tracing_funs,
-      by = "scenario"
+  sim_tracing_funs %>%
+    mutate(
+      n_iterations = n_iterations,
+      n_chains = n_chains,
+      gi_meanlog = 1.375738,
+      gi_sdlog = 0.5665299,
+      r_start = 7.82
     )
   
 }
