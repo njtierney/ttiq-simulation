@@ -5,6 +5,10 @@
 # ignore everything in the data folder
 data/
 
+# ignore figures in docs
+doc/*/figure-html/
+doc/*.md
+
 # DS Store
 .DS_Store
 

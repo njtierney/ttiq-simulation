@@ -31,13 +31,15 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
            avg_days,
            message) %>% 
     distinct() %>% 
-    mutate(x = c(13, 2, 2),
-           y = c(3200, 100, 100))
+    arrange(scenario) %>% 
+    mutate(x = c(13, 1, 13),
+           y = c(5000, 130, 4000))
   
   ggplot(cases_tp_reduction,
          aes(x = time_to_isolation_sims,
              fill = scenario)) +
-    geom_histogram(colour = "white") + 
+    geom_histogram(colour = "white",
+                   binwidth = 1) + 
     facet_wrap(~ scenario,
                ncol = 1,
                scales = "free_y") + 
@@ -51,7 +53,7 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       palette = "Dark2"
     ) + 
     lims(
-      x = c(0,14)
+      x = c(-1,14)
     ) + 
     geom_text(data = df_annotate,
               aes(x = x, y = y, label = message)) +

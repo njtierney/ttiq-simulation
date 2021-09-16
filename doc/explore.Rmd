@@ -2,11 +2,19 @@
 title: "Untitled Draft"
 author: "Report Author"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
-output: html_document
+output: 
+  html_document:
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(
+  echo = TRUE,
+  fig.height=10,
+  fig.width = 10,
+  dev = "png",
+  dpi = 300
+  )
 ## target knits Rmds in their own session, so load libraries here.
 ## source("here::here(packages.R"))
 ```
@@ -28,13 +36,17 @@ withr::with_dir(here::here(), {
       plot_cases_nsw_delays,
       derive_nsw_delay_distributions,
       nsw_delay_samples,
-      nsw_delay_samples_against_data
+      nsw_delay_samples_against_data,
+      plot_nsw_delay_samples_against_data,
+      plot_nsw_tp_reduction
       )
     )
 })
 # 
 # # This is not needed when using tar_make() to render the document.
 ```
+
+
 
 ```{r}
   
@@ -76,6 +88,17 @@ derive_nsw_delay_distributions
 #            .after = tp_multiplier)  %>% 
 #   mutate(tti_sims = map())
 ```
+
+## Figures
+
+```{r plot-nsw-delay-samples-against-data}
+plot_nsw_delay_samples_against_data
+```
+
+```{r plot-nsw-tp-reduction}
+plot_nsw_tp_reduction
+```
+
 
 
 ## Analysis
