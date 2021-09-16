@@ -55,9 +55,9 @@ read_cases_nsw <- function(cases_nsw_path) {
       )
     ) %>%
     mutate(
-      test_turnaround_time = as.numeric(swab_date - notification_date),
-      time_to_interview = as.numeric(notification_date - interview_date),
-      full_contact_delay = as.numeric(swab_date - interview_date)
+      test_turnaround_time = as.numeric(notification_date - swab_date),
+      time_to_interview = as.numeric(interview_date - notification_date),
+      full_contact_delay = as.numeric(interview_date - swab_date)
     )
   
   nsw_cases
