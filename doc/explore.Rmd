@@ -57,24 +57,24 @@ derive_nsw_delay_distributions
 ## EDA
 
 ```{r}
-cases_nsw_raw_delay_long %>% 
-    group_by(delay_type) %>% 
-    count(days, sort = TRUE) %>% 
-    mutate(prop = n / sum(n))
-  
-  
-    ggplot(aes(x = days)) + 
-    geom_histogram(binwidth = 1) + 
-    facet_wrap(~delay_type)
+# cases_nsw_raw_delay_long %>% 
+#     group_by(delay_type) %>% 
+#     count(days, sort = TRUE) %>% 
+#     mutate(prop = n / sum(n))
+#   
+#   
+#     ggplot(aes(x = days)) + 
+#     geom_histogram(binwidth = 1) + 
+#     facet_wrap(~delay_type)
 ```
 
 
 ```{r}
-scenario_df_run_tp_multiplier %>% 
-  relocate(time_to_isolation_sims,
-           sim_tracing_fun,
-           .after = tp_multiplier)  %>% 
-  mutate(tti_sims = map())
+# scenario_df_run_tp_multiplier %>% 
+#   relocate(time_to_isolation_sims,
+#            sim_tracing_fun,
+#            .after = tp_multiplier)  %>% 
+#   mutate(tti_sims = map())
 ```
 
 
