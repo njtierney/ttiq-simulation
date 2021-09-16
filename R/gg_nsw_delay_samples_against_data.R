@@ -31,7 +31,7 @@ gg_nsw_delay_samples_against_data <- function(nsw_delay_samples_against_data) {
              colour = data_type)) + 
     # Don't go to positive/negative infinity
     stat_ecdf(geom = "step", pad = FALSE) + 
-    facet_wrap(~ delay_type) +
+    facet_grid(scenario~ delay_type) +
     theme(aspect.ratio = 1) + 
     scale_colour_brewer(palette = "Dark2")
          

@@ -10,6 +10,6 @@
 #' @export
 get_sim_fun <- function (d1, d2) {
   function(n) {
-    generate(d1, n)[[1]] + generate(d2, n)[[1]]
+    generate(d1, n) + generate(d2, n)
   }
 }

@@ -69,6 +69,14 @@ cases_nsw_raw_delay_long %>%
 ```
 
 
+```{r}
+scenario_df_run_tp_multiplier %>% 
+  relocate(time_to_isolation_sims,
+           sim_tracing_fun,
+           .after = tp_multiplier)  %>% 
+  mutate(tti_sims = map())
+```
+
 
 ## Analysis
 

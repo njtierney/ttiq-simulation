@@ -12,8 +12,9 @@ create_dist_sim_fun <- function(derive_nsw_delay_distributions) {
   
   derive_nsw_delay_distributions %>%
     mutate(
-      sim_tracing_fun = list(get_sim_fun(dist_test_turnaround_time, 
-                                 dist_time_to_interview))
+      sim_tracing_fun = map2(.x = dist_test_turnaround_time, 
+                             .y = dist_time_to_interview,
+                             .f = ~get_sim_fun(.x, .y))
     ) %>% 
     select(scenario,
            sim_tracing_fun)
