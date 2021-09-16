@@ -17,11 +17,13 @@ derive_distributions <- function(cases_nsw_delays) {
         .cols = c(
           test_turnaround_time,
           time_to_interview,
-          full_contact_delay
+          # full_contact_delay
         ),
         .fns = derive_poisson_mixture,
         .names = "dist_{.col}"
       )
-    ) 
+    ) %>% 
+    mutate(dist_isol_swab = dist_poisson(1),
+           .before = dist_test_turnaround_time)
   
 }

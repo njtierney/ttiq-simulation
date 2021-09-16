@@ -20,6 +20,8 @@ tar_plan(
   
   cases_nsw_delays = cases_nsw_add_delays(cases_nsw),
   
+  are_cases_independent = check_cases_independence(cases_nsw_delays),
+  
   cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),

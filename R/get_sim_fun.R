@@ -8,8 +8,13 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-get_sim_fun <- function (d1, d2) {
+get_sim_fun <- function (...) {
+  distributions <- list(...)
   function(n) {
-    generate(d1, n) + generate(d2, n)
+    sims <- lapply(distributions, generate, n)
+    Reduce(
+      f = "+",
+      x = sims
+      )
   }
 }
