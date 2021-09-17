@@ -7,12 +7,8 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-gg_nsw_delay_samples_against_data <- function(nsw_delay_samples_against_data) {
+prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
 
-  # plot these against the data
-  # also plot them as an ecdf
-  # we wanted to know the "all" (total delay time) distribution looks the same 
-  # as the expected all, which is the sum of 1 and 2
   
   nsw_delay_samples_against_data %>% 
     rename(
@@ -38,26 +34,11 @@ gg_nsw_delay_samples_against_data <- function(nsw_delay_samples_against_data) {
                                     "swab_to_notification",
                                     "notification_to_interview",
                                     "other_delays"
-                                    ),
+           ),
            scenario = as_factor(scenario),
            scenario = fct_relevel(scenario,
                                   "optimal",
                                   "current",
-                                  "current_case_init")) %>% 
-  ggplot(aes(x = days,
-             colour = data_type)) + 
-    # Don't go to positive/negative infinity
-    stat_ecdf(geom = "step", pad = FALSE) + 
-    facet_grid(scenario ~ delay_type) +
-    theme_bw() +
-    theme(aspect.ratio = 1) + 
-    scale_colour_brewer(palette = "Dark2") + 
-    labs(
-      title = "Assumed contact tracing delays for model and data",
-      x = "Days",
-      y = "Proportion processed by",
-      colour = ""
-    )
-         
+                                  "current_case_init"))
 
 }

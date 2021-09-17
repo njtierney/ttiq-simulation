@@ -47,7 +47,8 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     labs(
       fill = "",
       y = "Count",
-      x = "# days from isolation to infection"
+      # x = "# days from isolation to infection"
+      x = "# days from infection to isolation"
     ) + 
     scale_fill_brewer(
       palette = "Dark2"
