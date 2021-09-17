@@ -7,7 +7,7 @@ lapply(list.files("./R", full.names = TRUE), source)
 tar_plan(
   
   tar_file(cases_nsw_path, 
-           here("data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx")),
+           "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
