@@ -39,8 +39,12 @@ tar_plan(
   nsw_delay_samples_against_data = add_data_to_delay_samples(nsw_delay_samples,
                                                              cases_nsw_delays),
   
-  plot_nsw_delay_samples_against_data = gg_nsw_delay_samples_against_data(
+  prepared_cases_for_plots = prepare_case_samples_for_plots(
     nsw_delay_samples_against_data
+    ),
+  
+  plot_ecdf_nsw_delay_samples_v_data = gg_ecdf_nsw_delay_samples_against_data(
+    prepared_cases_for_plots
   ),
   
   scenario_df = create_scenario_df(
@@ -62,10 +66,6 @@ tar_plan(
   
   
   plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
-  
-  write_plots = ggsave_these_plots(plot_nsw_delay_samples_against_data,
-                                   plot_nsw_tp_reduction),
-  
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
