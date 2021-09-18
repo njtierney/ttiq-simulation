@@ -10,7 +10,7 @@
 prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
 
   
-  plot_data <- nsw_delay_samples_against_data %>% 
+  nsw_delay_samples_against_data %>% 
     rename(
       other_delays = isol_swab,
       swab_to_notification = test_turnaround_time,
@@ -53,32 +53,4 @@ prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
       fraction = count / sum(count)
     )
   
-  plot_data %>%
-    ggplot() + 
-    # Don't go to positive/negative infinity
-    geom_col(
-      aes(x = days,
-          y = fraction),
-      fill = grey(0.5),
-      data = filter(plot_data,
-                    data_type == "model")
-    ) + 
-    geom_point(
-      aes(x = days,
-          y = fraction),
-      shape = 16,
-      data = filter(plot_data,
-                    data_type == "data",
-                    fraction > 0.005)
-    ) + 
-    facet_grid(scenario ~ delay_type) +
-    theme_bw() +
-    theme(aspect.ratio = 1) + 
-    scale_colour_brewer(palette = "Dark2") + 
-    labs(
-      title = "Assumed contact tracing delays (dots = data)",
-      x = "Days",
-      y = "Proportion of cases with delay",
-      colour = ""
-    )
 }
