@@ -7,16 +7,21 @@
 #' @param n_iterations
 #' @param gi_meanlog
 #' @param gi_sdlog
+#' @param passive_distribution
+#' @param max_prob_passive
 #' @param r_start
 #' @param sim_tracing_fun
 #' @return
 #' @author Nicholas Tierney
 #' @export
 time_to_isolation <- function(n_chains,
-                                n_iterations,
-                                gi_meanlog,
-                                gi_sdlog,
-                                sim_tracing_fun) {
+                              n_iterations,
+                              gi_meanlog,
+                              gi_sdlog,
+                              p_active_detection,
+                              p_passive_detection,
+                              passive_distribution,
+                              sim_tracing_fun) {
   # use a Gibbs Sampler to convert distributions of time from:
       # "infector isolation" to "infectee isolation" into 
       # distributions of time from "infection" to "isolation" of cases
@@ -46,18 +51,40 @@ time_to_isolation <- function(n_chains,
       meanlog = gi_meanlog,
       sdlog = gi_sdlog
     )
+  
     # simulate the delay from isolation of case to isolation of (infected)
-    # contact, which here is independent of the other random variables
-    # contact trcing delay
+    # contact, based on contact tracing alone
+    # (independent of the other random variables)
     t_isolate_case_isolate_contact <- sim_tracing_fun(n_chains)
-    # t_isolate_case_isolate_contact <- generate_dbl(sim_tracing_fun, 
-    #                                                times = n_chains)
-    # compute the infection to isolation for the (infected) contact, based on:
+    
+    # compute the infection to isolation for the (infected) contact, *if* they
+    # were found by contact tracing and not passive detection, based on:
       # infection to isolation for the case
       # generation interval, and
       # contact tracing time
-    t_infect_isolate <- 
+    t_infect_isolate_ct_only <- 
       t_infect_isolate + t_isolate_case_isolate_contact - t_infect_infect
+    
+    # compute infection to isolation for the contact *if* they
+    # were found by passive detection and not contact tracing
+    t_infect_isolate_passive_only <- generate(passive_distribution, n_chains)[[1]]
+    
+    # assuming they are found by either active, passive, or both, sample which
+    # would find them
+    found_by <- r_if_either(n_chains,
+                            p_active_detection,
+                            p_passive_detection)
+    
+    # get the earliest of the delays for each
+    time_to_active = ifelse(found_by$a, t_infect_isolate_ct_only, Inf)
+    time_to_passive = ifelse(found_by$b, t_infect_isolate_passive_only, Inf)
+    t_infect_isolate <- pmin(time_to_active, time_to_passive)
+    
+    # the case where they are not found either during the detectable period by
+    # passive detection, or due to contact tracing from source (ie. ignoring
+    # that they could be found later by backtracing) is handled in computing the
+    # TP reduction
+    
     # record the time from infection to isolation in this step
     trace_object[, iteration] <- t_infect_isolate
   }

@@ -9,7 +9,7 @@
 #' @export
 calculate_tp_multiplier <- function(scenario_df_run) {
   scenario_df_run %>%
-    mutate(tp_multiplier = pmap_dbl(
+    mutate(tp_multiplier_if_found = pmap_dbl(
       .l = list(
         inf_isol = time_to_isolation_sims,
         meanlog = gi_meanlog,
@@ -17,7 +17,15 @@ calculate_tp_multiplier <- function(scenario_df_run) {
       ),
       .f = tp_reduction
     )) %>%
-    relocate(tp_multiplier,
-             .before = everything())
+    # adjust tp multiplier for the probability of missing a case entirely
+    mutate(
+      p_missed = (1 - p_active_detection) * (1 - p_passive_detection),
+      tp_multiplier = tp_multiplier_if_found * (1 - p_missed) + 1 * p_missed
+    ) %>%
+    relocate(
+      tp_multiplier, 
+      tp_multiplier_if_found,
+      .before = everything()
+    )
   
 }
