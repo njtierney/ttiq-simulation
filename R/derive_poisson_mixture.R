@@ -11,17 +11,24 @@ derive_poisson_mixture <- function(x) {
   x <- as.numeric(x)
   
   if (all(x == 0)) {
-    return(dist_uniform(0, 0))
+    return(dist_degenerate(0))
   }
   
-  coefs <- zeroinfl(x ~ 1 | 1)$coefficients
+  coefs <- hurdle(x ~ 1)$coefficients
   rate <- exp(coefs$count)
-  p_extra_zero <- plogis(coefs$zero)
-  n <- length(x)
-  dist_mixture(
-    dist_uniform(0, 0),
+  p_nonzero <- plogis(coefs$zero)
+  
+  
+  zero <- dist_degenerate(0)
+  nonzero_poisson <- dist_truncated(
     dist_poisson(lambda = rate),
-    weights = c(p_extra_zero, 1 - p_extra_zero)
+    lower = 0
+  )
+  
+  dist_mixture(
+    zero,
+    nonzero_poisson,
+    weights = c(1 - p_nonzero, p_nonzero)
   )
   
 }
