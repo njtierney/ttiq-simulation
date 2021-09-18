@@ -28,7 +28,7 @@ tar_plan(
   
   derive_nsw_delay_distributions = derive_distributions(
     cases_nsw_delays,
-    prop_current_case_zero = 0.5
+    prop_current_case_zero = 0.8
     ),
   
   nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
@@ -58,7 +58,7 @@ tar_plan(
     p_active_detection = 0.9,
     # the probability of being found via passive detection (based on symptoms)
     # if not by contact tracing
-    p_passive_detection = 0.3,
+    p_passive_detection = 0.15,
     # if found by passive case detection (assuming contact tracing not in
     # place), the distribution of times from infection to detection
     passive_distribution = list(get_passive_distribution())
