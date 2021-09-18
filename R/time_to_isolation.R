@@ -76,13 +76,9 @@ time_to_isolation <- function(n_chains,
                             p_passive_detection)
     
     # get the earliest of the delays for each
-    t_infect_isolate <- found_by %>%
-      mutate(
-        time_to_active = if_else(a, t_infect_isolate_ct_only, Inf),
-        time_to_passive = if_else(b, t_infect_isolate_passive_only, Inf),
-        time_to_earliest = pmin(time_to_active, time_to_passive)
-      ) %>%
-      pull(time_to_earliest)
+    time_to_active = ifelse(found_by$a, t_infect_isolate_ct_only, Inf)
+    time_to_passive = ifelse(found_by$b, t_infect_isolate_passive_only, Inf)
+    t_infect_isolate <- pmin(time_to_active, time_to_passive)
     
     # the case where they are not found either during the detectable period by
     # passive detection, or due to contact tracing from source (ie. ignoring

@@ -44,7 +44,7 @@ r_if_either <- function(n, p_a, p_b) {
   a_if_either <- rbinom(n, 1, p_a_if_either)
   
   # combine into results object
-  tibble(
+  data.frame(
     a = both | a_if_either,
     b = both | (1 - a_if_either)
   )
