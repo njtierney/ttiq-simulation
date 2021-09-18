@@ -47,13 +47,16 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
+  passive_detection_distribution = get_passive_distribution(),
+  
   scenario_df = create_scenario_df(
-    
     # these terms are fixed for each simulation
     n_iterations = 1000,
     n_chains = 50,
     # parameters for sim_tracing
-    sim_tracing_funs = nsw_delay_dist_funs
+    sim_tracing_funs = nsw_delay_dist_funs,
+    passive_distribution = list(passive_detection_distribution),
+    max_prob_passive = 0.5
   ),
   
   scenario_df_run = run_ttiq_scenario(

@@ -16,6 +16,8 @@ run_ttiq_scenario <- function(scenario_df) {
           n_iterations = n_iterations,
           gi_meanlog = gi_meanlog,
           gi_sdlog = gi_sdlog,
+          passive_distribution = passive_distribution,
+          max_prob_passive = max_prob_passive,
           sim_tracing_fun = sim_tracing_fun
         ),
         .f = time_to_isolation

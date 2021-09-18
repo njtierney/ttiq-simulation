@@ -12,7 +12,9 @@
 #' @export
 create_scenario_df <- function(n_iterations,
                                n_chains,
-                               sim_tracing_funs) {
+                               sim_tracing_funs,
+                               passive_distribution,
+                               max_prob_passive) {
   # parameters of naive (untruncated) generation interval / infectiousness
   # profile
   sim_tracing_funs %>%
@@ -21,6 +23,8 @@ create_scenario_df <- function(n_iterations,
       n_chains = n_chains,
       gi_meanlog = 1.375738,
       gi_sdlog = 0.5665299,
+      passive_distribution = passive_distribution,
+      max_prob_passive = max_prob_passive,
       r_start = 7.82
     )
   
