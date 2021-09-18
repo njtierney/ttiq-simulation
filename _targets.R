@@ -28,7 +28,7 @@ tar_plan(
   
   derive_nsw_delay_distributions = derive_distributions(
     cases_nsw_delays,
-    prop_current_case_zero = 0.8
+    prop_current_case_zero = 0.5
     ),
   
   nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
@@ -47,16 +47,21 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
-  passive_detection_distribution = get_passive_distribution(),
-  
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
     n_iterations = 1000,
     n_chains = 50,
     # parameters for sim_tracing
     sim_tracing_funs = nsw_delay_dist_funs,
-    passive_distribution = list(passive_detection_distribution),
-    max_prob_passive = 0.5
+    # the probability of ever being found via contact tracing if not by passive
+    # detection
+    p_active_detection = 0.9,
+    # the probability of being found via passive detection (based on symptoms)
+    # if not by contact tracing
+    p_passive_detection = 0.3,
+    # if found by passive case detection (assuming contact tracing not in
+    # place), the distribution of times from infection to detection
+    passive_distribution = list(get_passive_distribution())
   ),
   
   scenario_df_run = run_ttiq_scenario(

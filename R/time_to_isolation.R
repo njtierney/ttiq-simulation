@@ -18,8 +18,9 @@ time_to_isolation <- function(n_chains,
                               n_iterations,
                               gi_meanlog,
                               gi_sdlog,
+                              p_active_detection,
+                              p_passive_detection,
                               passive_distribution,
-                              max_prob_passive,
                               sim_tracing_fun) {
   # use a Gibbs Sampler to convert distributions of time from:
       # "infector isolation" to "infectee isolation" into 
@@ -64,12 +65,29 @@ time_to_isolation <- function(n_chains,
     t_infect_isolate_ct_only <- 
       t_infect_isolate + t_isolate_case_isolate_contact - t_infect_infect
     
-    # combine this with the passive detection model to simulate the actual time from infection to isolation
-    t_infect_isolate <- sample_infection_isolation(
-      infection_ct_delay = t_infect_isolate_ct_only,
-      passive_detection_distribution = passive_distribution,
-      max_prob_passive = max_prob_passive
-    )
+    # compute infection to isolation for the contact *if* they
+    # were found by passive detection and not contact tracing
+    t_infect_isolate_passive_only <- generate(passive_distribution, n_chains)[[1]]
+    
+    # assuming they are found by either active, passive, or both, sample which
+    # would find them
+    found_by <- r_if_either(n_chains,
+                            p_active_detection,
+                            p_passive_detection)
+    
+    # get the earliest of the delays for each
+    t_infect_isolate <- found_by %>%
+      mutate(
+        time_to_active = if_else(a, t_infect_isolate_ct_only, Inf),
+        time_to_passive = if_else(b, t_infect_isolate_passive_only, Inf),
+        time_to_earliest = pmin(time_to_active, time_to_passive)
+      ) %>%
+      pull(time_to_earliest)
+    
+    # the case where they are not found either during the detectable period by
+    # passive detection, or due to contact tracing from source (ie. ignoring
+    # that they could be found later by backtracing) is handled in computing the
+    # TP reduction
     
     # record the time from infection to isolation in this step
     trace_object[, iteration] <- t_infect_isolate
