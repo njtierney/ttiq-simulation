@@ -53,3 +53,6 @@ _targets/
 
 # renv via capsule
 renv/
+
+# renv's .Rprofile setup
+.Rprofile
