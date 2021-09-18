@@ -39,6 +39,18 @@ prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
            scenario = fct_relevel(scenario,
                                   "optimal",
                                   "current",
-                                  "current_case_init"))
-
+                                  "current_case_init")) %>% 
+    group_by(
+      scenario, delay_type, data_type, days
+    ) %>%
+    summarise(
+      count = n()
+    ) %>%
+    group_by(
+      scenario, delay_type, data_type
+    ) %>%
+    mutate(
+      fraction = count / sum(count)
+    )
+  
 }

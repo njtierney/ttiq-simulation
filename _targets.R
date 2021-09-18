@@ -43,7 +43,7 @@ tar_plan(
     nsw_delay_samples_against_data
     ),
   
-  plot_ecdf_nsw_delay_samples_v_data = gg_ecdf_nsw_delay_samples_against_data(
+  plot_hist_nsw_delay_samples_v_data = gg_hist_nsw_delay_samples_against_data(
     prepared_cases_for_plots
   ),
   
