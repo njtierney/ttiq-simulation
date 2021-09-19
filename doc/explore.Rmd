@@ -37,7 +37,7 @@ withr::with_dir(here::here(), {
       derive_nsw_delay_distributions,
       nsw_delay_samples,
       nsw_delay_samples_against_data,
-      plot_nsw_delay_samples_against_data,
+      plot_hist_nsw_delay_samples_v_data,
       plot_nsw_tp_reduction
       )
     )
@@ -91,8 +91,8 @@ derive_nsw_delay_distributions
 
 ## Figures
 
-```{r plot-nsw-delay-samples-against-data}
-plot_nsw_delay_samples_against_data
+```{r plot-hist-nsw-delay-samples-v-data}
+plot_hist_nsw_delay_samples_v_data
 ```
 
 ```{r plot-nsw-tp-reduction}

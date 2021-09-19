@@ -33,7 +33,7 @@ gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     distinct() %>% 
     arrange(scenario) %>% 
     mutate(x = c(13, 1, 13),
-           y = c(5000, 4000, 4000))
+           y = c(5000, 3000, 4000))
   
   ggplot(cases_tp_reduction,
          aes(x = time_to_isolation_sims,
