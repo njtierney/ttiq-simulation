@@ -44,6 +44,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
   
   scenario_vaccination_isolation %>% 
     mutate(
+      # flip found and vaccination
       tp_mult_vacc_found = tp * vaccination_multiplier * (isolation_stringency * tp_multiplier),
       tp_mult_not_vacc_found = tp * 1,
       tp_mult_vacc_not_found = tp * vaccination_multiplier,
@@ -51,10 +52,18 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
       pr_found_given_vacc = 1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
       pr_found_given_not_vacc = (1 - (1 - p_active_detection) * (1 - p_passive_detection)),
       weight_vacc_found = pr_found_given_vacc * pr_vaccination_cases,
-      weight_not_vacc_found = ,
-      weight_vacc_not_found = ,
-      weight_not_vacc_not_found = ,
-    )
+      weight_not_vacc_found = pr_found_given_not_vacc * (1 - pr_vaccination_cases),
+      weight_vacc_not_found = (1 - pr_found_given_vacc) *  pr_vaccination_cases,
+      weight_not_vacc_not_found = (1 - pr_found_given_not_vacc) * (1 - pr_vaccination_cases)
+    ) %>% 
+    mutate(sanity_check = across(
+      .cols(
+        starts_with("weight_"),
+      ),
+      .fns = sum
+      )
+    ) # then multiply and sum them together.
+  # 
   
   # so above is the tp_multiplier for each group
   # to then work out the population fraction of each of these groups, we do 

@@ -8,7 +8,7 @@ tar_plan(
   
   tar_file(cases_nsw_path, 
            "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
-  
+   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw),
