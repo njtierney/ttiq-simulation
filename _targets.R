@@ -61,6 +61,9 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
+  p_active_detection = 0.9,
+  p_passive_detection = 0.3,
+  
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
     n_iterations = 1000,
@@ -69,10 +72,10 @@ tar_plan(
     sim_tracing_funs = delay_dist_funs,
     # the probability of ever being found via contact tracing if not by passive
     # detection
-    p_active_detection = 0.9,
+    p_active_detection = p_active_detection,
     # the probability of being found via passive detection (based on symptoms)
     # if not by contact tracing
-    p_passive_detection = 0.15,
+    p_passive_detection = p_passive_detection,
     # if found by passive case detection (assuming contact tracing not in
     # place), the distribution of times from infection to detection
     passive_distribution = list(get_passive_distribution())
@@ -90,15 +93,16 @@ tar_plan(
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
-    p_passive_detection_vaccinated = 0.15,
-    p_passive_detection = 0.15,
-    p_active_detection = 0.85,
+    p_passive_detection_vaccinated = 0.50,
+    p_active_detection = p_active_detection,
+    p_passive_detection = p_passive_detection,
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
     # isn't this estimated from the data?
     tp_multiplier = 0.46,
     tp = 7.82,
     isolation_stringency = seq(0, 1, by = 0.2),
     vaccination_coverage = seq(0.6, 0.9, by = 0.1),
+    # this will be computed from vaccination coverage function
     pr_vaccination_cases = 0.72,
   ), 
   
