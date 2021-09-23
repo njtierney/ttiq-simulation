@@ -51,9 +51,9 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
       pr_found_given_vacc = 1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
       pr_found_given_not_vacc = (1 - (1 - p_active_detection) * (1 - p_passive_detection)),
       weight_vacc_found = pr_found_given_vacc * pr_vaccination_cases,
-      weight_not_vacc_found = ,
-      weight_vacc_not_found = ,
-      weight_not_vacc_not_found = ,
+      # weight_not_vacc_found = ,
+      # weight_vacc_not_found = ,
+      # weight_not_vacc_not_found = ,
     )
   
   # so above is the tp_multiplier for each group
