@@ -31,11 +31,9 @@ withr::with_dir(here::here(), {
       cases_nsw,
       scenario_vaccination_isolation,
       scenario_run_vaccination_isolation,
-      plot_scenario_vaccination_isolation,
       cases_nsw_delays,
       cases_scenario,
       cases_nsw_interview_missings,
-      plot_cases_nsw_raw_delay_long,
       derived_delay_distributions,
       delay_dist_funs,
       delay_samples,
@@ -45,12 +43,14 @@ withr::with_dir(here::here(), {
       cases_nsw_delays_long,
       cases_nsw_raw_delay_long,
       are_cases_independent,
-      plot_cases_nsw_delays,
       delay_samples_against_data,
       prepared_cases_for_plots,
+      plot_scenario_vaccination_isolation,
+      plot_cases_nsw_raw_delay_long,
+      plot_cases_nsw_delays,
       plot_hist_delay_samples_v_data,
-      scenario_df_run_plots,
-      plot_tp_reduction
+      plot_tp_reduction,
+      scenario_df_run_plots
       )
     )
 })
@@ -97,6 +97,13 @@ plot_hist_delay_samples_v_data
 plot_tp_reduction
 ```
 
+```{r plot-cases-nsw-raw-delay-long}
+plot_cases_nsw_raw_delay_long
+```
+
+```{r plot-cases-nsw-delays}
+plot_cases_nsw_delays
+```
 
 
 ## Analysis
