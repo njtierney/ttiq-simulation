@@ -28,17 +28,29 @@ knitr::opts_chunk$set(
 withr::with_dir(here::here(), {
   tar_load(
     c(
-      scenario_df_run,
-      cases_nsw_delays,
-      cases_nsw_raw_delay_long,
       cases_nsw,
+      scenario_vaccination_isolation,
+      scenario_run_vaccination_isolation,
+      plot_scenario_vaccination_isolation,
+      cases_nsw_delays,
+      cases_scenario,
+      cases_nsw_interview_missings,
+      plot_cases_nsw_raw_delay_long,
+      derived_delay_distributions,
+      delay_dist_funs,
+      delay_samples,
+      scenario_df,
+      scenario_df_run,
+      scenario_df_run_tp_multiplier,
       cases_nsw_delays_long,
+      cases_nsw_raw_delay_long,
+      are_cases_independent,
       plot_cases_nsw_delays,
-      derive_nsw_delay_distributions,
-      nsw_delay_samples,
-      nsw_delay_samples_against_data,
-      plot_hist_nsw_delay_samples_v_data,
-      plot_nsw_tp_reduction
+      delay_samples_against_data,
+      prepared_cases_for_plots,
+      plot_hist_delay_samples_v_data,
+      scenario_df_run_plots,
+      plot_tp_reduction
       )
     )
 })
@@ -47,22 +59,8 @@ withr::with_dir(here::here(), {
 ```
 
 
-
 ```{r}
-  
-  cases_nsw %>%
-    select(
-      interview_date,
-      swab_date,
-      notification_date,
-      test_turnaround_time,
-      time_to_interview,
-      full_contact_delay
-    )
-```
-
-```{r}
-derive_nsw_delay_distributions
+derived_delay_distributions
 ```
 
 
@@ -92,11 +90,11 @@ derive_nsw_delay_distributions
 ## Figures
 
 ```{r plot-hist-nsw-delay-samples-v-data}
-plot_hist_nsw_delay_samples_v_data
+plot_hist_delay_samples_v_data
 ```
 
 ```{r plot-nsw-tp-reduction}
-plot_nsw_tp_reduction
+plot_tp_reduction
 ```
 
 
@@ -109,7 +107,7 @@ scenario_df_run
 
 ```{r}
 
-  cases_nsw_delays %>% 
+  cases_scenario %>% 
     group_by(scenario) %>% 
     summarise(
       across(
@@ -118,11 +116,12 @@ scenario_df_run
           time_to_interview,
           full_contact_delay
           ),
-        .fns = mean
+        .fns = mean,
+        na.rm = TRUE
         )
     )
   
-  cases_nsw_delays %>% 
+  cases_scenario %>% 
     select(test_turnaround_time,
            time_to_interview,
            full_contact_delay,

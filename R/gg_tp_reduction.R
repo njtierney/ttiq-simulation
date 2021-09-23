@@ -3,11 +3,11 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param nsw_delay_samples_against_data
+#' @param scenario_df_run_tp_multiplier
 #' @return
 #' @author Nicholas Tierney
 #' @export
-gg_nsw_tp_reduction <- function(scenario_df_run_tp_multiplier) {
+gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
 
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 

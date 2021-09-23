@@ -11,16 +11,16 @@ tar_plan(
    
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
-  cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw),
-  
-  plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
-  
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
     swab_date_var = earliest_detected,
     interview_date_var = interviewed_date,
     notification_date_var = earliest_confirmed_or_probable
   ),
+  
+  cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw_delays),
+  
+  plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
   
@@ -57,7 +57,7 @@ tar_plan(
     delay_samples_against_data
     ),
   
-  plot_hist_nsw_delay_samples_v_data = gg_hist_nsw_delay_samples_against_data(
+  plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
     prepared_cases_for_plots
   ),
   
@@ -86,9 +86,7 @@ tar_plan(
     scenario_df_run
   ),
   
-  # REFACTORING UP TO HERE
-  
-  plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
+  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
