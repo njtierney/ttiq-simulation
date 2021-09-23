@@ -29,16 +29,16 @@ withr::with_dir(here::here(), {
   tar_load(
     c(
       scenario_df_run,
-      cases_nsw_delays,
-      cases_nsw_raw_delay_long,
-      cases_nsw,
-      cases_nsw_delays_long,
-      plot_cases_nsw_delays,
-      derive_nsw_delay_distributions,
-      nsw_delay_samples,
-      nsw_delay_samples_against_data,
-      plot_hist_nsw_delay_samples_v_data,
-      plot_nsw_tp_reduction
+      cases_vic_delays,
+      cases_vic_raw_delay_long,
+      cases_vic,
+      cases_vic_delays_long,
+      plot_cases_vic_delays,
+      derive_vic_delay_distributions,
+      vic_delay_samples,
+      vic_delay_samples_against_data,
+      plot_hist_vic_delay_samples_v_data,
+      plot_vic_tp_reduction
       )
     )
 })
@@ -50,7 +50,7 @@ withr::with_dir(here::here(), {
 
 ```{r}
   
-  cases_nsw %>%
+  cases_vic %>%
     select(
       interview_date,
       swab_date,
@@ -62,14 +62,14 @@ withr::with_dir(here::here(), {
 ```
 
 ```{r}
-derive_nsw_delay_distributions
+derive_vic_delay_distributions
 ```
 
 
 ## EDA
 
 ```{r}
-# cases_nsw_raw_delay_long %>% 
+# cases_vic_raw_delay_long %>% 
 #     group_by(delay_type) %>% 
 #     count(days, sort = TRUE) %>% 
 #     mutate(prop = n / sum(n))
@@ -91,12 +91,12 @@ derive_nsw_delay_distributions
 
 ## Figures
 
-```{r plot-hist-nsw-delay-samples-v-data}
-plot_hist_nsw_delay_samples_v_data
+```{r plot-hist-vic-delay-samples-v-data}
+plot_hist_vic_delay_samples_v_data
 ```
 
-```{r plot-nsw-tp-reduction}
-plot_nsw_tp_reduction
+```{r plot-vic-tp-reduction}
+plot_vic_tp_reduction
 ```
 
 
@@ -109,7 +109,7 @@ scenario_df_run
 
 ```{r}
 
-  cases_nsw_delays %>% 
+  cases_vic_delays %>% 
     group_by(scenario) %>% 
     summarise(
       across(
@@ -122,7 +122,7 @@ scenario_df_run
         )
     )
   
-  cases_nsw_delays %>% 
+  cases_vic_delays %>% 
     select(test_turnaround_time,
            time_to_interview,
            full_contact_delay,

@@ -6,44 +6,45 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
-  tar_file(cases_nsw_path, 
-           "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  # tar_file(cases_nsw_path, 
+  #          "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
   
-  cases_nsw = read_cases_nsw(cases_nsw_path),
+  # cases_nsw = read_cases_nsw(cases_nsw_path),
+  cases_vic = read_cases_vic(),
   
-  cases_nsw_interview_missings = gg_interview_missings(cases_nsw),
+  cases_vic_interview_missings = gg_interview_missings(cases_vic),
   
-  cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw),
+  cases_vic_raw_delay_long = cases_nsw_delay_raw_longer(cases_vic),
 
-  plot_cases_nsw_raw_delay_long = 
-    gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
+  plot_cases_vic_raw_delay_long = 
+    gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
   
-  cases_nsw_delays = cases_nsw_add_delays(cases_nsw),
+  cases_vic_delays = cases_nsw_add_delays(cases_vic),
   
-  are_cases_independent = check_cases_independence(cases_nsw_delays),
+  are_cases_independent = check_cases_independence(cases_vic_delays),
   
-  cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
+  cases_vic_delays_long = cases_nsw_longer(cases_vic_delays),
   
-  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
+  plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
   
-  derive_nsw_delay_distributions = derive_distributions(
-    cases_nsw_delays,
+  derive_vic_delay_distributions = derive_distributions(
+    cases_vic_delays,
     prop_current_case_zero = 0.8
     ),
   
-  nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
+  vic_delay_dist_funs = create_dist_sim_fun(derive_vic_delay_distributions),
   
-  nsw_delay_samples = generate_delay_samples(derive_nsw_delay_distributions,
+  vic_delay_samples = generate_delay_samples(derive_vic_delay_distributions,
                                              n_samples = 100000),
   
-  nsw_delay_samples_against_data = add_data_to_delay_samples(nsw_delay_samples,
-                                                             cases_nsw_delays),
+  vic_delay_samples_against_data = add_data_to_delay_samples(vic_delay_samples,
+                                                             cases_vic_delays),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
-    nsw_delay_samples_against_data
+    vic_delay_samples_against_data
     ),
   
-  plot_hist_nsw_delay_samples_v_data = gg_hist_nsw_delay_samples_against_data(
+  plot_hist_vic_delay_samples_v_data = gg_hist_nsw_delay_samples_against_data(
     prepared_cases_for_plots
   ),
   
@@ -52,7 +53,7 @@ tar_plan(
     n_iterations = 1000,
     n_chains = 50,
     # parameters for sim_tracing
-    sim_tracing_funs = nsw_delay_dist_funs,
+    sim_tracing_funs = vic_delay_dist_funs,
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = 0.9,
@@ -73,7 +74,7 @@ tar_plan(
   ),
   
   
-  plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
+  plot_vic_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
   
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
@@ -121,7 +122,7 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd")
+  tar_render(explore, "doc/explore_vic.Rmd")
   
 )
 

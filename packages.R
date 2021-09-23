@@ -3,6 +3,7 @@ library(conflicted)
 
 conflict_prefer("filter", "dplyr")
 conflict_prefer("select", "dplyr")
+conflict_prefer("between", "dplyr")
 conflict_prefer("lag", "dplyr")
 conflict_prefer("slice", "dplyr")
 conflict_prefer("pluck", "purrr")
