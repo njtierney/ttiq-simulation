@@ -23,7 +23,7 @@ check_cases_independence <- function(cases_nsw_delays) {
     ) %>% 
     ggplot(aes(x = full_contact_delay_indep)) + 
     stat_ecdf(pad = FALSE) + 
-    stat_ecdf(aes(x = full_contact_delay,
-                  colour = "orange"))
+    stat_ecdf(aes(x = full_contact_delay),
+              colour = "orange")
 
 }

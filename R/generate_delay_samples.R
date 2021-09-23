@@ -7,9 +7,9 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-generate_delay_samples <- function(derive_nsw_delay_distributions,
+generate_delay_samples <- function(derived_delay_distributions,
                                    n_samples) {
-  generated_samples <- derive_nsw_delay_distributions %>%
+  generated_samples <- derived_delay_distributions %>%
     mutate(across(
       .cols = c(starts_with("dist_")),
       .fns = ~ generate(.x, times = n_samples),

@@ -7,10 +7,10 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-create_dist_sim_fun <- function(derive_nsw_delay_distributions) {
+create_dist_sim_fun <- function(derived_delay_distributions) {
 
   
-  derive_nsw_delay_distributions %>%
+  derived_delay_distributions %>%
     mutate(
       sim_tracing_fun = pmap(
         .l = list(d1 = dist_isol_swab,
