@@ -3,11 +3,11 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param nsw_delay_samples_against_data
+#' @param prepared_cases_for_plots
 #' @return
 #' @author Nicholas Tierney
 #' @export
-gg_hist_nsw_delay_samples_against_data <- function(
+gg_hist_delay_samples_against_data <- function(
   prepared_cases_for_plots
   ) {
 

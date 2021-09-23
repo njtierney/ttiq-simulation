@@ -11,14 +11,18 @@ tar_plan(
    
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
-  cases_nsw_interview_missings = gg_interview_missings(cases_nsw),
-  
   cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw),
-
-  plot_cases_nsw_raw_delay_long = 
-    gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
   
-  cases_nsw_delays = cases_nsw_add_delays(cases_nsw),
+  plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
+  
+  cases_nsw_delays = case_add_delays(
+    cases = cases_nsw,
+    swab_date_var = earliest_detected,
+    interview_date_var = interviewed_date,
+    notification_date_var = earliest_confirmed_or_probable
+  ),
+  
+  cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
   
   are_cases_independent = check_cases_independence(cases_nsw_delays),
   
@@ -26,21 +30,31 @@ tar_plan(
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
   
-  derive_nsw_delay_distributions = derive_distributions(
-    cases_nsw_delays,
+  cases_scenario = bind_rows(
+    optimal = keep_dates_between(cases_nsw_delays,
+                                 lower_date = "2020-07-01",
+                                 upper_date = "2021-02-01"),
+    current = keep_dates_between(cases_nsw_delays,
+                                 lower_date = "2021-08-01",
+                                 upper_date = "2021-09-15"),
+    .id = "scenario"
+  ),
+  
+  derived_delay_distributions = derive_distributions(
+    cases_scenario,
     prop_current_case_zero = 0.8
     ),
   
-  nsw_delay_dist_funs = create_dist_sim_fun(derive_nsw_delay_distributions),
+  delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
-  nsw_delay_samples = generate_delay_samples(derive_nsw_delay_distributions,
+  delay_samples = generate_delay_samples(derived_delay_distributions,
                                              n_samples = 100000),
   
-  nsw_delay_samples_against_data = add_data_to_delay_samples(nsw_delay_samples,
-                                                             cases_nsw_delays),
+  delay_samples_against_data = add_data_to_delay_samples(delay_samples,
+                                                         cases_scenario),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
-    nsw_delay_samples_against_data
+    delay_samples_against_data
     ),
   
   plot_hist_nsw_delay_samples_v_data = gg_hist_nsw_delay_samples_against_data(
@@ -52,7 +66,7 @@ tar_plan(
     n_iterations = 1000,
     n_chains = 50,
     # parameters for sim_tracing
-    sim_tracing_funs = nsw_delay_dist_funs,
+    sim_tracing_funs = delay_dist_funs,
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = 0.9,
@@ -71,6 +85,8 @@ tar_plan(
   scenario_df_run_tp_multiplier = calculate_tp_multiplier(
     scenario_df_run
   ),
+  
+  # REFACTORING UP TO HERE
   
   plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
   

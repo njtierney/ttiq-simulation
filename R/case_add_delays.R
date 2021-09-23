@@ -6,8 +6,6 @@
 #'
 #' @param case
 #' @param swab_date_var
-#' @param interview_date_var
-#' @param notification_date_var
 #'
 #' @return
 #' @author Nicholas Tierney
@@ -15,13 +13,7 @@
 case_add_delays <- function(cases,
                             swab_date_var,
                             interview_date_var,
-                            notification_date_var,
-                            na_if_below = 0,
-                            na_if_above = 14,
-                            optimal_lower = "2020-07-01",
-                            optimal_upper = "2021-02-01",
-                            current_lower = "2021-08-15",
-                            current_upper) {
+                            notification_date_var) {
   # analyse NSW data to get distributions of these delays
   
   # for NSW
@@ -31,15 +23,15 @@ case_add_delays <- function(cases,
   
   case_delays <- cases %>%
     rename(
-      swab_date = swab_date_var,
-      interview_date = interview_date,
-      notification_date = notification_date_var
+      swab_date = {{ swab_date_var }},
+      interview_date = {{ interview_date_var }},
+      notification_date = {{ notification_date_var }}
     ) %>%
     mutate(
       test_turnaround_time = as.numeric(notification_date - swab_date),
       time_to_interview = as.numeric(interview_date - notification_date),
       full_contact_delay = as.numeric(interview_date - swab_date)
-    )
+    ) %>% 
   select(
     interview_date,
     swab_date,
@@ -55,19 +47,12 @@ case_add_delays <- function(cases,
         full_contact_delay
       ),
       .fns = ~ set_na_when_not_between(x = .x,
-                                       left = na_if_below,
-                                       right = na_if_above)
+                                       left = 0,
+                                       right = 14)
     )) %>%
-    mutate(
-      scenario = case_when(
-        notification_date >= as_date(optimal_lower) &
-          notification_date <= as_date(optimal_upper) ~ "optimal",
-        notification_date >= as_date() & ~ "current",
-        TRUE ~ "outside"
-      ),
-      .before = interview_date
-    ) %>%
-    mutate(test_to_interview = test_turnaround_time + time_to_interview)
+    # check - does this code need to run after the filter? It shouldn't matter
+    # ...right?
+    mutate(test_to_interview = test_turnaround_time + time_to_interview) 
   
   case_delays
   
