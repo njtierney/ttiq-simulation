@@ -72,22 +72,27 @@ tar_plan(
     scenario_df_run
   ),
   
-  
   plot_nsw_tp_reduction = gg_nsw_tp_reduction(scenario_df_run_tp_multiplier),
-  
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
     p_passive_detection_vaccinated = 0.15,
+    p_passive_detection = 0.15,
+    p_active_detection = 0.85,
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
     # isn't this estimated from the data?
     tp_multiplier = 0.46,
+    tp = 7.82,
     isolation_stringency = seq(0, 1, by = 0.2),
     vaccination_coverage = seq(0.6, 0.9, by = 0.1)
   ), 
   
   scenario_run_vaccination_isolation = run_ttiq_vaccination_isolation(
     scenario_vaccination_isolation
+  ),
+  
+  plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(
+    scenario_run_vaccination_isolation
   ),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
