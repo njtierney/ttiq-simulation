@@ -44,31 +44,48 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
   
   scenario_vaccination_isolation %>% 
     mutate(
-      # flip found and vaccination
-      tp_mult_found_vacc = tp * vaccination_multiplier * (isolation_stringency * tp_multiplier),
-      tp_mult_found_not_vacc = tp * 1,
+      tp_mult_found_vacc = 
+        tp * vaccination_multiplier * (isolation_stringency * tp_multiplier),
+      tp_mult_found_not_vacc = tp * tp_multiplier,
       tp_mult_not_found_vacc = tp * vaccination_multiplier,
-      tp_mult_not_found_not_vacc = tp * tp_multiplier,
-      pr_found_given_vacc = 1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
-      pr_found_given_not_vacc = (1 - (1 - p_active_detection) * (1 - p_passive_detection)),
+      tp_mult_not_found_not_vacc = tp * 1,
+      pr_found_given_vacc = 
+        1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
+      pr_found_given_not_vacc = 
+        (1 - (1 - p_active_detection) * (1 - p_passive_detection)),
       weight_vacc_found = pr_found_given_vacc * pr_vaccination_cases,
-      weight_not_vacc_found = pr_found_given_not_vacc * (1 - pr_vaccination_cases),
+      weight_not_vacc_found = 
+        pr_found_given_not_vacc * (1 - pr_vaccination_cases),
       weight_vacc_not_found = (1 - pr_found_given_vacc) *  pr_vaccination_cases,
-      weight_not_vacc_not_found = (1 - pr_found_given_not_vacc) * (1 - pr_vaccination_cases)
+      weight_not_vacc_not_found = 
+        (1 - pr_found_given_not_vacc) * (1 - pr_vaccination_cases)
     ) %>% 
     # check that they sum to 1
-    mutate(sanity_check = weight_vacc_found + weight_not_vacc_found + weight_vacc_not_found + weight_not_vacc_not_found,
+    mutate(sanity_check = 
+             weight_vacc_found + 
+             weight_not_vacc_found + 
+             weight_vacc_not_found + 
+             weight_not_vacc_not_found,
            # check they sum to 1
            sanity_check_all = sanity_check == 1,
       .before = everything()
     ) %>% 
     # pull(sanity_check) %>% all()
     mutate(
-      weighted_tp_mult_found_vacc = tp_mult_found_vacc * weight_vacc_found,
-      weighted_tp_mult_found_not_vacc = tp_mult_found_not_vacc * weight_not_vacc_found,
-      weighted_tp_mult_not_found_vacc = tp_mult_not_found_vacc * weight_vacc_not_found,
-      weighted_tp_mult_not_found_not_vacc = tp_mult_not_found_not_vacc * weight_not_vacc_not_found,
-      weighted_tp_mutliplier_popn = weighted_tp_mult_found_vacc + weighted_tp_mult_found_not_vacc + weighted_tp_mult_not_found_vacc + weighted_tp_mult_not_found_not_vacc
+      weighted_tp_mult_found_vacc = 
+        tp_mult_found_vacc * weight_vacc_found,
+      weighted_tp_mult_found_not_vacc = 
+        tp_mult_found_not_vacc * weight_not_vacc_found,
+      weighted_tp_mult_not_found_vacc = 
+        tp_mult_not_found_vacc * weight_vacc_not_found,
+      weighted_tp_mult_not_found_not_vacc = 
+        tp_mult_not_found_not_vacc * weight_not_vacc_not_found,
+      weighted_tp_mutliplier_popn = 
+        weighted_tp_mult_found_vacc + 
+        weighted_tp_mult_found_not_vacc + 
+        weighted_tp_mult_not_found_vacc + 
+        weighted_tp_mult_not_found_not_vacc,
+      # tp_reduction = 1 - (weighted_tp_multiplier_popn * 0.57 / x)
     ) 
     
      # then multiply and sum them together.

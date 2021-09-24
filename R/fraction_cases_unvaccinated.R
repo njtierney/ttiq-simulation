@@ -42,8 +42,11 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
                                  cbind(unvax_vax, vax_vax))
   
   stable_state <- Re(eigen(vax_structured_matrix)$vectors[, 1])
-  fraction_cases_unvaccinated <-
-    stable_state[1:17] / (stable_state[1:17] + stable_state[18:34])
+  fraction_cases_unvaccinated <- 
+    sum(stable_state[1:17]) / sum(stable_state[1:34])
+  # fraction_cases_unvaccinated <-
+    # stable_state[1:17] / (stable_state[1:17] + stable_state[18:34])
+  
   
   fraction_cases_unvaccinated
   
