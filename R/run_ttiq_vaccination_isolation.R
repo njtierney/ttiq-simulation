@@ -59,7 +59,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
     # check that they sum to 1
     mutate(sanity_check = weight_vacc_found + weight_not_vacc_found + weight_vacc_not_found + weight_not_vacc_not_found,
            # check they sum to 1
-           sanity_check = sanity_check == 1,
+           sanity_check_all = sanity_check == 1,
       .before = everything()
     ) %>% 
     # pull(sanity_check) %>% all()
@@ -69,7 +69,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
       weighted_tp_mult_not_found_vacc = tp_mult_not_found_vacc * weight_vacc_not_found,
       weighted_tp_mult_not_found_not_vacc = tp_mult_not_found_not_vacc * weight_not_vacc_not_found,
       weighted_tp_mutliplier_popn = weighted_tp_mult_found_vacc + weighted_tp_mult_found_not_vacc + weighted_tp_mult_not_found_vacc + weighted_tp_mult_not_found_not_vacc
-    )
+    ) 
     
      # then multiply and sum them together.
   # 

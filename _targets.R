@@ -91,6 +91,12 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
+  pr_vaccination_cases = fraction_cases_unvaccinated(
+    efficacy_susceptibility = 0.9,
+    efficacy_onward = 0.8,
+    coverage_any_vaccine = 0.95
+  ),
+  
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
     p_passive_detection_vaccinated = 0.50,
@@ -103,7 +109,8 @@ tar_plan(
     isolation_stringency = seq(0, 1, by = 0.2),
     vaccination_coverage = seq(0.6, 0.9, by = 0.1),
     # this will be computed from vaccination coverage function
-    pr_vaccination_cases = 0.72,
+    # pr_vaccination_cases = 0.72,
+    pr_vaccination_cases = pr_vaccination_cases,
   ), 
   
   scenario_run_vaccination_isolation = run_ttiq_vaccination_isolation(
