@@ -11,15 +11,16 @@
 #' @export
 fraction_cases_unvaccinated <- function(efficacy_susceptibility,
                                         efficacy_onward,
-                                        coverage_any_vaccine) {
+                                        coverage_any_vaccine,
+                                        baseline_matrix = baseline_matrix()) {
   # transmission between unvaccinated people, no effect of vaccines and scale down
   # to vaccinated population
-  unvax_unvax <- baseline_matrix() %>%
+  unvax_unvax <- baseline_matrix %>%
     sweep(1, 1 - coverage_any_vaccine, FUN = "*")
   
   # transmission between vaccinated people, susceptibility and onward transmission
   # effects and scale down to vaccinated population
-  vax_vax <- baseline_matrix() %>%
+  vax_vax <- baseline_matrix %>%
     sweep(1, 1 - efficacy_susceptibility, FUN = "*") %>%
     sweep(2, 1 - efficacy_onward, FUN = "*") %>%
     sweep(1, coverage_any_vaccine, FUN = "*")
@@ -27,13 +28,13 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
   # transmission from unvaccinated to vaccinated people (account for
   # susceptibility effects on rows) and scale down to vaccinated population
   # fraction
-  unvax_vax <- baseline_matrix() %>%
+  unvax_vax <- baseline_matrix %>%
     sweep(1, 1 - efficacy_susceptibility, FUN = "*") %>%
     sweep(1, coverage_any_vaccine, FUN = "*")
   
   # transmission from vaccinated to unvaccinated people (account for transmission
   # effects) and scale down to unvaccinated population
-  vax_unvax <- baseline_matrix() %>%
+  vax_unvax <- baseline_matrix %>%
     sweep(2, 1 - efficacy_onward, FUN = "*") %>%
     sweep(1, 1 - coverage_any_vaccine, FUN = "*")
   

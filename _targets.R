@@ -91,10 +91,15 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
+  age_limits_5y = c(seq(0, 80, by = 5), Inf),
+  
+  oz_baseline_matrix = get_oz_baseline_matrix(age_limits = age_limits_5y),
+  
   pr_vaccination_cases = fraction_cases_unvaccinated(
     efficacy_susceptibility = 0.9,
     efficacy_onward = 0.8,
-    coverage_any_vaccine = 0.95
+    coverage_any_vaccine = 0.95,
+    baseline_matrix = oz_baseline_matrix
   ),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
