@@ -91,16 +91,7 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
-  age_limits_5y = c(seq(0, 80, by = 5), Inf),
-  
-  oz_baseline_matrix = get_oz_baseline_matrix(age_limits = age_limits_5y),
-  
-  pr_vaccination_cases = fraction_cases_unvaccinated(
-    efficacy_susceptibility = 0.9,
-    efficacy_onward = 0.8,
-    coverage_any_vaccine = 0.95,
-    baseline_matrix = oz_baseline_matrix
-  ),
+  oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
@@ -108,18 +99,14 @@ tar_plan(
     p_active_detection = p_active_detection,
     p_passive_detection = p_passive_detection,
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
-    # isn't this estimated from the data?
     tp_multiplier = 0.46,
-    tp = 7.82,
     isolation_stringency = seq(0, 1, by = 0.2),
-    vaccination_coverage = seq(0.6, 0.9, by = 0.1),
-    # this will be computed from vaccination coverage function
-    # pr_vaccination_cases = 0.72,
-    pr_vaccination_cases = pr_vaccination_cases,
+    vaccination_coverage = seq(0.7, 0.9, by = 0.1)
   ), 
   
   scenario_run_vaccination_isolation = run_ttiq_vaccination_isolation(
-    scenario_vaccination_isolation
+    scenario_vaccination_isolation,
+    oz_baseline_matrix
   ),
   
   plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(

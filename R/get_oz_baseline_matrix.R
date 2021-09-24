@@ -9,6 +9,11 @@
 #' @export
 get_oz_baseline_matrix <- function(age_limits = c(seq(0, 80, by = 5), Inf)) {
 
+  setting_models <- fit_setting_contacts(
+    contact_data_list = get_polymod_setting_data(),
+    population = get_polymod_population()
+  )
+  
   australia_contact_matrix <- conmat::abs_pop_age_lga_2020 %>%
     group_by(age_group) %>%
     summarise(
@@ -17,7 +22,9 @@ get_oz_baseline_matrix <- function(age_limits = c(seq(0, 80, by = 5), Inf)) {
     mutate(
       lower.age.limit = readr::parse_number(as.character(age_group))
     ) %>%
-    extrapolate_polymod(
+    predict_setting_contacts(
+      contact_model = setting_models,
+      population = .,
       age_breaks = age_limits
     )
   

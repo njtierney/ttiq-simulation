@@ -93,27 +93,15 @@
     "bit": {
       "Package": "bit",
       "Version": "4.0.4",
-      "Source": "CRAN",
+      "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "bit",
-      "RemoteRef": "bit",
-      "RemoteRepos": "https://cran.rstudio.com/",
-      "RemotePkgPlatform": "macos",
-      "RemoteSha": "4.0.4",
       "Hash": "f36715f14d94678eea9933af927bc15d"
     },
     "bit64": {
       "Package": "bit64",
       "Version": "4.0.5",
-      "Source": "CRAN",
+      "Source": "Repository",
       "Repository": "CRAN",
-      "RemoteType": "standard",
-      "RemotePkgRef": "bit64",
-      "RemoteRef": "bit64",
-      "RemoteRepos": "https://cran.rstudio.com/",
-      "RemotePkgPlatform": "macos",
-      "RemoteSha": "4.0.5",
       "Hash": "9fe98599ca456d6552421db0d6772d8f"
     },
     "blob": {
@@ -195,8 +183,8 @@
       "RemoteRepo": "conmat",
       "RemoteUsername": "njtierney",
       "RemoteRef": "HEAD",
-      "RemoteSha": "73a3798e379dc98214dffc94e7b0a7bdb0b99204",
-      "Hash": "6db8b3302d5acd49988cf00a3cb32c67"
+      "RemoteSha": "88e6f6cf362627a4bb61d5d043793c8a71c2109e",
+      "Hash": "1582cf7c1c44da8245ee473296a5c296"
     },
     "countrycode": {
       "Package": "countrycode",
@@ -331,6 +319,20 @@
       "Repository": "CRAN",
       "Hash": "44594a07a42e5f91fac9f93fda6d0109"
     },
+    "furrr": {
+      "Package": "furrr",
+      "Version": "0.2.3",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2aba4ab06e8707ac054c6683cb6fed56"
+    },
+    "future": {
+      "Package": "future",
+      "Version": "1.22.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "9c56382c3e53f0b4fc0fc16d88fc3974"
+    },
     "gargle": {
       "Package": "gargle",
       "Version": "1.1.0",
@@ -351,6 +353,20 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "d7566c471c7b17e095dd023b9ef155ad"
+    },
+    "git2r": {
+      "Package": "git2r",
+      "Version": "0.28.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f64fd34026f6025de71a4354800e6d79"
+    },
+    "globals": {
+      "Package": "globals",
+      "Version": "0.14.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "eca8023ed5ca6372479ebb9b3207f5ae"
     },
     "glue": {
       "Package": "glue",
@@ -485,6 +501,13 @@
       "Repository": "CRAN",
       "Hash": "3471fb65971f1a7b2d4ae7848cf2db8d"
     },
+    "listenv": {
+      "Package": "listenv",
+      "Version": "0.8.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "0bde42ee282efb18c7c4e63822f5b4f7"
+    },
     "lubridate": {
       "Package": "lubridate",
       "Version": "1.7.10",
@@ -568,6 +591,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "5406fd37ef0bf9b88c8a4f264d6ec220"
+    },
+    "parallelly": {
+      "Package": "parallelly",
+      "Version": "1.28.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "5300c9fc71841550bdca64d39e82af0e"
     },
     "patchwork": {
       "Package": "patchwork",
@@ -750,6 +780,18 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "2acd9f032970edf1b57fcad232f9e788"
+    },
+    "stickylabeller": {
+      "Package": "stickylabeller",
+      "Version": "0.0.0.9100",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "stickylabeller",
+      "RemoteUsername": "rensa",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "f22b5b3cf43c7c66d199f6d3197e702351d301b5",
+      "Hash": "6c90a3d4e201ffbb9678db30a3a9f8b3"
     },
     "stringi": {
       "Package": "stringi",

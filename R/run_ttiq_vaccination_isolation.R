@@ -7,7 +7,7 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
+run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, baseline_matrix) {
 
   
   # some notes on the variables
@@ -42,13 +42,33 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
   # vacc & !found = tp * vaccination_multiplier
   # !vacc & found = tp * tp_multiplier
   
-  scenario_vaccination_isolation %>% 
+  results <- scenario_vaccination_isolation %>% 
+    # compute the vaccination coverage among cases
+    rowwise() %>%
     mutate(
+      pr_vaccination_cases = fraction_cases_unvaccinated(
+        efficacy_susceptibility = 0.9,
+        efficacy_onward = 0.8,
+        coverage_any_vaccine = vaccination_coverage,
+        baseline_matrix = baseline_matrix
+      )
+    ) %>%
+    ungroup() %>%
+    # compute tp mutlitpliers for all combinations people who are vaccianted or
+    # not, and detected or not
+    mutate(
+      # no reduction if vaccinated and unfound
+      tp_mult_not_found_not_vacc = 1,
+      # only the vaccination reduction if vaccinated and unfound
+      tp_mult_not_found_vacc = vaccination_multiplier,
+      # usual reduction if unvaccinated and found
+      tp_mult_found_not_vacc = tp_multiplier,
+      # if unvaccinated and found, get the vaccination reduction and the tp
+      # multiplier - scaled by isolation stringency. If isolation stringency is
+      # 1, should just be the tp multiplier, if isolation stringency is 0,
+      # should be 1
       tp_mult_found_vacc = 
-        tp * vaccination_multiplier * (isolation_stringency * tp_multiplier),
-      tp_mult_found_not_vacc = tp * tp_multiplier,
-      tp_mult_not_found_vacc = tp * vaccination_multiplier,
-      tp_mult_not_found_not_vacc = tp * 1,
+        vaccination_multiplier * (1 - isolation_stringency * (1 - tp_multiplier)),
       pr_found_given_vacc = 
         1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
       pr_found_given_not_vacc = 
@@ -84,10 +104,46 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation) {
         weighted_tp_mult_found_vacc + 
         weighted_tp_mult_found_not_vacc + 
         weighted_tp_mult_not_found_vacc + 
-        weighted_tp_mult_not_found_not_vacc,
-      # tp_reduction = 1 - (weighted_tp_multiplier_popn * 0.57 / x)
-    ) 
-    
+        weighted_tp_mult_not_found_not_vacc
+    )
+  
+  # get baseline tp multiplier for each vaccination coverage
+  baseline <- results %>%
+    filter(
+      isolation_stringency == 1
+    ) %>%
+    rename(
+      baseline_tp_multiplier = weighted_tp_mutliplier_popn
+    ) %>%
+    select(
+      vaccination_multiplier,
+      p_passive_detection_vaccinated,
+      p_active_detection,
+      p_passive_detection,
+      tp_multiplier,
+      vaccination_coverage,
+      baseline_tp_multiplier
+    )
+
+  # join on and rescale the TP reductions  
+  results %>%
+    left_join(
+      baseline,
+      by = c(
+        "vaccination_multiplier",
+        "p_passive_detection_vaccinated",
+        "p_active_detection",
+        "p_passive_detection",
+        "tp_multiplier",
+        "vaccination_coverage"
+      )
+    ) %>%
+    mutate(
+      weighted_tp_mutliplier_popn_normalised = weighted_tp_mutliplier_popn / baseline_tp_multiplier,
+      weighted_tp_reduction_scaled = 1 - (weighted_tp_mutliplier_popn_normalised * tp_multiplier)
+    )
+  # normalise the TP reduction so that it is 'tp_multiplier' when isolation is 1
+  
      # then multiply and sum them together.
   # 
   
