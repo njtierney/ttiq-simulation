@@ -27,6 +27,7 @@ prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
       names_to = "delay_type",
       values_to = "days"
     ) %>% 
+    drop_na %>%
     filter(delay_type != "full_contact_delay") %>% 
     filter(delay_type != "test_to_interview") %>% 
     mutate(delay_type = as_factor(delay_type),
@@ -52,5 +53,7 @@ prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
     mutate(
       fraction = count / sum(count)
     )
-  
+  # x %>% filter(scenario=="current", delay_type=="notification_to_interview", data_type=="data") %>%
+  #   pull(fraction) %>% sum
+  # table(x$scenario, x$delay_type)
 }

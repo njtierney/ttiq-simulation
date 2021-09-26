@@ -33,9 +33,11 @@ cases_nsw_add_delays <- function(cases_nsw) {
     mutate(
       scenario = case_when(
         # adjusted dates for VIC
-        notification_date >= as_date("2020-09-01") &
-          notification_date <= as_date("2021-08-03") ~ "optimal",
-        notification_date >= (as_date("2021-08-04")) ~ "current",
+        # notification_date >= as_date("2020-09-01") &
+        #   # notification_date <= as_date("2021-08-03") ~ "optimal",
+        # notification_date >= as_date("2020-07-19") & notification_date <= as_date("2020-08-19") ~ "2020-07-19 to 2020-08-19",
+        notification_date >= as_date("2020-08-01") & notification_date <= as_date("2020-08-07") ~ "2020-08-01 to 2020-08-07",
+        notification_date >= (as_date("2021-09-01")) ~ "current",
         TRUE ~ "outside"
       ),
       .before = interview_date
