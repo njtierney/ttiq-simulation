@@ -21,16 +21,16 @@ tar_plan(
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
   
-  are_cases_independent = check_cases_independence(cases_vic_delays),
+  are_cases_independent = check_cases_independence(cases_nsw_delays),
   
-  cases_vic_delays_long = cases_nsw_longer(cases_vic_delays),
+  cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
   
-  plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
+  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
   
   cases_scenario = bind_rows(
     optimal = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2020-07-01",
-                                 upper_date = "2021-02-01"),
+                                 lower_date = "2020-09-01",
+                                 upper_date = "2021-08-03"),
     current = keep_dates_between(cases_nsw_delays,
                                  lower_date = "2021-08-01",
                                  upper_date = "2021-09-15"),

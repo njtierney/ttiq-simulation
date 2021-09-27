@@ -37,10 +37,15 @@ read_cases_vic <- function() {
     #     false = notification_date
     #   )
     # ) %>%
-    mutate(
-      test_turnaround_time = as.numeric(notification_date - swab_date),
-      time_to_interview = as.numeric(interview_date - notification_date),
-      full_contact_delay = as.numeric(interview_date - swab_date)
+    # mutate(
+    #   test_turnaround_time = as.numeric(notification_date - swab_date),
+    #   time_to_interview = as.numeric(interview_date - notification_date),
+    #   full_contact_delay = as.numeric(interview_date - swab_date)
+    # ) %>%
+    rename(
+      earliest_detected = swab_date,
+      interviewed_date = interview_date,
+      earliest_confirmed_or_probable = notification_date
     )
   
   # 1. Swab Date (earliest_detected) Yep
