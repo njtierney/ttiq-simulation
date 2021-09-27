@@ -3,14 +3,20 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param nsw_delay_samples
-#' @param cases_nsw_delays
+#' @param delay_samples
+#' @param cases_scenario
 #' @return
 #' @author Nicholas Tierney
 #' @export
-add_data_to_delay_samples <- function(nsw_delay_samples, cases_nsw_delays) {
-
-  cases_nsw_delays_renamed <- cases_nsw_delays %>% 
+add_data_to_delay_samples <- function(delay_samples, cases_scenario) {
+  
+  delay_samples_renamed <- delay_samples %>% 
+    rename_with(
+      .fn = ~str_remove_all(.x, "samples_"),
+      .cols = starts_with("samples_")
+    )
+  
+  cases_delays_renamed <- cases_scenario %>% 
     filter(scenario != "outside") %>% 
     select(-ends_with("date")) %>% 
     mutate(
@@ -20,17 +26,10 @@ add_data_to_delay_samples <- function(nsw_delay_samples, cases_nsw_delays) {
         )
     )
   
-  nsw_delay_samples_renamed <- nsw_delay_samples %>% 
-    rename_with(
-      .fn = ~str_remove_all(.x, "samples_"),
-      .cols = starts_with("samples_")
-    )
-  
   bind_rows(
-    data = cases_nsw_delays_renamed,
-    samples = nsw_delay_samples_renamed,
+    data = cases_delays_renamed,
+    samples = delay_samples_renamed,
     .id = "data_type"
   ) 
-    
 
 }

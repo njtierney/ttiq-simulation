@@ -7,10 +7,9 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-prepare_case_samples_for_plots <- function(nsw_delay_samples_against_data) {
-
+prepare_case_samples_for_plots <- function(delay_samples_against_data) {
   
-  nsw_delay_samples_against_data %>% 
+  delay_samples_against_data %>% 
     rename(
       other_delays = isol_swab,
       swab_to_notification = test_turnaround_time,

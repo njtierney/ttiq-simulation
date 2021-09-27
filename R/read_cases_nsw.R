@@ -14,57 +14,43 @@ read_cases_nsw <- function(cases_nsw_path) {
     na = "NA"
   ) %>%
     clean_names() %>%
-    rename(
-      swab_date = earliest_detected,
-      interview_date = interviewed_date,
-      notification_date = earliest_confirmed_or_probable
-    ) %>%
     mutate(across(
       .cols = c(
-        interview_date,
-        swab_date,
-        notification_date
+        interviewed_date,
+        earliest_detected,
+        earliest_confirmed_or_probable
       ),
       .fns = as_date
     )) %>%
     #
     mutate(across(
       c(
-        interview_date,
-        swab_date,
-        notification_date
+        interviewed_date,
+        earliest_detected,
+        earliest_confirmed_or_probable
       ),
       .fns = ~ .x >= as_date("2020-01-01") & .x <= today(),
       .names = "valid_{.col}"
     )) %>%
     mutate(
-      interview_date = if_else(
-        condition = !valid_interview_date,
+      interviewed_date = if_else(
+        condition = !valid_interviewed_date,
         true = NA_Date_,
-        false = interview_date
+        false = interviewed_date
       ),
-      swab_date = if_else(
-        condition = !valid_swab_date,
+      earliest_detected = if_else(
+        condition = !valid_earliest_detected,
         true = NA_Date_,
-        false = swab_date
+        false = earliest_detected
       ),
-      notification_date = if_else(
-        condition = !valid_notification_date,
+      earliest_confirmed_or_probable = if_else(
+        condition = !valid_earliest_confirmed_or_probable,
         true = NA_Date_,
-        false = notification_date
+        false = earliest_confirmed_or_probable
       )
-    ) %>%
-    mutate(
-      test_turnaround_time = as.numeric(notification_date - swab_date),
-      time_to_interview = as.numeric(interview_date - notification_date),
-      full_contact_delay = as.numeric(interview_date - swab_date)
-    )
+    ) 
+  
   
   nsw_cases
-
-  # 1. Swab Date (earliest_detected) Yep
-  #
-  # 2. Date of notification (earliest_confirmed_or_probable)
-  #
-  # 3. Date of interview (interviewed_date) Yep
+  
 }
