@@ -95,7 +95,7 @@ tar_plan(
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     vaccination_multiplier = 0.3,
-    p_passive_detection_vaccinated = 0.50,
+    p_passive_detection_vaccinated = 0.50 * p_passive_detection,
     p_active_detection = p_active_detection,
     p_passive_detection = p_passive_detection,
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
