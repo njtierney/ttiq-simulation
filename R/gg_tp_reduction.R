@@ -8,7 +8,7 @@
 #' @author Nicholas Tierney
 #' @export
 gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
-
+  
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 
     mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>% 
@@ -31,9 +31,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
            avg_days,
            message) %>% 
     distinct() %>% 
-    arrange(scenario) %>% 
-    mutate(x = c(13, 1, 13),
-           y = c(5000, 3000, 4000))
+    arrange(scenario)
   
   ggplot(cases_tp_reduction,
          aes(x = time_to_isolation_sims,
@@ -55,9 +53,9 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     ) + 
     lims(
       x = c(-1,14)
-    ) + 
-    geom_text(data = df_annotate,
-              aes(x = x, y = y, label = message)) +
+    ) +
+    geom_label(data = df_annotate,
+               aes(x = Inf, y = Inf, label=message), hjust="inward", vjust="inward", color="white", label.size=NA) +
     theme(legend.position = "none")
-
+  
 }
