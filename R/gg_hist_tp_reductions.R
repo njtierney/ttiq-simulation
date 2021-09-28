@@ -20,10 +20,10 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
       ),
       `TTIQ effectiveness` = factor(
         `TTIQ effectiveness`,
-        levels = c("Optimal TTIQ", "Current TTIQ", "Partial TTIQ"),
+        levels = c("Optimal TTIQ", "Partial TTIQ", "Current TTIQ"),
         labels = c("Optimal",
-                   "Current without case-initated",
-                   "Current with case-initated CT" 
+                   "Partial",
+                   "NSW Current" 
         )
       ),
       x = 12,
@@ -31,7 +31,7 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
       message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average")
     )
   
-  cols = scales::hue_pal()(3)[1:3]
+#  cols = scales::hue_pal()(3)[1:3]
   
   # plot histograms
   tti_distributions %>%
@@ -54,10 +54,10 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
     mutate(
       `TTIQ effectiveness` = factor(
         `TTIQ effectiveness`,
-        levels = c("Optimal TTIQ", "Current TTIQ", "Partial TTIQ"),
+        levels = c("Optimal TTIQ", "Partial TTIQ", "Current TTIQ"),
         labels = c("Optimal",
-                   "Current without case-initated",
-                   "Current with case-initated" 
+                   "Partial",
+                   "NSW Current" 
         )
       )
     ) %>%
@@ -89,7 +89,9 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
     theme(
       legend.position = "none"
     ) +
-    scale_fill_discrete(type = cols) +
+    scale_fill_brewer(
+      palette = "Dark2"
+    ) +
     geom_text(
       aes(
         x = x,
@@ -97,6 +99,7 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
         label = message
       ),
       data = df_annotate
-    )
+    )+ 
+    ggtitle("Times to isolation from case data")
 
 }
