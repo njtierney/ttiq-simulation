@@ -7,7 +7,7 @@ lapply(list.files("./R", full.names = TRUE), source)
 tar_plan(
   
   tar_file(cases_nsw_path, 
-           "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+           "not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
    
   cases_nsw = read_cases_nsw(cases_nsw_path),
   
@@ -132,6 +132,27 @@ tar_plan(
     surveillance_cdfs,
     surveillance
   ),
+  
+  tti_distributions = create_tti_distributions(isolation_cdfs),
+
+  plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
+  
+  tar_file(plot_ecdf_path,
+           "figs/nsw_ttiq_step.png"),
+  
+  save_plot_tti_ecdf_comparison = ggsave_write_path(plot_tti_ecdf_comparison,
+                                                    path = plot_ecdf_path),
+  
+  tp_reductions = calculate_tp_reductions(tti_distributions),
+  
+  plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
+                                                  tti_distributions),
+  
+  tar_file(plot_hist_tp_path,
+           "figs/nsw_ttiq_hist.png"),
+  
+  save_plot_tp_reductions_hist = ggsave_write_path(plot_hist_tp_reductions,
+                                                   path = plot_hist_tp_path),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
