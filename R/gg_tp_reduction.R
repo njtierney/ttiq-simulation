@@ -56,7 +56,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       scenario_colour = first(scenario_colour)
     ) %>% 
     ungroup() %>% 
-    mutate(tp_reduction = glue("{percent(1 - tp_multiplier)} reduction"),
+    mutate(tp_reduction = glue("{percent(1 - tp_multiplier, accuracy = 1)} reduction"),
            avg_days = glue("{round(avg_days)} day average"),
            message = glue("{tp_reduction}\n{avg_days}")) %>% 
     relocate(tp_reduction) %>% 

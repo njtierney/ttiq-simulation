@@ -28,20 +28,32 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data) {
     ) %>% 
     filter(delay_type != "full_contact_delay") %>% 
     filter(delay_type != "test_to_interview") %>% 
-    mutate(delay_type = as_factor(delay_type),
-           delay_type = fct_relevel(delay_type,
-                                    "swab_to_notification",
-                                    "notification_to_interview",
-                                    "other_delays"
-           ),
-           scenario = as_factor(scenario),
-           scenario = fct_relevel(scenario,
-                                  "optimal",
-                                  "current",
-                                  "current_case_init")) %>% 
+    mutate(
+      delay_type = str_replace_all(delay_type, "_", " "),
+      delay_type = as_factor(delay_type),
+      delay_type = fct_relevel(
+        delay_type,
+        "swab to notification",
+        "notification to interview",
+        "other delays"
+      ),
+      scenario = case_when(
+        scenario == "optimal" ~ "Optimal",
+        scenario == "current" ~ "NSW Current\nwithout case-initiated",
+        scenario == "current_case_init" ~ "NSW Current\nwith case-initiated",
+      ),
+      scenario = as_factor(scenario),
+      scenario = fct_relevel(
+        scenario,
+        "Optimal",
+        "NSW Current\nwithout case-initiated",
+        "NSW Current\nwith case-initiated"
+      )
+    ) %>% 
     group_by(
       scenario, delay_type, data_type, days
     ) %>%
+    drop_na() %>%
     summarise(
       count = n()
     ) %>%

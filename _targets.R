@@ -61,6 +61,16 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
+  tar_file(plot_hist_delay_samples_v_data_path,
+           "figs/hist_delay_samples_v_data.png"),
+  
+  save_plot_hist_delay_samples_v_data = ggsave_write_path(
+    plot = plot_hist_delay_samples_v_data,
+    path = plot_hist_delay_samples_v_data_path,
+    width = 6,
+    height = 6
+  ),
+  
   p_active_detection = 0.9,
   p_passive_detection = 0.3,
   
