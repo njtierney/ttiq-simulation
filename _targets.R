@@ -113,6 +113,26 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  nsw_delays = read_nsw_delays(cases_nsw_path),
+  
+  plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
+  
+  tar_file(delay_from_onset_cdfs_path,
+           "data/delay_from_onset_cdfs.RDS"),
+  
+  tar_file(surveillance_matrix_path,
+           "data/surveillance_matrix.RDS"),
+  
+  surveillance_cdfs = read_rds(delay_from_onset_cdfs_path),
+  
+  surveillance = read_rds(surveillance_matrix_path),
+  
+  isolation_cdfs = create_isolation_cdfs(
+    nsw_delays,
+    surveillance_cdfs,
+    surveillance
+  ),
+  
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
   # 1. Swab
