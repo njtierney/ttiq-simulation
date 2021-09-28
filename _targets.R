@@ -35,7 +35,7 @@ tar_plan(
                                  lower_date = "2020-07-01",
                                  upper_date = "2021-02-01"),
     current = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2021-08-01",
+                                 lower_date = "2021-08-15",
                                  upper_date = "2021-09-15"),
     .id = "scenario"
   ),
