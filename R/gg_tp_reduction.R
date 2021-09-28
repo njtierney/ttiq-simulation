@@ -18,8 +18,8 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
                                         "current_case_init",
                                         "current"),
                              labels = c("Optimal",
-                                        "NSW Current with case-initiated",
-                                        "NSW Current without case-initiated"))
+                                        "NSW Current\nwith case-initiated",
+                                        "NSW Current\nwithout case-initiated"))
           ) %>%
     mutate(time_to_isolation_sims = floor(time_to_isolation_sims)) %>%
     group_by(scenario, time_to_isolation_sims) %>%
@@ -36,7 +36,10 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
   
   df_annotate <- cases_tp_reduction %>% 
     group_by(scenario) %>% 
-    mutate(avg_days = mean(time_to_isolation_sims)) %>% 
+    summarise(
+      avg_days = weighted.mean(time_to_isolation_sims, fraction),
+      tp_multiplier = first(tp_multiplier)
+    ) %>% 
     ungroup() %>% 
     mutate(tp_reduction = glue("{percent(1 - tp_multiplier)} reduction"),
            avg_days = glue("{round(avg_days)} day average"),
@@ -48,8 +51,10 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
            message) %>% 
     distinct() %>% 
     arrange(scenario) %>% 
-    mutate(x = c(13, 1, 13),
-           y = c(.15, .15, .15))
+    mutate(
+      x = 14,
+      y = 0.12
+    )
 
 
   ggplot(cases_tp_reduction,
@@ -62,11 +67,15 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       ) +
     geom_col() + 
     facet_wrap(~ scenario,
-               ncol = 3,
-               labeller = label_wrap_gen(width=15)
+               ncol = 3
+               # labeller = label_wrap_gen(width=15)
                ) + 
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
-    theme_minimal() + 
+    theme_cowplot() +
+    theme(
+      legend.position = "none",
+      strip.background = element_blank()
+    ) +
     labs(
       fill = "",
       y = "Cases isolated",
@@ -77,7 +86,11 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       x = c(-1,14)
     ) +
     geom_text(data = df_annotate,
-              aes(x = x, y = y, label = message)) +
+              aes(x = x, y = y, label = message),
+              size = 4,
+              hjust = 1,
+              vjust = 0
+    ) +
     theme(legend.position = "none") + 
     ggtitle("Times to isolation from model")
 

@@ -91,6 +91,16 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
+  tar_file(plot_tp_reduction_path,
+           "figs/nsw_ttiq_model_hist.png"),
+  
+  save_plot_tp_reductions = ggsave_write_path(
+    plot = plot_tp_reduction,
+    path = plot_tp_reduction_path,
+    width = 9,
+    height = 3.5
+  ),
+  
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
