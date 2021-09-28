@@ -19,7 +19,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
                                         "current"),
                              labels = c("Optimal",
                                         "NSW Current with case-initiated",
-                                        "NSW Current without case-initiated")),
+                                        "NSW Current without case-initiated"))
           ) %>%
     mutate(time_to_isolation_sims = floor(time_to_isolation_sims)) %>%
     group_by(scenario, time_to_isolation_sims) %>%
@@ -50,11 +50,11 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     arrange(scenario) %>% 
     mutate(x = c(13, 1, 13),
            y = c(.15, .15, .15))
-  
-  #match_cols <- manual_pal(values = c("#1B9E77", "#7570B3", "#7570B3"))
-  
+
+
   ggplot(cases_tp_reduction,
-         aes(x = time_to_isolation_sims, y = fraction, fill = scenario)) +
+         aes(x = time_to_isolation_sims, y = fraction,
+             fill = scenario)) +
     geom_vline(
       xintercept = 5,
       linetype = 3,
