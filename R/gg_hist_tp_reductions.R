@@ -26,8 +26,8 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
                    "NSW Current" 
         )
       ),
-      x = 12,
-      y = 0.1,
+      x = 14,
+      y = 0.12,
       message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average")
     )
   
@@ -85,9 +85,10 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
     xlab("Days since infection") +
     ylab("Cases isolated") +
-    theme_minimal() +
+    theme_cowplot() +
     theme(
-      legend.position = "none"
+      legend.position = "none",
+      strip.background = element_blank()
     ) +
     scale_fill_brewer(
       palette = "Dark2"
@@ -96,10 +97,13 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
       aes(
         x = x,
         y = y,
-        label = message
+        label = message,
       ),
+      size = 4,
+      hjust = 1,
+      vjust = 0,
       data = df_annotate
-    )+ 
+    ) + 
     ggtitle("Times to isolation from case data")
 
 }

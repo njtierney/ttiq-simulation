@@ -14,6 +14,7 @@ conflict_prefer("complete", "tidyr")
 conflict_prefer("expand", "tidyr")
 
 library(conmat)
+library(cowplot)
 library(dotenv)
 library(distributional)
 library(fs)

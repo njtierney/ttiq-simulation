@@ -36,7 +36,8 @@ gg_hist_delay_samples_against_data <- function(
     ) + 
     facet_grid(scenario ~ delay_type) +
     theme_bw() +
-    theme(aspect.ratio = 1) + 
+    theme(aspect.ratio = 1,
+          strip.background = element_blank()) + 
     scale_colour_brewer(palette = "Dark2") + 
     labs(
       title = "Assumed contact tracing delays (dots = data)",
