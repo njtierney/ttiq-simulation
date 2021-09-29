@@ -61,16 +61,15 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
-  tar_file(plot_hist_delay_samples_v_data_path,
-           "figs/hist_delay_samples_v_data.png"),
-  
-  save_plot_hist_delay_samples_v_data = ggsave_write_path(
-    plot = plot_hist_delay_samples_v_data,
-    path = plot_hist_delay_samples_v_data_path,
-    width = 6,
-    height = 6
-  ),
-  
+  tar_file(plot_hist_delay_samples_v_data_path, {
+    ggsave_write_path(
+      plot = plot_hist_delay_samples_v_data,
+      path = "figs/hist_delay_samples_v_data.png",
+      width = 6,
+      height = 6
+    )
+  }),
+
   p_active_detection = 0.9,
   p_passive_detection = 0.3,
   
@@ -101,15 +100,14 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
-  tar_file(plot_tp_reduction_path,
-           "figs/nsw_ttiq_model_hist.png"),
-  
-  save_plot_tp_reductions = ggsave_write_path(
-    plot = plot_tp_reduction,
-    path = plot_tp_reduction_path,
-    width = 9,
-    height = 3.5
-  ),
+  tar_file(plot_tp_reduction_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction,
+      path = "figs/nsw_ttiq_model_hist.png",
+      width = 9,
+      height = 3.5
+    )
+  }),
   
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
@@ -157,26 +155,26 @@ tar_plan(
 
   plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
   
-  tar_file(plot_ecdf_path,
-           "figs/nsw_ttiq_step.png"),
-  
-  save_plot_tti_ecdf_comparison = ggsave_write_path(plot_tti_ecdf_comparison,
-                                                    path = plot_ecdf_path),
+  tar_file(plot_ecdf_path, {
+    ggsave_write_path(
+      plot = plot_tti_ecdf_comparison,
+      path = "figs/nsw_ttiq_step.png",
+    )
+  }),
   
   tp_reductions = calculate_tp_reductions(tti_distributions),
   
   plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
                                                   tti_distributions),
   
-  tar_file(plot_hist_tp_path,
-           "figs/nsw_ttiq_hist.png"),
-  
-  save_plot_tp_reductions_hist = ggsave_write_path(
-    plot = plot_hist_tp_reductions,
-    path = plot_hist_tp_path,
-    width = 9,
-    height = 3.5
-  ),
+  tar_file(plot_hist_tp_path, {
+    ggsave_write_path(
+      plot = plot_hist_tp_reductions,
+      path = "figs/nsw_ttiq_hist.png",
+      width = 9,
+      height = 3.5
+      )
+  }),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
