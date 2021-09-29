@@ -35,7 +35,7 @@ tar_plan(
                                  lower_date = "2020-07-01",
                                  upper_date = "2021-02-01"),
     current = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2021-08-01",
+                                 lower_date = "2021-08-15",
                                  upper_date = "2021-09-15"),
     .id = "scenario"
   ),
@@ -59,6 +59,16 @@ tar_plan(
   
   plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
     prepared_cases_for_plots
+  ),
+  
+  tar_file(plot_hist_delay_samples_v_data_path,
+           "figs/hist_delay_samples_v_data.png"),
+  
+  save_plot_hist_delay_samples_v_data = ggsave_write_path(
+    plot = plot_hist_delay_samples_v_data,
+    path = plot_hist_delay_samples_v_data_path,
+    width = 6,
+    height = 6
   ),
   
   p_active_detection = 0.9,
@@ -91,6 +101,16 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
+  tar_file(plot_tp_reduction_path,
+           "figs/nsw_ttiq_model_hist.png"),
+  
+  save_plot_tp_reductions = ggsave_write_path(
+    plot = plot_tp_reduction,
+    path = plot_tp_reduction_path,
+    width = 9,
+    height = 3.5
+  ),
+  
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
@@ -111,6 +131,51 @@ tar_plan(
   
   plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(
     scenario_run_vaccination_isolation
+  ),
+  
+  nsw_delays = read_nsw_delays(cases_nsw_path),
+  
+  plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
+  
+  tar_file(delay_from_onset_cdfs_path,
+           "data/delay_from_onset_cdfs.RDS"),
+  
+  tar_file(surveillance_matrix_path,
+           "data/surveillance_matrix.RDS"),
+  
+  surveillance_cdfs = read_rds(delay_from_onset_cdfs_path),
+  
+  surveillance = read_rds(surveillance_matrix_path),
+  
+  isolation_cdfs = create_isolation_cdfs(
+    nsw_delays,
+    surveillance_cdfs,
+    surveillance
+  ),
+  
+  tti_distributions = create_tti_distributions(isolation_cdfs),
+
+  plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
+  
+  tar_file(plot_ecdf_path,
+           "figs/nsw_ttiq_step.png"),
+  
+  save_plot_tti_ecdf_comparison = ggsave_write_path(plot_tti_ecdf_comparison,
+                                                    path = plot_ecdf_path),
+  
+  tp_reductions = calculate_tp_reductions(tti_distributions),
+  
+  plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
+                                                  tti_distributions),
+  
+  tar_file(plot_hist_tp_path,
+           "figs/nsw_ttiq_hist.png"),
+  
+  save_plot_tp_reductions_hist = ggsave_write_path(
+    plot = plot_hist_tp_reductions,
+    path = plot_hist_tp_path,
+    width = 9,
+    height = 3.5
   ),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)

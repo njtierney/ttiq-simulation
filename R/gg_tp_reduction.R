@@ -11,53 +11,114 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
 
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 
-    mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>% 
+    mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>%
     unnest(cols = time_to_isolation_sims) %>% 
-    mutate(scenario = as_factor(scenario),
-           scenario = fct_relevel(scenario,
-                                  "optimal",
-                                  "current"))
+    mutate(
+      scenario = factor(
+        scenario, 
+        levels = c("optimal",
+                   "current_case_init",
+                   "current"),
+        labels = c("Optimal",
+                   "NSW Current\nwith case-initiated",
+                   "NSW Current\nwithout case-initiated")
+      )
+    ) %>%
+    mutate(
+      time_to_isolation_sims = floor(time_to_isolation_sims)
+    ) %>%
+    group_by(scenario, time_to_isolation_sims) %>%
+    summarise(
+      count = n(),
+      tp_multiplier = first(tp_multiplier),
+      .groups = "drop"
+    ) %>%
+    group_by(scenario) %>%
+    mutate(
+      fraction = count / sum(count)
+    ) %>%
+    ungroup() %>%
+    mutate(
+      scenario_colour = case_when(
+        scenario == "Optimal" ~ 1,
+        TRUE ~ 2
+      ),
+      scenario_colour = factor(scenario_colour)
+    ) %>%
+    ungroup()
+    
   
   df_annotate <- cases_tp_reduction %>% 
     group_by(scenario) %>% 
-    mutate(avg_days = mean(time_to_isolation_sims)) %>% 
+    summarise(
+      avg_days = weighted.mean(time_to_isolation_sims, fraction),
+      tp_multiplier = first(tp_multiplier),
+      scenario_colour = first(scenario_colour)
+    ) %>% 
     ungroup() %>% 
-    mutate(tp_reduction = glue("{percent(1 - tp_multiplier)} reduction"),
+    mutate(tp_reduction = glue("{percent(1 - tp_multiplier, accuracy = 1)} reduction"),
            avg_days = glue("{round(avg_days)} day average"),
            message = glue("{tp_reduction}\n{avg_days}")) %>% 
     relocate(tp_reduction) %>% 
     select(tp_reduction,
            scenario,
+           scenario_colour,
            avg_days,
            message) %>% 
     distinct() %>% 
     arrange(scenario) %>% 
-    mutate(x = c(13, 1, 13),
-           y = c(5000, 3000, 4000))
-  
+    mutate(
+      x = 14,
+      y = 0.18
+    )
+
+  cols <- RColorBrewer::brewer.pal(3, "Dark2")[c(1, 3)]
+
   ggplot(cases_tp_reduction,
-         aes(x = time_to_isolation_sims,
-             fill = scenario)) +
-    geom_histogram(colour = "white",
-                   binwidth = 1) + 
-    facet_wrap(~ scenario,
-               ncol = 1,
-               scales = "free_y") + 
-    theme_bw() + 
+         aes(
+           x = time_to_isolation_sims,
+           y = fraction,
+           fill = scenario_colour
+         )) +
+    geom_vline(
+      xintercept = 5,
+      linetype = 3,
+      col = grey(0.5)
+    ) +
+    geom_col() + 
+    facet_wrap(
+      ~ scenario,
+      ncol = 3
+    ) + 
+    scale_y_continuous(
+      labels = scales::percent_format(accuracy = 1)
+    ) +
+    theme_cowplot() +
+    theme(
+      legend.position = "none",
+      strip.background = element_blank()
+    ) +
     labs(
       fill = "",
-      y = "Count",
-      # x = "# days from isolation to infection"
-      x = "# days from infection to isolation"
+      y = "Cases isolated",
+      x = "Days since infection"
     ) + 
-    scale_fill_brewer(
-      palette = "Dark2"
-    ) + 
+    scale_fill_manual(values = cols) + 
     lims(
       x = c(-1,14)
-    ) + 
-    geom_text(data = df_annotate,
-              aes(x = x, y = y, label = message)) +
-    theme(legend.position = "none")
+    ) +
+    geom_text(
+      data = df_annotate,
+      aes(
+        x = x,
+        y = y,
+        label = message
+      ),
+      size = 4,
+      hjust = 1,
+      vjust = 0
+    ) +
+    theme(legend.position = "none") + 
+    ggtitle("Times to isolation from model")
 
 }
