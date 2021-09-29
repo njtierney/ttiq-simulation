@@ -32,8 +32,9 @@ derive_distributions <- function(cases_scenario,
   current_case <- df_distributions %>% 
     # check: should this part of adding things to current case
     # be put into another step outside of this function?
-    filter(scenario == "current") %>% 
-    mutate(scenario = "current_case_init") %>% 
+    filter(str_detect(scenario, "current")) %>% 
+    mutate(scenario = paste0(scenario, "_case_init")) %>% 
+    group_by(scenario) %>%
     mutate(dist_time_to_interview = dist_mixture(
       dist_uniform(0,0),
       dist_time_to_interview,

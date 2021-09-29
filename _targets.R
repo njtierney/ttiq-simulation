@@ -6,7 +6,10 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
-  cases_nsw = read_cases_vic(),
+  tar_file(cases_nsw_path, "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  
+  cases_nsw = read_cases_nsw(cases_nsw_path),
+  cases_vic = read_cases_vic(),
   
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
@@ -14,36 +17,57 @@ tar_plan(
     interview_date_var = interviewed_date,
     notification_date_var = earliest_confirmed_or_probable
   ),
+  cases_vic_delays = case_add_delays(
+    cases = cases_vic,
+    swab_date_var = earliest_detected,
+    interview_date_var = interviewed_date,
+    notification_date_var = earliest_confirmed_or_probable
+  ),
   
   cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw_delays),
+  cases_vic_raw_delay_long = cases_nsw_delay_raw_longer(cases_vic_delays),
   
   plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
+  plot_cases_vic_raw_delay_long = gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
+  cases_vic_interview_missings = gg_interview_missings(cases_vic_delays),
   
-  are_cases_independent = check_cases_independence(cases_nsw_delays),
+  are_nsw_cases_independent = check_cases_independence(cases_nsw_delays),
+  are_vic_cases_independent = check_cases_independence(cases_vic_delays),
   
   cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
+  cases_vic_delays_long = cases_nsw_longer(cases_vic_delays),
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
-  
+  plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
+
   cases_scenario = bind_rows(
     optimal = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2020-09-01",
-                                 upper_date = "2021-08-03"),
-    august_20 = keep_dates_between(cases_nsw_delays,
+                                 lower_date = "2020-07-01",
+                                 upper_date = "2021-02-01"),
+    current_nsw = keep_dates_between(cases_nsw_delays,
+                                     lower_date = "2021-08-01",
+                                     upper_date = "2021-09-15"),
+    partial = keep_dates_between(cases_vic_delays,
                                  lower_date = "2020-08-01",
                                  upper_date = "2020-08-07"),
-    current = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2021-08-01",
-                                 upper_date = "2021-09-15"),
+    current_vic = keep_dates_between(cases_vic_delays,
+                                     lower_date = "2021-08-01",
+                                     upper_date = "2021-09-15"),
     .id = "scenario"
   ),
   
   derived_delay_distributions = derive_distributions(
     cases_scenario,
     prop_current_case_zero = 0.8
-    ),
+  ),
+  
+  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  
+  tar_file(derived_delay_distributions_csv, {
+    write_csv_return_path(derived_delay_distributions_df, here("outputs/derived_delay_distributions.csv"))
+  }),
   
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   

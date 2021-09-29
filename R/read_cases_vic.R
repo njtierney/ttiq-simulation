@@ -8,7 +8,7 @@ read_cases_vic <- function() {
            interview_date = InterviewDate,
            notification_date = DiagnosisDate) %>%
     mutate_at(vars(interview_date, swab_date, notification_date),
-              function (x) ifelse(x > as_date("2020-01-01") & x <= today(),
+              function (x) if_else(x > as_date("2020-01-01") & x <= today(),
                                   x,
                                   NA_Date_)) %>%
     # mutate(across(
