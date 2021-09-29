@@ -85,6 +85,15 @@ tar_plan(
     prepared_cases_for_plots
   ),
   
+  tar_file(plot_hist_delay_samples_v_data_path, {
+    ggsave_write_path(
+      plot = plot_hist_delay_samples_v_data,
+      path = "figs/hist_delay_samples_v_data.png",
+      width = 6,
+      height = 6
+    )
+  }),
+
   p_active_detection = 0.9,
   p_passive_detection = 0.3,
   
@@ -115,6 +124,15 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
   
+  tar_file(plot_tp_reduction_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction,
+      path = "figs/nsw_ttiq_model_hist.png",
+      width = 9,
+      height = 3.5
+    )
+  }),
+  
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
@@ -136,6 +154,59 @@ tar_plan(
   plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(
     scenario_run_vaccination_isolation
   ),
+  
+  nsw_delays = read_nsw_delays(cases_nsw_path),
+  
+  plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
+  
+  tar_file(delay_from_onset_cdfs_path,
+           "data/delay_from_onset_cdfs.RDS"),
+  
+  tar_file(surveillance_matrix_path,
+           "data/surveillance_matrix.RDS"),
+  
+  surveillance_cdfs = read_rds(delay_from_onset_cdfs_path),
+  
+  surveillance = read_rds(surveillance_matrix_path),
+  
+  isolation_cdfs = create_isolation_cdfs(
+    nsw_delays,
+    surveillance_cdfs,
+    surveillance
+  ),
+  
+  tti_distributions = create_tti_distributions(isolation_cdfs),
+
+  plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
+  
+  tar_file(plot_ecdf_path, {
+    ggsave_write_path(
+      plot = plot_tti_ecdf_comparison,
+      path = "figs/nsw_ttiq_step.png",
+    )
+  }),
+  
+  tp_reductions = calculate_tp_reductions(tti_distributions),
+  
+  plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
+                                                  tti_distributions),
+  
+  tar_file(plot_hist_tp_path, {
+    ggsave_write_path(
+      plot = plot_hist_tp_reductions,
+      path = "figs/nsw_ttiq_hist.png",
+      width = 9,
+      height = 3.5
+      )
+  }),
+  
+  ## @logan - code for writing parameters
+  # tar_file(dist_parameters_csv_path, {
+  #   write_csv_return_path(
+  #     x = dist_parameters_csv,
+  #     path = "output-public/dist_parameters.csv"
+  #   )
+  # }),
   
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
