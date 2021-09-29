@@ -176,7 +176,7 @@ tti_distributions %>%
   mutate(
     days = days + 5 - 0.5,
     across(
-      c(optimal, current),
+      c(optimal, partial, current),
       cumsum
     )
   ) %>%
@@ -289,26 +289,30 @@ df_annotate <- tp_reductions %>%
     ),
     `TTIQ effectiveness` = factor(
       `TTIQ effectiveness`,
-      levels = rev(unique(`TTIQ effectiveness`))
+      levels = c("Optimal TTIQ", "Current TTIQ", "Partial TTIQ"),
+      labels = c("Optimal",
+                 "Current without case-initated CT",
+                 "Current + case-initated CT" 
+                 )
     ),
     x = 12,
     y = 0.1,
     message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average")
   )
   
-
 cols = scales::hue_pal()(3)[c(1, 3)]
 
 # plot histograms
 tti_distributions %>%
   pivot_longer(
-    cols = c("current", "optimal"),
+    cols = c("current", "partial", "optimal"),
     names_to = "TTIQ effectiveness",
     values_to = "pdf"
   ) %>%
   mutate(
     colour = case_when(
       `TTIQ effectiveness` == "optimal" ~ 1,
+      `TTIQ effectiveness` == "partial" ~ 2,
       `TTIQ effectiveness` == "current" ~ 3,
     ),
     `TTIQ effectiveness` = paste(
@@ -319,7 +323,11 @@ tti_distributions %>%
   mutate(
     `TTIQ effectiveness` = factor(
       `TTIQ effectiveness`,
-      levels = rev(unique(`TTIQ effectiveness`))
+      levels = c("Optimal TTIQ", "Current TTIQ", "Partial TTIQ"),
+      labels = c("Optimal",
+                 "Current without case-initated CT",
+                 "Current + case-initated CT" 
+      )
     )
   ) %>%
   ggplot(
@@ -331,7 +339,7 @@ tti_distributions %>%
   ) +
   facet_wrap(
     facets = vars(`TTIQ effectiveness`),
-    ncol = 1
+    ncol = 3
   ) +
   geom_vline(
     xintercept = 5,
@@ -357,7 +365,7 @@ tti_distributions %>%
       y = y,
       label = message
     ),
-    data = filter(df_annotate, `TTIQ effectiveness` != "Partial TTIQ")
+    data = df_annotate
   )
 
 ggsave(
