@@ -176,6 +176,14 @@ tar_plan(
       )
   }),
   
+  ## @logan - code for writing parameters
+  # tar_file(dist_parameters_csv_path, {
+  #   write_csv_return_path(
+  #     x = dist_parameters_csv,
+  #     path = "output-public/dist_parameters.csv"
+  #   )
+  # }),
+  
   # analyse NSW data to get distributions of these delays (blue + yellow graphs)
   
   # 1. Swab
