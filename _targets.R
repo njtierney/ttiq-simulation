@@ -42,7 +42,7 @@ tar_plan(
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
   plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
-
+  
   cases_scenario = bind_rows(
     optimal = keep_dates_between(cases_nsw_delays,
                                  lower_date = "2020-07-01",
@@ -67,20 +67,20 @@ tar_plan(
   derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
   tar_file(derived_delay_distributions_csv, {
-    write_csv_return_path(derived_delay_distributions_df, here("outputs/derived_delay_distributions.csv"))
+    write_csv_return_path(derived_delay_distributions_df, here("public-outputs/derived_delay_distributions.csv"))
   }),
   
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
-                                             n_samples = 100000),
+                                         n_samples = 100000),
   
   delay_samples_against_data = add_data_to_delay_samples(delay_samples,
                                                          cases_scenario),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
     delay_samples_against_data
-    ),
+  ),
   
   plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
     prepared_cases_for_plots
@@ -94,7 +94,7 @@ tar_plan(
       height = 6
     )
   }),
-
+  
   p_active_detection = 0.9,
   p_passive_detection = 0.3,
   
@@ -177,7 +177,7 @@ tar_plan(
   ),
   
   tti_distributions = create_tti_distributions(isolation_cdfs),
-
+  
   plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
   
   tar_file(plot_ecdf_path, {
@@ -198,7 +198,7 @@ tar_plan(
       path = "figs/nsw_ttiq_hist.png",
       width = 9,
       height = 3.5
-      )
+    )
   }),
   
   ## @logan - code for writing parameters
@@ -244,28 +244,28 @@ tar_plan(
   
 )
 
-    # change this so we can provide our own distribution
-    
-    ## optimal
-    ## current
-    ## current + case initiated contract tracing
-      # some fraction of these the fraction of them is 0
-      # mixture of current + fraction where time = 0
-    
-    ## idependent assumption
-    
-   
-    # delay from speciman collection to notification - this is test turaround time
-    # time from notification to interview
-    
-    # earliest confirmed or probable (notification date) - pretend this is 
-    # interviewed date (date of interview)
-    # difference of these is delay to interview - THIS IS sim tracing delay
-    # time to interview
-    
-    # test turnaround time IS:
-      # difference of swab date and earliest confirmed or probable
-    
-    # speciman collection date to earliest confirmed or probably
-    
-    # bootstrap sample from observed
+# change this so we can provide our own distribution
+
+## optimal
+## current
+## current + case initiated contract tracing
+# some fraction of these the fraction of them is 0
+# mixture of current + fraction where time = 0
+
+## idependent assumption
+
+
+# delay from speciman collection to notification - this is test turaround time
+# time from notification to interview
+
+# earliest confirmed or probable (notification date) - pretend this is 
+# interviewed date (date of interview)
+# difference of these is delay to interview - THIS IS sim tracing delay
+# time to interview
+
+# test turnaround time IS:
+# difference of swab date and earliest confirmed or probable
+
+# speciman collection date to earliest confirmed or probably
+
+# bootstrap sample from observed

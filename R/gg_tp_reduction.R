@@ -46,7 +46,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       scenario_colour = factor(scenario_colour)
     ) %>%
     ungroup()
-    
+  
   
   df_annotate <- cases_tp_reduction %>% 
     group_by(scenario) %>% 
@@ -67,7 +67,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
            message) %>% 
     distinct() %>%
     arrange(scenario)
-
+  
   ggplot(cases_tp_reduction,
          aes(
            x = time_to_isolation_sims,
@@ -97,7 +97,6 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       y = "Cases isolated",
       x = "Days since infection"
     ) + 
-    scale_fill_manual(values = cols) + 
     lims(
       x = c(-1,14)
     ) +
