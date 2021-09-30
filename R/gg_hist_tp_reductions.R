@@ -8,58 +8,32 @@
 #' @author dhduncan
 #' @export
 gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
-
-  df_annotate <- tp_reductions %>%
-    rename(
-      `TTIQ effectiveness` = ttiq_effectiveness
-    ) %>%
-    mutate(
-      `TTIQ effectiveness` = paste(
-        stringr::str_to_sentence(`TTIQ effectiveness`),
-        "TTIQ"
-      ),
-      `TTIQ effectiveness` = factor(
-        `TTIQ effectiveness`,
-        levels = c("Optimal TTIQ", "Partial TTIQ", "Current TTIQ"),
-        labels = c("Optimal",
-                   "Partial",
-                   "NSW Current" 
-        )
-      ),
-      x = 14,
-      y = 0.12,
-      message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average")
-    )
   
-#  cols = scales::hue_pal()(3)[1:3]
+  dark2 = brewer.pal(8, "Dark2")
+  # Define plotting constants in order
+  scenarios = tribble(
+    ~name, ~value, ~colour,
+    "Optimal (NSW)", "optimal", dark2[1],
+    "Partial (VIC)", "partial", dark2[2],
+    "NSW Current", "current", dark2[3]
+  ) %>%
+    mutate(name = fct_inorder(name))
+  
+  df_annotate = tp_reductions %>%
+    left_join(scenarios, by=c("ttiq_effectiveness"="value")) %>%
+    mutate(message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average"),
+           `TTIQ effectiveness` = name)
   
   # plot histograms
   tti_distributions %>%
     pivot_longer(
       cols = c("current", "partial", "optimal"),
-      names_to = "TTIQ effectiveness",
+      names_to = "ttiq_effectiveness",
       values_to = "pdf"
     ) %>%
+    left_join(scenarios, by=c("ttiq_effectiveness"="value")) %>%
     mutate(
-      colour = case_when(
-        `TTIQ effectiveness` == "optimal" ~ 1,
-        `TTIQ effectiveness` == "partial" ~ 2,
-        `TTIQ effectiveness` == "current" ~ 3,
-      ),
-      `TTIQ effectiveness` = paste(
-        stringr::str_to_sentence(`TTIQ effectiveness`),
-        "TTIQ"
-      )
-    ) %>%
-    mutate(
-      `TTIQ effectiveness` = factor(
-        `TTIQ effectiveness`,
-        levels = c("Optimal TTIQ", "Partial TTIQ", "Current TTIQ"),
-        labels = c("Optimal",
-                   "Partial",
-                   "NSW Current" 
-        )
-      )
+      `TTIQ effectiveness` = name
     ) %>%
     ggplot(
       aes(
@@ -93,17 +67,9 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
     scale_fill_brewer(
       palette = "Dark2"
     ) +
-    geom_text(
-      aes(
-        x = x,
-        y = y,
-        label = message,
-      ),
-      size = 4,
-      hjust = 1,
-      vjust = 0,
-      data = df_annotate
-    ) + 
+    geom_text(data = df_annotate,
+              aes(x = Inf, y = Inf, label=message, fill = NULL),
+              hjust="inward", vjust="inward") +
     ggtitle("Times to isolation from case data")
 
 }
