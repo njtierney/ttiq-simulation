@@ -1,13 +1,16 @@
-## Load your packages, e.g. library(targets).
+## Loads all packages and defines how to handle NAMESPACE conflicts
 source("./packages.R")
 
-## Load your R files
+## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
-  tar_file(cases_nsw_path, "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
-  tar_file(cases_vic_path, "data/Linelist_Cases_20210917.xlsx"),
+  tar_file(cases_nsw_path, 
+           "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  
+  tar_file(cases_vic_path, 
+           "data/Linelist_Cases_20210917.xlsx"),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
@@ -28,8 +31,10 @@ tar_plan(
   cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw_delays),
   cases_vic_raw_delay_long = cases_nsw_delay_raw_longer(cases_vic_delays),
   
-  plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
-  plot_cases_vic_raw_delay_long = gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
+  plot_cases_nsw_raw_delay_long = 
+    gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
+  plot_cases_vic_raw_delay_long = 
+    gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
   cases_vic_interview_missings = gg_interview_missings(cases_vic_delays),
@@ -66,10 +71,14 @@ tar_plan(
     prop_current_case_zero = 0.8
   ),
   
-  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  derived_delay_distributions_df = 
+    dist_params_to_df(derived_delay_distributions),
   
   tar_file(derived_delay_distributions_csv, {
-    write_csv_return_path(derived_delay_distributions_df, here("public-outputs/derived_delay_distributions.csv"))
+    write_csv_return_path(
+      derived_delay_distributions_df, 
+      here("outputs-public/derived_delay_distributions.csv")
+      )
   }),
   
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
@@ -206,48 +215,40 @@ tar_plan(
     )
   }),
   
-  ## @logan - code for writing parameters
-  # tar_file(dist_parameters_csv_path, {
-  #   write_csv_return_path(
-  #     x = dist_parameters_csv,
-  #     path = "output-public/dist_parameters.csv"
-  #   )
-  # }),
-  
-  # analyse NSW data to get distributions of these delays (blue + yellow graphs)
-  
-  # 1. Swab
-  # 2. Notification
-  # 3. Interview
-  
-  # (assuming the infector isolates on date of swab)
-  # (assuming infectees isolate on date of interview)
-  
-  # difference of 1-2 is test turnaround time
-  # simulate random draw from this distribution
-  # difference of 2-3 is time to interview ()
-  # simulate random draw from this distribution
-  
-  # sum these random draws together
-  # this gives you the full contact tracing delay
-  # this ^^ returns what we currently have in the sim_tracing function
-  
-  ## optimal is this time period from July 2020 to Feb 2021
-  
-  ## Current is from the last month
-  
-  ## current + case initiated
-  # same as current, but we randomly set the notification to interview to 0
-  
-  # difference of 1-3 is swab to interview (full contact tracing delay)
-  
-  
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
   tar_render(explore, "doc/explore_vic.Rmd")
   
 )
+
+
+# analyse NSW data to get distributions of these delays (blue + yellow graphs)
+
+# 1. Swab
+# 2. Notification
+# 3. Interview
+
+# (assuming the infector isolates on date of swab)
+# (assuming infectees isolate on date of interview)
+
+# difference of 1-2 is test turnaround time
+# simulate random draw from this distribution
+# difference of 2-3 is time to interview ()
+# simulate random draw from this distribution
+
+# sum these random draws together
+# this gives you the full contact tracing delay
+# this ^^ returns what we currently have in the sim_tracing function
+
+## optimal is this time period from July 2020 to Feb 2021
+
+## Current is from the last month
+
+## current + case initiated
+# same as current, but we randomly set the notification to interview to 0
+
+# difference of 1-3 is swab to interview (full contact tracing delay)
 
 # change this so we can provide our own distribution
 
@@ -258,7 +259,6 @@ tar_plan(
 # mixture of current + fraction where time = 0
 
 ## idependent assumption
-
 
 # delay from speciman collection to notification - this is test turaround time
 # time from notification to interview
