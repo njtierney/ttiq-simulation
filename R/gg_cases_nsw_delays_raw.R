@@ -7,9 +7,9 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-gg_cases_nsw_delays_raw <- function(cases_nsw_raw_delay_long) {
+gg_cases_delays <- function(cases_longer) {
 
-  ggplot(cases_nsw_raw_delay_long,
+  ggplot(cases_longer,
          aes(x = days)) +
     geom_bar() +
     facet_wrap(~delay_type) + 

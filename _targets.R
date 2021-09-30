@@ -28,26 +28,6 @@ tar_plan(
     notification_date_var = earliest_confirmed_or_probable
   ),
   
-  cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw_delays),
-  cases_vic_raw_delay_long = cases_nsw_delay_raw_longer(cases_vic_delays),
-  
-  plot_cases_nsw_raw_delay_long = 
-    gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
-  plot_cases_vic_raw_delay_long = 
-    gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
-  
-  cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
-  cases_vic_interview_missings = gg_interview_missings(cases_vic_delays),
-  
-  are_nsw_cases_independent = check_cases_independence(cases_nsw_delays),
-  are_vic_cases_independent = check_cases_independence(cases_vic_delays),
-  
-  cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
-  cases_vic_delays_long = cases_nsw_longer(cases_vic_delays),
-  
-  plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
-  plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
-  
   cases_scenario = bind_rows(
     optimal = keep_dates_between(cases_nsw_delays,
                                  lower_date = "2020-07-01",
@@ -218,7 +198,7 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore_vic.Rmd")
+  tar_render(explore, "doc/explore.Rmd")
   
 )
 
