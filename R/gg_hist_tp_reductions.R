@@ -27,7 +27,7 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
   # plot histograms
   tti_distributions %>%
     pivot_longer(
-      cols = c("current", "partial", "optimal"),
+      cols = -days,
       names_to = "ttiq_effectiveness",
       values_to = "pdf"
     ) %>%
@@ -37,9 +37,9 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
     ) %>%
     ggplot(
       aes(
-        days + 5,
-        pdf,
-        fill = `TTIQ effectiveness`
+        x = days + 5,
+        y = pdf,
+        fill = colour
       )
     ) +
     facet_wrap(
@@ -57,15 +57,13 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
       breaks = seq(0, 15, by = 5),
     ) +
     scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_fill_identity() +
     xlab("Days since infection") +
     ylab("Cases isolated") +
     theme_cowplot() +
     theme(
       legend.position = "none",
       strip.background = element_blank()
-    ) +
-    scale_fill_brewer(
-      palette = "Dark2"
     ) +
     geom_text(data = df_annotate,
               aes(x = Inf, y = Inf, label=message, fill = NULL),

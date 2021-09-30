@@ -53,12 +53,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     ungroup() %>% 
     mutate(tp_reduction = glue("{percent(1 - tp_multiplier, accuracy = 1)} reduction"),
            avg_days = glue("{round(avg_days)} day average"),
-           message = glue("{tp_reduction}\n{avg_days}")) %>% 
-    relocate(tp_reduction) %>%
-    distinct(tp_reduction,
-             scenario,
-             avg_days,
-             message)
+           message = glue("{tp_reduction}\n{avg_days}"))
   
   ggplot(cases_tp_reduction,
          aes(
@@ -85,7 +80,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       strip.background = element_blank()
     ) +
     labs(
-      fill = "",
+      title = "Times to isolation from model",
       y = "Cases isolated",
       x = "Days since infection"
     ) + 
@@ -94,8 +89,6 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       x = c(-1,14)
     ) +
     geom_text(data = df_annotate,
-               aes(x = Inf, y = Inf, label=message, fill = NULL),
-               hjust="inward", vjust="inward") +
-    theme(legend.position = "none") + 
-    ggtitle("Times to isolation from model")
+              aes(x = Inf, y = Inf, label = message, fill = NULL),
+              hjust="inward", vjust="inward")
 }
