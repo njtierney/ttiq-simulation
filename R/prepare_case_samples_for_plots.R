@@ -4,11 +4,13 @@
 #'
 #' @title
 #' @param nsw_delay_samples_against_data
+#' @param scenario_parameters Dataframe of scenario (display) name, value in data,
+#' and color.
 #' @return
 #' @author Nicholas Tierney
 #' @export
-prepare_case_samples_for_plots <- function(delay_samples_against_data) {
-  
+prepare_case_samples_for_plots <- function(delay_samples_against_data, scenario_parameters) {
+
   delay_samples_against_data %>% 
     rename(
       other_delays = isol_swab,
@@ -26,8 +28,11 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data) {
       names_to = "delay_type",
       values_to = "days"
     ) %>% 
+    drop_na() %>%
     filter(delay_type != "full_contact_delay") %>% 
     filter(delay_type != "test_to_interview") %>% 
+    left_join(scenario_parameters, by=c("scenario"="value")) %>%
+    mutate(scenario = name) %>%
     mutate(
       delay_type = str_replace_all(delay_type, "_", " "),
       delay_type = as_factor(delay_type),
@@ -36,18 +41,6 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data) {
         "swab to notification",
         "notification to interview",
         "other delays"
-      ),
-      scenario = case_when(
-        scenario == "optimal" ~ "Optimal",
-        scenario == "current" ~ "NSW Current\nwithout case-initiated",
-        scenario == "current_case_init" ~ "NSW Current\nwith case-initiated",
-      ),
-      scenario = as_factor(scenario),
-      scenario = fct_relevel(
-        scenario,
-        "Optimal",
-        "NSW Current\nwithout case-initiated",
-        "NSW Current\nwith case-initiated"
       )
     ) %>% 
     group_by(
@@ -63,5 +56,4 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data) {
     mutate(
       fraction = count / sum(count)
     )
-  
 }

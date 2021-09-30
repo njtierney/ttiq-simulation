@@ -6,10 +6,11 @@ lapply(list.files("./R", full.names = TRUE), source)
 
 tar_plan(
   
-  tar_file(cases_nsw_path, 
-           "~/not_synced/vaccination/nsw/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
-   
+  tar_file(cases_nsw_path, "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  tar_file(cases_vic_path, "data/Linelist_Cases_20210917.xlsx"),
+  
   cases_nsw = read_cases_nsw(cases_nsw_path),
+  cases_vic = read_cases_vic(cases_vic_path),
   
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
@@ -17,45 +18,72 @@ tar_plan(
     interview_date_var = interviewed_date,
     notification_date_var = earliest_confirmed_or_probable
   ),
+  cases_vic_delays = case_add_delays(
+    cases = cases_vic,
+    swab_date_var = earliest_detected,
+    interview_date_var = interviewed_date,
+    notification_date_var = earliest_confirmed_or_probable
+  ),
   
   cases_nsw_raw_delay_long = cases_nsw_delay_raw_longer(cases_nsw_delays),
+  cases_vic_raw_delay_long = cases_nsw_delay_raw_longer(cases_vic_delays),
   
   plot_cases_nsw_raw_delay_long = gg_cases_nsw_delays_raw(cases_nsw_raw_delay_long),
+  plot_cases_vic_raw_delay_long = gg_cases_nsw_delays_raw(cases_vic_raw_delay_long),
   
   cases_nsw_interview_missings = gg_interview_missings(cases_nsw_delays),
+  cases_vic_interview_missings = gg_interview_missings(cases_vic_delays),
   
-  are_cases_independent = check_cases_independence(cases_nsw_delays),
+  are_nsw_cases_independent = check_cases_independence(cases_nsw_delays),
+  are_vic_cases_independent = check_cases_independence(cases_vic_delays),
   
   cases_nsw_delays_long = cases_nsw_longer(cases_nsw_delays),
+  cases_vic_delays_long = cases_nsw_longer(cases_vic_delays),
   
   plot_cases_nsw_delays = gg_cases_nsw_delays(cases_nsw_delays_long),
+  plot_cases_vic_delays = gg_cases_nsw_delays(cases_vic_delays_long),
   
   cases_scenario = bind_rows(
     optimal = keep_dates_between(cases_nsw_delays,
                                  lower_date = "2020-07-01",
                                  upper_date = "2021-02-01"),
-    current = keep_dates_between(cases_nsw_delays,
-                                 lower_date = "2021-08-15",
-                                 upper_date = "2021-09-15"),
+    current_nsw = keep_dates_between(cases_nsw_delays,
+                                     lower_date = "2021-08-01",
+                                     upper_date = "2021-09-15"),
+    partial = keep_dates_between(cases_vic_delays,
+                                 lower_date = "2020-08-01",
+                                 upper_date = "2020-08-07"),
+    current_vic = keep_dates_between(cases_vic_delays,
+                                     lower_date = "2021-08-01",
+                                     upper_date = "2021-09-15"),
     .id = "scenario"
   ),
+  
+  scenario_parameters = create_scenario_parameters(),
   
   derived_delay_distributions = derive_distributions(
     cases_scenario,
     prop_current_case_zero = 0.8
-    ),
+  ),
+  
+  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  
+  tar_file(derived_delay_distributions_csv, {
+    write_csv_return_path(derived_delay_distributions_df, here("public-outputs/derived_delay_distributions.csv"))
+  }),
   
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
-                                             n_samples = 100000),
+                                         n_samples = 100000),
   
   delay_samples_against_data = add_data_to_delay_samples(delay_samples,
                                                          cases_scenario),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
-    delay_samples_against_data
-    ),
+    delay_samples_against_data,
+    scenario_parameters
+  ),
   
   plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
     prepared_cases_for_plots
@@ -69,7 +97,7 @@ tar_plan(
       height = 6
     )
   }),
-
+  
   p_active_detection = 0.9,
   p_passive_detection = 0.3,
   
@@ -98,14 +126,15 @@ tar_plan(
     scenario_df_run
   ),
   
-  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
+  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
+                                      scenario_parameters),
   
   tar_file(plot_tp_reduction_path, {
     ggsave_write_path(
       plot = plot_tp_reduction,
       path = "figs/nsw_ttiq_model_hist.png",
       width = 9,
-      height = 3.5
+      height = 6
     )
   }),
   
@@ -152,7 +181,7 @@ tar_plan(
   ),
   
   tti_distributions = create_tti_distributions(isolation_cdfs),
-
+  
   plot_tti_ecdf_comparison = gg_tti_ecdf_comparison(tti_distributions),
   
   tar_file(plot_ecdf_path, {
@@ -165,7 +194,8 @@ tar_plan(
   tp_reductions = calculate_tp_reductions(tti_distributions),
   
   plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
-                                                  tti_distributions),
+                                                  tti_distributions,
+                                                  scenario_parameters),
   
   tar_file(plot_hist_tp_path, {
     ggsave_write_path(
@@ -173,7 +203,7 @@ tar_plan(
       path = "figs/nsw_ttiq_hist.png",
       width = 9,
       height = 3.5
-      )
+    )
   }),
   
   ## @logan - code for writing parameters
@@ -215,32 +245,32 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd")
+  tar_render(explore, "doc/explore_vic.Rmd")
   
 )
 
-    # change this so we can provide our own distribution
-    
-    ## optimal
-    ## current
-    ## current + case initiated contract tracing
-      # some fraction of these the fraction of them is 0
-      # mixture of current + fraction where time = 0
-    
-    ## idependent assumption
-    
-   
-    # delay from speciman collection to notification - this is test turaround time
-    # time from notification to interview
-    
-    # earliest confirmed or probable (notification date) - pretend this is 
-    # interviewed date (date of interview)
-    # difference of these is delay to interview - THIS IS sim tracing delay
-    # time to interview
-    
-    # test turnaround time IS:
-      # difference of swab date and earliest confirmed or probable
-    
-    # speciman collection date to earliest confirmed or probably
-    
-    # bootstrap sample from observed
+# change this so we can provide our own distribution
+
+## optimal
+## current
+## current + case initiated contract tracing
+# some fraction of these the fraction of them is 0
+# mixture of current + fraction where time = 0
+
+## idependent assumption
+
+
+# delay from speciman collection to notification - this is test turaround time
+# time from notification to interview
+
+# earliest confirmed or probable (notification date) - pretend this is 
+# interviewed date (date of interview)
+# difference of these is delay to interview - THIS IS sim tracing delay
+# time to interview
+
+# test turnaround time IS:
+# difference of swab date and earliest confirmed or probable
+
+# speciman collection date to earliest confirmed or probably
+
+# bootstrap sample from observed

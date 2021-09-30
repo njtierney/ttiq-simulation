@@ -67,7 +67,7 @@ derived_delay_distributions
 ## EDA
 
 ```{r}
-# cases_nsw_raw_delay_long %>% 
+# cases_vic_raw_delay_long %>% 
 #     group_by(delay_type) %>% 
 #     count(days, sort = TRUE) %>% 
 #     mutate(prop = n / sum(n))
@@ -113,7 +113,6 @@ scenario_df_run
 ```
 
 ```{r}
-
   cases_scenario %>% 
     group_by(scenario) %>% 
     summarise(
@@ -127,8 +126,8 @@ scenario_df_run
         na.rm = TRUE
         )
     )
-  
-  cases_scenario %>% 
+
+  cases_scenario %>%
     select(test_turnaround_time,
            time_to_interview,
            full_contact_delay,
