@@ -37,5 +37,6 @@ library(tarchetypes)
 library(truncdist)
 library(tidyverse)
 library(vctrs)
+library(RColorBrewer)
 
 message("packages loaded!")

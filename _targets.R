@@ -130,7 +130,7 @@ tar_plan(
       plot = plot_tp_reduction,
       path = "figs/nsw_ttiq_model_hist.png",
       width = 9,
-      height = 3.5
+      height = 6
     )
   }),
   

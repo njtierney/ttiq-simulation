@@ -9,26 +9,25 @@
 #' @export
 gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
   
+  dark2 = brewer.pal(8, "Dark2")
+  # Define plotting constants in order
+  scenario_names = c("Optimal (NSW)", "Partial (VIC)",
+                     "NSW Current\nwith case-initiated",
+                     "NSW Current\nwithout case-initiated",
+                     "VIC Current\nwith case-initiated", 
+                     "VIC Current\nwithout case-initiated")
+  scenario_values = c("optimal", "partial", "current_nsw_case_init", "current_nsw",
+                      "current_vic_case_init", "current_vic") %>%
+    setNames(scenario_names)
+  scenario_colors = c(dark2[1], dark2[2], dark2[3], dark2[3], dark2[4], dark2[4])
+  
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 
     mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>%
     unnest(cols = time_to_isolation_sims) %>% 
     mutate(
-      scenario = factor(
-        scenario, 
-        levels = c("optimal",
-                   "partial",
-                   "current_nsw_case_init",
-                   "current_vic_case_init",
-                   "current_nsw",
-                   "current_vic"),
-        labels = c("Optimal (NSW)",
-                   "Partial (VIC)",
-                   "NSW Current\nwith case-initiated",
-                   "VIC Current\nwith case-initiated",
-                   "NSW Current\nwithout case-initiated",
-                   "VIC Current\nwithout case-initiated")
-      )
+      scenario = fct_recode(scenario, !!!scenario_values) %>%
+        fct_relevel(scenario_names)
     ) %>%
     mutate(
       time_to_isolation_sims = floor(time_to_isolation_sims)
@@ -86,7 +85,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     geom_col() + 
     facet_wrap(
       ~ scenario,
-      ncol = 3
+      ncol = 2
     ) + 
     scale_y_continuous(
       labels = scales::percent_format(accuracy = 1)
@@ -101,7 +100,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       y = "Cases isolated",
       x = "Days since infection"
     ) + 
-    scale_fill_brewer(palette="Dark2") +
+    scale_fill_manual(values=scenario_colors) +
     lims(
       x = c(-1,14)
     ) +
