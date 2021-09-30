@@ -7,9 +7,10 @@ lapply(list.files("./R", full.names = TRUE), source)
 tar_plan(
   
   tar_file(cases_nsw_path, "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  tar_file(cases_vic_path, "data/Linelist_Cases_20210917.xlsx"),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
-  cases_vic = read_cases_vic(),
+  cases_vic = read_cases_vic(cases_vic_path),
   
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,

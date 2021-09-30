@@ -26,7 +26,7 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data) {
       names_to = "delay_type",
       values_to = "days"
     ) %>% 
-    drop_na %>%
+    drop_na() %>%
     filter(delay_type != "full_contact_delay") %>% 
     filter(delay_type != "test_to_interview") %>% 
     mutate(
