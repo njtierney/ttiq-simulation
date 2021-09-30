@@ -102,8 +102,8 @@ tar_plan(
     ggsave_write_path(
       plot = plot_hist_delay_samples_v_data,
       path = "figs/hist_delay_samples_v_data.png",
-      width = 6,
-      height = 6
+      width = 8,
+      height = 8
     )
   }),
   
