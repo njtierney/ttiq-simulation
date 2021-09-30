@@ -45,7 +45,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
   
   
   df_annotate <- cases_tp_reduction %>% 
-    group_by(scenario, colour) %>% 
+    group_by(scenario) %>% 
     summarise(
       avg_days = weighted.mean(time_to_isolation_sims, fraction),
       tp_multiplier = first(tp_multiplier),
@@ -59,8 +59,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     distinct(tp_reduction,
              scenario,
              avg_days,
-             message,
-             colour)
+             message)
   
   ggplot(cases_tp_reduction,
          aes(
@@ -95,9 +94,9 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     lims(
       x = c(-1,14)
     ) +
-    geom_label(data = df_annotate,
-               aes(x = Inf, y = Inf, label=message),
-               hjust="inward", vjust="inward", color="white", label.size=NA) +
+    geom_text(data = df_annotate,
+               aes(x = Inf, y = Inf, label=message, fill = NULL),
+               hjust="inward", vjust="inward") +
     theme(legend.position = "none") + 
     ggtitle("Times to isolation from model")
 }
