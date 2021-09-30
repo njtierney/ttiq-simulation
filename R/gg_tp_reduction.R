@@ -67,7 +67,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
            message) %>% 
     distinct() %>%
     arrange(scenario)
-    
+
   ggplot(cases_tp_reduction,
          aes(
            x = time_to_isolation_sims,
