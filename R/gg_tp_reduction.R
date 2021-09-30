@@ -17,11 +17,17 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       scenario = factor(
         scenario, 
         levels = c("optimal",
-                   "current_case_init",
-                   "current"),
-        labels = c("Optimal",
+                   "partial",
+                   "current_nsw_case_init",
+                   "current_vic_case_init",
+                   "current_nsw",
+                   "current_vic"),
+        labels = c("Optimal (NSW)",
+                   "Partial (VIC)",
                    "NSW Current\nwith case-initiated",
-                   "NSW Current\nwithout case-initiated")
+                   "VIC Current\nwith case-initiated",
+                   "NSW Current\nwithout case-initiated",
+                   "VIC Current\nwithout case-initiated")
       )
     ) %>%
     mutate(
@@ -53,7 +59,6 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     summarise(
       avg_days = weighted.mean(time_to_isolation_sims, fraction),
       tp_multiplier = first(tp_multiplier),
-      scenario_colour = first(scenario_colour)
     ) %>% 
     ungroup() %>% 
     mutate(tp_reduction = glue("{percent(1 - tp_multiplier, accuracy = 1)} reduction"),
@@ -62,7 +67,6 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     relocate(tp_reduction) %>% 
     select(tp_reduction,
            scenario,
-           scenario_colour,
            avg_days,
            message) %>% 
     distinct() %>%
@@ -72,7 +76,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
          aes(
            x = time_to_isolation_sims,
            y = fraction,
-           fill = scenario_colour
+           fill = scenario
          )) +
     geom_vline(
       xintercept = 5,
@@ -97,6 +101,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
       y = "Cases isolated",
       x = "Days since infection"
     ) + 
+    scale_fill_brewer(palette="Dark2") +
     lims(
       x = c(-1,14)
     ) +
