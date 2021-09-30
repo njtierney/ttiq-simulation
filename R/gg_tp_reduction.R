@@ -4,29 +4,18 @@
 #'
 #' @title
 #' @param scenario_df_run_tp_multiplier
+#' @param scenario_parameters Dataframe of scenario (display) name, value in data,
+#' and color.
 #' @return
 #' @author Nicholas Tierney
 #' @export
-gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
-  
-  dark2 = brewer.pal(8, "Dark2")
-  # Define plotting constants in order
-  scenarios = tribble(
-    ~name, ~value, ~colour,
-    "Optimal (NSW)", "optimal", dark2[1],
-    "Partial (VIC)", "partial", dark2[2],
-    "NSW Current\nwith case-initiated", "current_nsw_case_init", dark2[3],
-    "NSW Current\nwithout case-initiated", "current_nsw", dark2[3],
-    "VIC Current\nwith case-initiated", "current_vic_case_init", dark2[4],
-    "VIC Current\nwithout case-initiated", "current_vic", dark2[4]
-  ) %>%
-    mutate(name = fct_inorder(name))
-  
+gg_tp_reduction <- function(scenario_df_run_tp_multiplier, scenario_parameters) {
+
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 
     mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>%
     unnest(cols = time_to_isolation_sims) %>% 
-    left_join(scenarios, by=c("scenario"="value")) %>%
+    left_join(scenario_parameters, by=c("scenario"="value")) %>%
     mutate(
       scenario = name,
       time_to_isolation_sims = floor(time_to_isolation_sims)

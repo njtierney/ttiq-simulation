@@ -4,23 +4,16 @@
 #'
 #' @title
 #' @param tti_tp_reductions
+#' @param tti_distributions
+#' @param scenario_parameters Dataframe of scenario (display) name, value in data,
+#' and color.
 #' @return
 #' @author dhduncan
 #' @export
-gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
-  
-  dark2 = brewer.pal(8, "Dark2")
-  # Define plotting constants in order
-  scenarios = tribble(
-    ~name, ~value, ~colour,
-    "Optimal (NSW)", "optimal", dark2[1],
-    "Partial (VIC)", "partial", dark2[2],
-    "NSW Current", "current", dark2[3]
-  ) %>%
-    mutate(name = fct_inorder(name))
+gg_hist_tp_reductions <- function(tp_reductions, tti_distributions, scenario_parameters) {
   
   df_annotate = tp_reductions %>%
-    left_join(scenarios, by=c("ttiq_effectiveness"="value")) %>%
+    left_join(scenario_parameters, by=c("ttiq_effectiveness"="value")) %>%
     mutate(message = glue("{percent(tp_reduction, accuracy = 1)} reduction\n{round(avg_days)} day average"),
            `TTIQ effectiveness` = name)
   
@@ -31,7 +24,7 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions) {
       names_to = "ttiq_effectiveness",
       values_to = "pdf"
     ) %>%
-    left_join(scenarios, by=c("ttiq_effectiveness"="value")) %>%
+    left_join(scenario_parameters, by=c("ttiq_effectiveness"="value")) %>%
     mutate(
       `TTIQ effectiveness` = name
     ) %>%

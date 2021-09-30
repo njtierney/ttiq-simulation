@@ -59,6 +59,8 @@ tar_plan(
     .id = "scenario"
   ),
   
+  scenario_parameters = create_scenario_parameters(),
+  
   derived_delay_distributions = derive_distributions(
     cases_scenario,
     prop_current_case_zero = 0.8
@@ -79,7 +81,8 @@ tar_plan(
                                                          cases_scenario),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
-    delay_samples_against_data
+    delay_samples_against_data,
+    scenario_parameters
   ),
   
   plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
@@ -123,7 +126,8 @@ tar_plan(
     scenario_df_run
   ),
   
-  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier),
+  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
+                                      scenario_parameters),
   
   tar_file(plot_tp_reduction_path, {
     ggsave_write_path(
@@ -190,7 +194,8 @@ tar_plan(
   tp_reductions = calculate_tp_reductions(tti_distributions),
   
   plot_hist_tp_reductions = gg_hist_tp_reductions(tp_reductions,
-                                                  tti_distributions),
+                                                  tti_distributions,
+                                                  scenario_parameters),
   
   tar_file(plot_hist_tp_path, {
     ggsave_write_path(
