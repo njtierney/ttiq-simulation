@@ -48,8 +48,7 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier) {
     group_by(scenario) %>% 
     summarise(
       avg_days = weighted.mean(time_to_isolation_sims, fraction),
-      tp_multiplier = first(tp_multiplier),
-      .groups = "drop"
+      tp_multiplier = first(tp_multiplier)
     ) %>% 
     ungroup() %>% 
     mutate(tp_reduction = glue("{percent(1 - tp_multiplier, accuracy = 1)} reduction"),
