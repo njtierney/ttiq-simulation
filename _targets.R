@@ -151,7 +151,7 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
-  plot_scenario_vaccination_isolation = gg_scenario_vacc_iso_unfaceted(
+  plot_scenario_vaccination_isolation_unfaceted = gg_scenario_vacc_iso_unfaceted(
     scenario_run_vaccination_isolation
   ),
   
