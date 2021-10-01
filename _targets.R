@@ -130,6 +130,8 @@ tar_plan(
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
+    # vaccination_multiplier is the relative probability of onward 
+    # transmission for vaccinated people (constant)
     vaccination_multiplier = 0.3,
     p_passive_detection_vaccinated = 0.50 * p_passive_detection,
     p_active_detection = p_active_detection,
