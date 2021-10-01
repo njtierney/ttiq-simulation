@@ -155,6 +155,10 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  # Out of all of the people identified as casual contacts
+  # How many casual cases get covid?
+  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic),
+  
   nsw_delays = read_nsw_delays(cases_nsw_path),
   
   plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
