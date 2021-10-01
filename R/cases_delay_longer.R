@@ -3,20 +3,21 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param cases_nsw
+#' @param cases
 #' @return
 #' @author Nicholas Tierney
 #' @export
-cases_nsw_delay_raw_longer <- function(cases_nsw) {
+cases_delay_longer <- function(cases) {
 
-   cases_nsw %>% 
-    select(full_contact_delay,
+  cases %>% 
+    select(test_turnaround_time,
            time_to_interview,
-           test_turnaround_time) %>% 
+           full_contact_delay,
+           test_to_interview) %>% 
     pivot_longer(
       cols = everything(),
       names_to = "delay_type",
       values_to = "days"
-    )
+    ) 
 
 }

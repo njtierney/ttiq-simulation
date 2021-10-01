@@ -32,6 +32,7 @@ withr::with_dir(here::here(), {
       scenario_vaccination_isolation,
       scenario_run_vaccination_isolation,
       cases_nsw_delays,
+      cases_vic_delays,
       cases_scenario,
       cases_nsw_interview_missings,
       derived_delay_distributions,
@@ -65,6 +66,51 @@ derived_delay_distributions
 
 
 ## EDA
+
+```{r}
+cases_nsw_delays_long <- cases_delay_longer(cases_nsw_delays)
+cases_vic_delays_long <- cases_delay_longer(cases_vic_delays)
+```
+
+```{r gg-cases-delays-cases-nsw-raw-delay-long}
+gg_cases_delays(cases_nsw_delays_long)
+```
+
+
+```{r gg-cases-delays-cases-vic-raw-delay-long}
+gg_cases_delays(cases_vic_delays_long)
+```
+
+
+```{r gg-interview-missings-cases-nsw-delays}
+gg_interview_missings(cases_nsw_delays)
+```
+
+
+```{r gg-interview-missings-cases-vic-delays}
+gg_interview_missings(cases_vic_delays)
+```
+
+
+```{r check-cases-independence-cases-nsw-delays}
+check_cases_independence(cases_nsw_delays)
+```
+
+
+```{r check-cases-independence-cases-vic-delays}
+check_cases_independence(cases_vic_delays)
+```
+
+
+```{r gg-cases-nsw-delays-cases-nsw-delays-long}
+gg_cases_nsw_delays(cases_nsw_delays_long)
+```
+
+
+```{r gg-cases-nsw-delays-cases-vic-delays-long}
+gg_cases_nsw_delays(cases_vic_delays_long)
+```
+
 
 ```{r}
 # cases_vic_raw_delay_long %>% 

@@ -6,7 +6,7 @@ current_vic,dist_isol_swab,1,NA
 current_vic,dist_test_turnaround_time,0.422927915662097,0.919946182318755
 current_vic,dist_time_to_interview,0.515913703626672,0.426037887948408
 optimal,dist_isol_swab,1,NA
-optimal,dist_test_turnaround_time,0.661031223099205,0.875796179484394
+optimal,dist_test_turnaround_time,0.661031224011276,0.875796179484394
 optimal,dist_time_to_interview,0.223186339078369,0.24629418454955
 partial,dist_isol_swab,1,NA
 partial,dist_test_turnaround_time,1.99666663549423,0.964702363147612
