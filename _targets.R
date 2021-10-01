@@ -151,6 +151,10 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  plot_scenario_vaccination_isolation = gg_scenario_vacc_iso_unfaceted(
+    scenario_run_vaccination_isolation
+  ),
+  
   nsw_delays = read_nsw_delays(cases_nsw_path),
   
   plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
