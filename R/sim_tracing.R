@@ -27,7 +27,8 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
   
   
   # hardcoded parameters for now
-  rate = 50 # poisson(rate) per day
+  rate = 20 # poisson(rate) per day
+  if (n_samples / rate < 1000) warning("n_samples / rate < 1000. Recommend increasing n_samples or decreasing rate to simulate more days.")
   capacity = 0.8 * rate
   
   queue_samples = lapply(generated_samples$scenario, function(scenario) {
@@ -69,14 +70,15 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
           desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
           # Prioritise today's notifications
           desc(notification_date >= sim_day),
-          # Finally put the oldest swabs first
-          swab_date,
+          # Finally prioritise most recent swabs (Jennie Musto, Health NSW)
+          desc(swab_date),
         ) %>%
         # Interview the maximum number of cases that can be interviewed
         mutate(interview_date = ifelse(
           # extra `if` criteria ensure non-interviewable cases are not interviewed
           is.na(interview_date) & notification_date <= sim_day & row_number() <= capacity,
-          ifelse(runif(n()) < 0.7, sim_day, sim_day+1),
+          # probability to push interview to next day 
+          ifelse(runif(n()) < 0.3, sim_day + 1, sim_day),
           interview_date))
     }
     
@@ -90,30 +92,33 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
     bind_rows()
   
   # Return a dataframe with additional columns
-  generated_samples %>%
+  generated_samples = generated_samples %>%
     left_join(queue_samples, by="scenario")
   
   
   # Diagnostic plots
-  # scenario_samples = generated_samples %>%
-  #   filter(scenario == "current_nsw") %>%
-  #   unnest(cols = starts_with("samples_"))
-  # p1 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
-  #   geom_bar() +
-  #   coord_cartesian(xlim=c(-2, 7)) +
-  #   scale_x_continuous(breaks = c(-2, 0:7), labels=c("Missed", 0:7)) +
-  #   labs(title = glue("Interview capacity of {capacity/rate} x rate"),
-  #        fill = "Interviewed\n(to show NAs)")
-  # 
-  # p2 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
-  #   geom_bar() +
-  #   facet_wrap(vars(priority_group)) +
-  #   coord_cartesian(xlim=c(-2, 7)) +
-  #   scale_x_continuous(breaks = c(-2, 0:7), labels=c("Missed", 0:7)) +
-  #   labs(title = glue("Facet by priority group"),
-  #        fill = "Interviewed\n(to show NAs)")
-  # 
-  # p1 / p2
+  {
+    scenario_samples = generated_samples %>%
+      filter(scenario == "current_nsw") %>%
+      unnest(cols = starts_with("samples_"))
+    xmax = max(scenario_samples$samples_time_to_interview)
+    p1 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
+      geom_bar() +
+      coord_cartesian(xlim=c(-2, NA)) +
+      scale_x_continuous(breaks = c(-2, 0:xmax), labels=c("Missed", 0:xmax)) +
+      labs(title = glue("Interview capacity of {capacity/rate} x rate"),
+           fill = "Interviewed\n(to show NAs)")
+
+    p2 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
+      geom_bar() +
+      facet_wrap(vars(samples_priority_group)) +
+      coord_cartesian(xlim=c(-2, NA)) +
+      scale_x_continuous(breaks = c(-2, 0:xmax), labels=c("Missed", 0:xmax)) +
+      labs(title = glue("Facet by priority group"),
+           fill = "Interviewed\n(to show NAs)")
+
+    p1 / p2
+  }
 }
 
 # # From Nick Golding on Slack
