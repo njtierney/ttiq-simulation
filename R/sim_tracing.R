@@ -20,20 +20,21 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
   # hardcoded parameters for now
   {
     rate = 50 # poisson(rate) per day
-    capacity = 0.7 * rate
+    capacity = 0.8 * rate
     scenario = "current_nsw"
     
     scenario_samples = generated_samples %>%
       filter(scenario == !!scenario) %>%
       mutate(interview_date = NA_integer_,
-             priority_group = runif(nrow(.)) < 0.4)
+             priority_group = runif(n()) < 0.4,
+             priority_info_delay = rpois(n(), 2))
     
     # Generate a sample case rate. Loop isn't slow enough to bother vectorising.
     swab_date = numeric(0)
     i = 1
     while (length(swab_date) < n_samples) {
-      # swab_date = c(swab_date, rep(i, rpois(1, rate)))
-      swab_date = c(swab_date, rep(i, round(runif(1, rate, 2*rate))))
+      swab_date = c(swab_date, rep(i, rpois(1, rate)))
+      # swab_date = c(swab_date, rep(i, round(runif(1, rate, 2*rate))))
       i = i + 1
     }
     scenario_samples$swab_date = swab_date[seq_len(n_samples)]
@@ -43,7 +44,7 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
     scenario_samples$notification_date = scenario_samples$swab_date + samples_test_turnaround_time
     
     # Simulate queue
-    message(glue("Simulating queue for {max(scenario_samples$notification_date)} iterations"))
+    message(glue("Simulating queue for {max(scenario_samples$notification_date)} iterations/days"))
     for (sim_day in seq_len(max(scenario_samples$notification_date))) {
       
       scenario_samples = scenario_samples %>%
@@ -53,12 +54,12 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
           # ensures that all interviewable cases are above non-interviewable cases
           desc(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14)),
           # Prioritise cases from the past week
-          desc(swab_date >= (sim_day - 7)),
-          # Prioritise cases in the priority proportion
-          # desc(priority_group),
-          runif(n()) < 0.6,
+          # desc(swab_date >= (sim_day - 7)),
+          # # Prioritise cases in the priority proportion
+          desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
+          # runif(n()) < 0.6,
           # Prioritise today's notifications
-          # desc(notification_date >= sim_day),
+          desc(notification_date >= sim_day),
           # Finally put the oldest swabs first
           swab_date,
         ) %>%
@@ -66,7 +67,7 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
         mutate(interview_date = ifelse(
           # extra `if` criteria ensure non-interviewable cases are not interviewed
           is.na(interview_date) & notification_date <= sim_day & row_number() <= capacity,
-          sim_day,
+          ifelse(runif(n()) < 0.7, sim_day, sim_day+1),
           interview_date))
     }
     scenario_samples = scenario_samples %>%
@@ -74,12 +75,24 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
                replace_na(-2))
     }
   
-  ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
-    geom_bar() +
-    coord_cartesian(xlim=c(-2, 7)) +
-    scale_x_continuous(breaks = c(-2, 0:7), labels=c("Missed", 0:7)) +
-    labs(title = glue("Interview capacity of {capacity/rate} x rate"),
-         fill = "Interviewed\n(to show NAs)")
+  {
+    p1 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
+      geom_bar() +
+      coord_cartesian(xlim=c(-2, 7)) +
+      scale_x_continuous(breaks = c(-2, 0:7), labels=c("Missed", 0:7)) +
+      labs(title = glue("Interview capacity of {capacity/rate} x rate"),
+           fill = "Interviewed\n(to show NAs)")
+    
+    p2 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
+      geom_bar() +
+      facet_wrap(vars(priority_group)) +
+      coord_cartesian(xlim=c(-2, 7)) +
+      scale_x_continuous(breaks = c(-2, 0:7), labels=c("Missed", 0:7)) +
+      labs(title = glue("Facet by priority group"),
+           fill = "Interviewed\n(to show NAs)")
+    
+    p1 / p2
+  }
 }
 
 # From Nick Golding on Slack
