@@ -15,6 +15,11 @@ tar_plan(
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
+  tar_file(casual_vic_path, 
+           "data/vic/Linelist_casual_20210917.xlsx"),
+  
+  casual_vic = read_casual_vic(casual_vic_path),
+  
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
     swab_date_var = earliest_detected,
@@ -155,9 +160,13 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  n_casual_cases = dplyr::n(casual_vic),
   # Out of all of the people identified as casual contacts
   # How many casual cases get covid?
-  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic),
+  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic,
+                                                               casual_vic),
+  
+  sentence = generate_statement_on_casual_cases(vic_casual_cases_get_covid),
   
   nsw_delays = read_nsw_delays(cases_nsw_path),
   
