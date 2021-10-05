@@ -163,10 +163,23 @@ tar_plan(
   n_casual_cases = dplyr::n(casual_vic),
   # Out of all of the people identified as casual contacts
   # How many casual cases get covid?
+  
+  casual_cases = filter_casual_cases(cases_vic),
+  
+  vic_casual_cases_covid_monthly = casual_cases_get_covid_monthly(cases_vic,
+                                                                  casual_cases),
+  
+  plot_vic_casual_cases_monthly = gg_casual_cases_covid_monthly(
+    vic_casual_cases_covid_monthly
+  ),
+  
   vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic,
+                                                               casual_cases,
                                                                casual_vic),
   
-  sentence = generate_statement_on_casual_cases(vic_casual_cases_get_covid),
+  vic_statement_on_casual_cases = generate_statement_on_casual_cases(
+    vic_casual_cases_get_covid
+    ),
   
   nsw_delays = read_nsw_delays(cases_nsw_path),
   

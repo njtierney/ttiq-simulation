@@ -4,11 +4,13 @@
 #'
 #' @title
 #' @param cases_vic
+#' @param casual_cases
 #' @param casual_vic
 #' @return
 #' @author Nicholas Tierney
 #' @export
 how_many_casual_cases_get_covid <- function(cases_vic,
+                                            casual_cases,
                                             casual_vic) {
 
   # Out of all of the people identified as casual contacts
@@ -17,56 +19,6 @@ how_many_casual_cases_get_covid <- function(cases_vic,
   # tell us the number of people who were identified as casual contacts
   # this will be a really big number, as there are a lot of people identified
   # as casual contacts
-  
-  
-  # Filter down to the individuals who are cases who were identified as
-  # being casual contacts
-  # this will be a smaller number as not many casual contacts test positive
-  casual_cases <- cases_vic %>% 
-    filter(
-      # status when confirmed
-      # 'screening' means casual contact
-      # 'Contact Tracing' means close contact
-      # 'Clinical Presentation' used to mean 'random detection' / no identified
-      # contact
-      CaseFoundBy == "Screening",
-      # this tells us that they've been interviewed - 
-      # which tells us that the casual contacts of *this* case are in 
-      # the database
-      CaseInterview == "Yes"
-    ) 
-  
-  casual_cases_monthly <- casual_cases %>% 
-    mutate(month = month(CalculatedOnsetDate),
-           year = year(CalculatedOnsetDate)) %>% 
-    group_by(year,
-             month) %>% 
-    summarise(
-      n_casual_cases = n()
-    )
-  
-  cases_monthly <- cases_vic %>% 
-    mutate(month = month(CalculatedOnsetDate),
-           year = year(CalculatedOnsetDate)) %>% 
-    group_by(year,
-             month) %>% 
-    summarise(
-      n_cases = n()
-    )
-  
-  # would be interesting to correlate this with how far behind contact tracing
-  # is - might be interesting to see
-  casual_cases_monthly %>% 
-    left_join(
-      cases_monthly,
-      by = c("year", "month")
-    ) %>% 
-    mutate(proportion = n_casual_cases / n_cases,
-           day = 1,
-           date = as_date(ISOdate(year = year, month = month, day = day))) %>% 
-    ggplot(aes(x = date,
-               y = proportion)) + 
-    geom_line()
   
   n_casual_cases <- nrow(casual_cases) 
   n_casual_contacts <- nrow(casual_vic)
@@ -80,10 +32,10 @@ how_many_casual_cases_get_covid <- function(cases_vic,
   prop_cases_who_are_casual_contacts <- n_casual_cases / nrow(cases_vic)
   
   return(
-  tibble(
-    prop_casual_contacts_w_covid,
-    prop_cases_who_are_casual_contacts,
-  )
+    tibble(
+      prop_casual_contacts_w_covid,
+      prop_cases_who_are_casual_contacts,
+    )
   )
   
   # > So to me there are two reasons to know that figure: 
