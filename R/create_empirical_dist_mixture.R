@@ -28,7 +28,7 @@ derive_empirical_dist_mixture <- function(cases_scenario,
   )   
   
   sim_delay <- function(n_samples, delay_params, fraction_extra_zero = 0) {
-    
+
     sim_basic <- sample(
       x = delay_params$days,
       size = n_samples,
