@@ -130,6 +130,8 @@ tar_plan(
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
+    # vaccination_multiplier is the relative probability of onward 
+    # transmission for vaccinated people (constant)
     vaccination_multiplier = 0.3,
     p_passive_detection_vaccinated = 0.50 * p_passive_detection,
     p_active_detection = p_active_detection,
@@ -148,6 +150,14 @@ tar_plan(
   plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(
     scenario_run_vaccination_isolation
   ),
+  
+  plot_scenario_vaccination_isolation_unfaceted = gg_scenario_vacc_iso_unfaceted(
+    scenario_run_vaccination_isolation
+  ),
+  
+  # Out of all of the people identified as casual contacts
+  # How many casual cases get covid?
+  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic),
   
   nsw_delays = read_nsw_delays(cases_nsw_path),
   
