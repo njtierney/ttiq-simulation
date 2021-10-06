@@ -166,8 +166,6 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
-  n_casual_cases = dplyr::n(casual_vic),
-  # Out of all of the people identified as casual contacts
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
