@@ -7,11 +7,12 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-get_oz_baseline_matrix <- function(age_limits = c(seq(0, 80, by = 5), Inf)) {
+get_oz_baseline_matrix <- function(population,
+                                   age_limits = c(seq(0, 80, by = 5), Inf)) {
 
   setting_models <- fit_setting_contacts(
     contact_data_list = get_polymod_setting_data(),
-    population = get_polymod_population()
+    population = population
   )
   
   australia_contact_matrix <- conmat::abs_pop_age_lga_2020 %>%
@@ -25,7 +26,8 @@ get_oz_baseline_matrix <- function(age_limits = c(seq(0, 80, by = 5), Inf)) {
     predict_setting_contacts(
       contact_model = setting_models,
       population = .,
-      age_breaks = age_limits
+      age_breaks = age_limits,
+      per_capita_household_size = get_per_capita_household_size()
     )
   
   # apply age-based susceptibility and infectiousness from Davies et al.
@@ -42,3 +44,26 @@ get_oz_baseline_matrix <- function(age_limits = c(seq(0, 80, by = 5), Inf)) {
   australia_ngm
 
 }
+# 
+# not sure how to add these next parts from
+# https://github.com/njtierney/conmat/blob/master/R/get_setting_transmission_matrices.R#L15-L52
+# into this code
+# # remove the 'all' matrix, keep the other four settings
+# contact_matrices <- contact_matrices[c("home", "school", "work", "other")]
+# 
+# # get setting-specific transmission probability matrices for the same age
+# # aggregations
+# transmission_matrices <- get_setting_transmission_matrices(
+#   age_breaks = age_breaks
+# )
+# 
+# # combine them to get setting-specific (unscaled) next-generation matrices
+# next_generation_matrices <- mapply(
+#   FUN = `*`,
+#   contact_matrices,
+#   transmission_matrices,
+#   SIMPLIFY = FALSE
+# )
+# 
+# # get the all-settings NGM
+# ngm_overall <- Reduce("+", next_generation_matrices)

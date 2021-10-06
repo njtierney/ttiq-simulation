@@ -138,7 +138,11 @@ tar_plan(
     )
   }),
   
-  oz_baseline_matrix = get_oz_baseline_matrix(),
+  australian_pop = get_australian_pop(),
+  
+  oz_baseline_matrix = get_oz_baseline_matrix(
+    population = australian_pop
+  ),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     # vaccination_multiplier is the relative probability of onward 
