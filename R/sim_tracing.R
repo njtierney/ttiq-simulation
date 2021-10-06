@@ -10,7 +10,12 @@
 #' @return Dataframe of generated delay samples including simulated time from notification to interview
 #' 
 #' @export
-sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1e4) {
+sim_tracing <- function(derived_delay_distributions,
+                        capacity_ratio = 0.8,
+                        prop_priority = 0.4,
+                        prop_time_delay = 0.2,
+                        f_priority = NULL,
+                        n_samples = 1e4) {
   
   generated_samples <- derived_delay_distributions %>%
     select(scenario, dist_isol_swab, dist_test_turnaround_time) %>%
@@ -29,7 +34,7 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
   # hardcoded parameters for now
   rate = 20 # poisson(rate) per day
   if (n_samples / rate < 1000) warning("n_samples / rate < 1000. Recommend increasing n_samples or decreasing rate to simulate more days.")
-  capacity = 0.8 * rate
+  capacity = capacity_ratio * rate
   
   queue_samples = lapply(generated_samples$scenario, function(scenario) {
     # Draw from distributions
@@ -37,7 +42,8 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
       filter(scenario == !!scenario) %>%
       unnest(cols = starts_with("samples_")) %>%
       mutate(interview_date = NA_integer_,
-             priority_group = runif(n()) < 0.4,
+             interview_time = runif(n()),
+             priority_group = runif(n()) < prop_priority,
              priority_info_delay = rpois(n(), 2))
     
     # Generate a sample case rate with a Poisson process
@@ -53,39 +59,42 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
     scenario_samples = scenario_samples %>%
       mutate(swab_date = .swab_date[seq_len(n_samples)],
              notification_date = swab_date + samples_test_turnaround_time)
-    setDT(scenario_samples)
+    # setDT(scenario_samples)
     
     # Simulate queue
-    message(glue("Simulating queue for {max(scenario_samples$notification_date)} iterations/days"))
+    message(glue("Simulating queue for {scenario} over {max(scenario_samples$notification_date)} iterations/days"))
     pb = txtProgressBar(min = 1, max = max(scenario_samples$notification_date), initial = 1) 
     for (sim_day in seq_len(max(scenario_samples$notification_date))) {
       setTxtProgressBar(pb, sim_day)
       
-      # scenario_samples = scenario_samples %>%
-      #   arrange(
-      #     desc(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14)),
-      #     desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
-      #     desc(notification_date >= sim_day),
-      #     desc(swab_date),
-      #   ) %>%
-      #   mutate(interview_date = ifelse(
-      #     is.na(interview_date) & notification_date <= sim_day & row_number() <= capacity,
-      #     ifelse(runif(n()) < 0.3, sim_day + 1, sim_day),
-      #     interview_date))
+      scenario_samples = scenario_samples %>%
+        arrange(
+          # Whether case is eligible to be interviewed
+          desc(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & interview_time > prop_time_delay),
+          # Priorities
+          desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
+          desc(notification_date >= sim_day),
+          desc(swab_date),
+        ) %>%
+        mutate(interview_date = ifelse(
+          # Condition on whether case is eligible to be interviewed
+          is.na(interview_date) & notification_date <= sim_day & row_number() <= capacity & interview_time > prop_time_delay,
+          sim_day,         # Interview
+          interview_date)) # No interview
       
       # DT version
       # Arrange in order of priorities
-      scenario_samples <- scenario_samples[order(scenario_samples[, .(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14), 
-                                                                      priority_group & (notification_date + priority_info_delay) <= sim_day,
-                                                                      notification_date >= sim_day,
-                                                                      swab_date)],
-                                                 decreasing = T),]
-      # Set the first `capacity` to be interviewed if not already interviewed
-      scenario_samples[,row_number := 1:.N][, interview_date := as.numeric(interview_date)][ 
-        is.na(interview_date) & notification_date <= sim_day & row_number <= capacity, 
-        # Fraction get interviewed on the next day if they are too late in the day
-        # Currently affects all interviews. Maybe it should only affect day 0 interviews?
-        interview_date := ifelse(runif(.N) < 0.3, sim_day + 1, sim_day)]
+      # scenario_samples <- scenario_samples[order(scenario_samples[, .(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14),
+      #                                                                 priority_group & (notification_date + priority_info_delay) <= sim_day,
+      #                                                                 notification_date >= sim_day,
+      #                                                                 swab_date)],
+      #                                            decreasing = T),]
+      # # Set the first `capacity` to be interviewed if not already interviewed
+      # scenario_samples[,row_number := 1:.N][, interview_date := as.numeric(interview_date)][
+      #   is.na(interview_date) & notification_date <= sim_day & row_number <= capacity,
+      #   # Fraction get interviewed on the next day if they are too late in the day
+      #   # Currently affects all interviews. Maybe it should only affect day 0 interviews?
+      #   interview_date := ifelse(runif(.N) < 0.3, sim_day + 1, sim_day)]
     }
     close(pb)
     
@@ -94,7 +103,9 @@ sim_tracing <- function(cases_scenario, derived_delay_distributions, n_samples=1
            samples_time_to_interview = replace_na(scenario_samples$interview_date - scenario_samples$notification_date, -2),
            samples_priority_group = scenario_samples$priority_group) %>%
       nest(samples_time_to_interview = samples_time_to_interview,
-           samples_priority_group = samples_priority_group)
+           samples_priority_group = samples_priority_group) %>%
+      mutate(samples_time_to_interview = lapply(samples_time_to_interview, function(x) x[[1]]),
+             samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]))
   }) %>%
     bind_rows()
   
