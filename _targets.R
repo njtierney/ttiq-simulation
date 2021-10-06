@@ -53,6 +53,7 @@ tar_plan(
   
   derived_delay_distributions = derive_distributions(
     cases_scenario,
+    # TODO vary this to be 0.2 ... 0.8
     prop_current_case_zero = 0.8
   ),
   
@@ -93,6 +94,11 @@ tar_plan(
   }),
   
   p_active_detection = 0.9,
+  # TODO change this p_passive
+  # passive_detection_given_symptoms = 0.5 or 0.25
+  # pr_symptoms = 0.6 (this will change as a function of vaccination coverage)
+  # code this up so pr_symptoms
+  # so p_passive_detection = passive_detection_given_symptoms * pr_symptoms
   p_passive_detection = 0.3,
   
   scenario_df = create_scenario_df(
