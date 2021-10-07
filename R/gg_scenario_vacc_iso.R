@@ -17,11 +17,17 @@ gg_scenario_vacc_iso <- function(scenario_run_vaccination_isolation) {
   
   # some kind of an onion plot
   scenario_run_vaccination_isolation %>%
+    filter(
+      ve_onward_transmission == ve_onward_transmission[1],
+      !no_passive_detection_vaccinated,
+      fraction_vaccinated_low_risk == 1,
+      vacc_setting_risk_ratio == vacc_setting_risk_ratio[1]
+    ) %>%
     mutate(
       vaccination_coverage_percent = 100 * vaccination_coverage
     ) %>%
     ggplot(
-      aes(x = isolation_stringency,
+      aes(x = isolation_stringency_vaccinated,
           y = weighted_tp_reduction_scaled)) + 
     geom_col() +
     facet_wrap( ~ vaccination_coverage_percent,
