@@ -124,7 +124,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
     }
   }
 names(output_list) = output_names_list
-sim_tracing_output_list = output_list
+  output_list
   #example1 = sim_tracing(
   #  derived_delay_distributions,
   #  capacity_ratio = 0.8,
@@ -138,4 +138,4 @@ sim_tracing_output_list = output_list
   #
   #list(example1)
 }
-#test_output = run_sim_tracing(derived_delay_distributions)
+#sim_tracing_output_list = run_sim_tracing(derived_delay_distributions)

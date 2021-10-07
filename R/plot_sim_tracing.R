@@ -6,7 +6,7 @@
    #Diagnostic plots
    {
   scenario_index = 15
-     scenario_samples = sim_tracing_output_list[[scenario_index]] %>%
+     scenario_samples = experiment_result[[scenario_index]] %>%
        filter(scenario == "current_nsw") %>%
        unnest(cols = starts_with("samples_"))
      xmax = max(scenario_samples$samples_time_to_interview)
