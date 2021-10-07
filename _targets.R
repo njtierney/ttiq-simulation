@@ -152,11 +152,13 @@ tar_plan(
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     
     # VE for onward transmission with sensitivity test for 50% lower effect
-    # need to replace this with the real assumptions!
-    ve_onward_transmission = 0.3 * c(1, 0.5),
+    # need to replace this with the real assumptions based on fractions of each type!
+    ve_onward_transmission = 0.5 * c(1, 0.5),
+    
+    ve_susceptibility = 0.73,
 
     # VE for symptoms in breakthrough infections
-    ve_symptoms = 0.5,
+    ve_symptoms = 0.78,
     
     # the reduction in test seeking for vaccinated symptomatic infections
     # relative to unvaccinated symptomatic infections
