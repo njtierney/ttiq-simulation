@@ -56,3 +56,6 @@ renv/
 
 # renv's .Rprofile setup
 .Rprofile
+
+# outputs folder
+outputs/

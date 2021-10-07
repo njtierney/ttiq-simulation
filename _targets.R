@@ -126,6 +126,15 @@ tar_plan(
     scenario_df_run
   ),
   
+  ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
+  
+  tar_file(scenario_df_run_tp_multiplier_csv,{
+    write_csv_return_path(
+      x = ttiq_scenario_prepared,
+      file = "outputs/ttiq_scenario_run.csv.gz"
+    )
+  }),
+  
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
                                       scenario_parameters),
   
@@ -166,8 +175,6 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
-  n_casual_cases = dplyr::n(casual_vic),
-  # Out of all of the people identified as casual contacts
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
