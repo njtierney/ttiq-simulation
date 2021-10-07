@@ -69,7 +69,7 @@ tar_plan(
   delay_samples_against_data = add_data_to_delay_samples(delay_samples,
                                                          cases_scenario),
   
-  experiment_result = run_sim_tracing(delay_samples),
+  experiment_result = run_sim_tracing(derived_delay_distributions),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
     delay_samples_against_data,

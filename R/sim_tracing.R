@@ -87,18 +87,11 @@ sim_tracing <- function(derived_delay_distributions,
     pb = txtProgressBar(min = 1, max = max(scenario_samples$notification_date), initial = 1) 
     for (sim_day in seq_len(max(scenario_samples$notification_date))) {
       setTxtProgressBar(pb, sim_day)
-      
+
       scenario_samples = scenario_samples %>%
         #                               Case has been notified         no interview yet        less than 2 weeks old              if notified today, not notified too late
         mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
-        arrange(
-          # Put ineligible cases last
-          desc(eligible_for_interview),
-          # Priorities
-          desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
-          desc(notification_date >= sim_day),
-          desc(swab_date),
-        ) %>%
+        f_priority(sim_day, notification_time) %>%
         mutate(interview_date = ifelse(
           # Condition on whether case is eligible to be interviewed
           # Within capacity and      able to be interviewed
