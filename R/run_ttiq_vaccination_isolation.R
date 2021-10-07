@@ -125,19 +125,22 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     ) %>% 
     # pull(sanity_check) %>% all()
     mutate(
-      weighted_tp_mult_found_vacc = 
-        tp_mult_found_vacc * weight_vacc_found,
       weighted_tp_mult_found_not_vacc = 
         tp_mult_found_not_vacc * weight_not_vacc_found,
       weighted_tp_mult_not_found_vacc = 
         tp_mult_not_found_vacc * weight_vacc_not_found,
       weighted_tp_mult_not_found_not_vacc = 
         tp_mult_not_found_not_vacc * weight_not_vacc_not_found,
+      weighted_tp_mult_found_vacc_low_risk = 
+        tp_mult_found_vacc_low_risk * weight_vacc_found_low_risk,
+      weighted_tp_mult_found_vacc_high_risk = 
+        tp_mult_found_vacc_high_risk * weight_vacc_found_high_risk,
       weighted_tp_mutliplier_popn = 
-        weighted_tp_mult_found_vacc + 
         weighted_tp_mult_found_not_vacc + 
         weighted_tp_mult_not_found_vacc + 
-        weighted_tp_mult_not_found_not_vacc
+        weighted_tp_mult_not_found_not_vacc +
+        weighted_tp_mult_found_vacc_low_risk +
+        weighted_tp_mult_found_vacc_high_risk
     )
   
   # get baseline tp multiplier for each vaccination coverage
