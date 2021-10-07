@@ -60,33 +60,67 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       tp_mult_not_found_vacc = vaccination_multiplier,
       # usual reduction if unvaccinated and found
       tp_mult_found_not_vacc = tp_multiplier,
+      
       # if unvaccinated and found, get the vaccination reduction and the tp
       # multiplier - scaled by isolation stringency. If isolation stringency is
       # 1, should just be the tp multiplier, if isolation stringency is 0,
-      # should be 1
-      tp_mult_found_vacc = 
-        vaccination_multiplier * (1 - isolation_stringency_vaccinated * (1 - tp_multiplier)),
+      # should be 1.
+      
+      # Now we split these by high vs low risk settings
+      
+      # compute the TP multipliers for high-risk vs low-risk settings
+      high_risk_multiplier = 1 / (fraction_vaccinated_low_risk * (vacc_setting_risk_ratio - 1) + 1),
+      low_risk_multiplier = high_risk_multiplier * vacc_setting_risk_ratio,
+      
+      # check these balance out to a multiplier of 1 across all the vaccinated
+      # found cases
+      check_risk_multiplier = (
+        high_risk_multiplier * fraction_vaccinated_low_risk +
+          low_risk_multiplier * (1 - fraction_vaccinated_low_risk)
+      ) == 1,
+      
+      # split the found and vaccinated into two sets - the low risk and the high risk
+      tp_mult_found_vacc_low_risk =
+        low_risk_multiplier * vaccination_multiplier *
+        (1 - isolation_stringency_vaccinated * (1 - tp_multiplier)),
+      
+      tp_mult_found_vacc_high_risk = high_risk_multiplier * vaccination_multiplier *
+        tp_multiplier,
       
       pr_found_given_vacc = 
         1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
       pr_found_given_not_vacc = 
         (1 - (1 - p_active_detection) * (1 - p_passive_detection)),
-      weight_vacc_found = pr_found_given_vacc * pr_vaccination_cases,
       weight_not_vacc_found = 
         pr_found_given_not_vacc * (1 - pr_vaccination_cases),
       weight_vacc_not_found = (1 - pr_found_given_vacc) *  pr_vaccination_cases,
       weight_not_vacc_not_found = 
-        (1 - pr_found_given_not_vacc) * (1 - pr_vaccination_cases)
-    ) %>% 
-    # check that they sum to 1
-    mutate(sanity_check = 
-             weight_vacc_found + 
-             weight_not_vacc_found + 
-             weight_vacc_not_found + 
-             weight_not_vacc_not_found,
-           # check they sum to 1
-           sanity_check_all = sanity_check == 1,
-      .before = everything()
+        (1 - pr_found_given_not_vacc) * (1 - pr_vaccination_cases),
+      
+      # for the cases vaccinated and found, split between low- and high-risk settings
+      # weight_vacc_found = pr_found_given_vacc * pr_vaccination_cases,
+      weight_vacc_found_low_risk = pr_found_given_vacc * pr_vaccination_cases *
+        fraction_vaccinated_low_risk,
+      
+      weight_vacc_found_high_risk = pr_found_given_vacc * pr_vaccination_cases *
+        (1 - fraction_vaccinated_low_risk),
+      
+      # check the weights sum to 1
+      check_weights = (
+        weight_not_vacc_found + 
+          weight_vacc_not_found + 
+          weight_not_vacc_not_found +
+          weight_vacc_found_low_risk +
+          weight_vacc_found_high_risk
+      ) == 1,
+      
+      # check that all the numerical checks pass
+      all_checks = all(
+        across(
+          starts_with("check")
+        )
+      )
+    
     ) %>% 
     # pull(sanity_check) %>% all()
     mutate(

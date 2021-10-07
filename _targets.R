@@ -159,6 +159,11 @@ tar_plan(
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
     tp_multiplier = 0.46,
     isolation_stringency_vaccinated = seq(0, 1, by = 0.2),
+    # what fraction of vaccinated cases have reduced stringency?
+    fraction_vaccinated_low_risk = c(0, 0.5, 1),
+    # what is the ratio of TP between low risk (those where vaccinated cases are allowed lower stringency) and high risk (those where they are not) settings?
+    vacc_setting_risk_ratio = c(0.75, 0.5, 0.25),
+    # what is the vaccination coverage
     vaccination_coverage = seq(0.7, 0.9, by = 0.1)
   ), 
   
