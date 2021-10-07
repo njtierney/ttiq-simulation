@@ -5,27 +5,27 @@
 #' @return list of simulation results
 #' @export
 run_sim_tracing <- function(derived_delay_distributions) {
-
-priorty_ranking_1 <- function(x, sim_day, notification_time) {
-      x %>%
-        arrange(
-          # Whether case is eligible to be interviewed
-          desc(notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & notification_time > .8),
-          # Priorities
-          desc(priority_group & (notification_date + priority_info_delay) <= sim_day),
-          desc(!vaccinated & notification_date <= sim_day),
-          desc(notification_date >= sim_day),
-          desc(swab_date),
-        )
-    }
-
+  
+  priority_ranking_1 <- function(x, sim_day, notification_time) {
+    x %>%
+      arrange(
+        # Whether case is eligible to be interviewed
+        desc(eligible_for_interview),
+        # Priorities, in order of appearance
+        desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
+        vaccinated, # vaccinated FALSE first
+        desc(notification_date >= sim_day), # notified today first (maximise day 0s)
+        desc(swab_date), # oldest first
+      )
+  }
+  
   example1 = sim_tracing(
     derived_delay_distributions,
     capacity_ratio = 0.8,
     prop_priority = 0.4,
     prop_time_delay = 0.2,
     priority_delay_distribution = function(n) rpois(n, 2),
-    f_priority = priorty_ranking_1,
+    f_priority = priority_ranking_1,
     proportion_cases_vaccinated = 0.8,
     n_samples = 1e4
   )
