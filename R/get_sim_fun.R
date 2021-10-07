@@ -11,10 +11,17 @@
 get_sim_fun <- function (...) {
   distributions <- list(...)
   function(n) {
-    sims <- lapply(distributions, generate, n)
-    Reduce(
-      f = "+",
-      x = sims
-      )
+    sims <- map(.x = distributions, 
+                .f = generate, 
+                times = n) %>% 
+      as_tibble() %>% 
+      unnest(cols = everything())
+    
+    rowSums(sims)
+    # sims <- lapply(distributions, generate, n)
+    # Reduce(
+    #   f = "+",
+    #   x = sims
+    #   )
   }
 }

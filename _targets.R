@@ -54,11 +54,11 @@ tar_plan(
   derived_delay_distributions = derive_distributions(
     cases_scenario,
     # TODO vary this to be 0.2 ... 0.8
-    prop_current_case_zero = 0.8
+    # was previously just only 0.8
+    prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
-  derived_delay_distributions_df = 
-    dist_params_to_df(derived_delay_distributions),
+  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
   tar_file(derived_delay_distributions_csv, {
     write_csv_return_path(
@@ -94,12 +94,10 @@ tar_plan(
   }),
   
   p_active_detection = 0.9,
-  # TODO change this p_passive
-  # passive_detection_given_symptoms = 0.5 or 0.25
-  # pr_symptoms = 0.6 (this will change as a function of vaccination coverage)
-  # code this up so pr_symptoms
-  # so p_passive_detection = passive_detection_given_symptoms * pr_symptoms
-  p_passive_detection = 0.3,
+  passive_detection_given_symptoms = 0.5,
+  # (this will change as a function of vaccination coverage)
+  pr_symptoms = 0.6,
+  p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
@@ -110,6 +108,8 @@ tar_plan(
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = p_active_detection,
+    passive_detection_given_symptoms = passive_detection_given_symptoms,
+    pr_symptoms = pr_symptoms,
     # the probability of being found via passive detection (based on symptoms)
     # if not by contact tracing
     p_passive_detection = p_passive_detection,
@@ -137,6 +137,11 @@ tar_plan(
   
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
                                       scenario_parameters),
+  
+  plot_tp_reduction_over_prop_zeros = gg_tp_reduction_prop_zeros(
+    scenario_df_run_tp_multiplier,
+    scenario_parameters
+    ),
   
   tar_file(plot_tp_reduction_path, {
     ggsave_write_path(
