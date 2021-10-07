@@ -44,8 +44,8 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     rowwise() %>%
     mutate(
       pr_vaccination_cases = fraction_cases_unvaccinated(
-        efficacy_susceptibility = 0.9,
-        efficacy_onward = 0.8,
+        efficacy_susceptibility = ve_susceptibility,
+        efficacy_onward = ve_onward_transmission,
         coverage_any_vaccine = vaccination_coverage,
         baseline_matrix = baseline_matrix
       )
@@ -138,12 +138,19 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
         tp_mult_found_vacc_low_risk * weight_vacc_found_low_risk,
       weighted_tp_mult_found_vacc_high_risk = 
         tp_mult_found_vacc_high_risk * weight_vacc_found_high_risk,
-      weighted_tp_mutliplier_popn = 
+      tp_multiplier_output = 
         weighted_tp_mult_found_not_vacc + 
         weighted_tp_mult_not_found_vacc + 
         weighted_tp_mult_not_found_not_vacc +
         weighted_tp_mult_found_vacc_low_risk +
         weighted_tp_mult_found_vacc_high_risk
+    ) %>%
+    select(
+      -starts_with("weight"),
+      -starts_with("check"),
+      -starts_with("pr"),
+      -starts_with("tp_mult_"),
+      ends_with("risk_multiplier")
     )
   
   # get baseline tp multiplier for each vaccination coverage
@@ -152,14 +159,20 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       isolation_stringency_vaccinated == 1
     ) %>%
     rename(
-      baseline_tp_multiplier = weighted_tp_mutliplier_popn
+      baseline_tp_multiplier = tp_multiplier_output
     ) %>%
     select(
       ve_onward_transmission,
-      p_passive_detection_vaccinated,
+      ve_susceptibility,
+      ve_symptoms,
+      rel_test_seeking_vaccinated,
+      no_passive_detection_vaccinated,
       p_active_detection,
       p_passive_detection,
+      p_passive_detection_vaccinated,
       tp_multiplier,
+      fraction_vaccinated_low_risk,
+      vacc_setting_risk_ratio,
       vaccination_coverage,
       baseline_tp_multiplier
     )
@@ -170,16 +183,22 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       baseline,
       by = c(
         "ve_onward_transmission",
-        "p_passive_detection_vaccinated",
+        "ve_susceptibility",
+        "ve_symptoms",
+        "rel_test_seeking_vaccinated",
+        "no_passive_detection_vaccinated",
         "p_active_detection",
         "p_passive_detection",
+        "p_passive_detection_vaccinated",
         "tp_multiplier",
+        "fraction_vaccinated_low_risk",
+        "vacc_setting_risk_ratio",
         "vaccination_coverage"
       )
     ) %>%
     mutate(
-      weighted_tp_mutliplier_popn_normalised = weighted_tp_mutliplier_popn / baseline_tp_multiplier,
-      weighted_tp_reduction_scaled = 1 - (weighted_tp_mutliplier_popn_normalised * tp_multiplier)
+      tp_multiplier_output_normalised = tp_multiplier_output / baseline_tp_multiplier,
+      weighted_tp_reduction_scaled = 1 - (tp_multiplier_output_normalised * tp_multiplier)
     )
   # normalise the TP reduction so that it is 'tp_multiplier' when isolation is 1
   
