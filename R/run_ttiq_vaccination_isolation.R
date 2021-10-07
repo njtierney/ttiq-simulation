@@ -70,14 +70,17 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # Now we split these by high vs low risk settings
       
       # compute the TP multipliers for high-risk vs low-risk settings
-      high_risk_multiplier = 1 / (fraction_vaccinated_low_risk * (vacc_setting_risk_ratio - 1) + 1),
+      high_risk_multiplier = 1 / ((1 - fraction_vaccinated_low_risk) * (vacc_setting_risk_ratio - 1) + 1),
       low_risk_multiplier = high_risk_multiplier * vacc_setting_risk_ratio,
       
       # check these balance out to a multiplier of 1 across all the vaccinated
       # found cases
-      check_risk_multiplier = (
+      check_risk_multiplier_balances = (
         high_risk_multiplier * fraction_vaccinated_low_risk +
           low_risk_multiplier * (1 - fraction_vaccinated_low_risk)
+      ) == 1,
+      check_risk_multiplier_matches_ratio = (
+        low_risk_multiplier / high_risk_multiplier == vacc_setting_risk_ratio
       ) == 1,
       
       # split the found and vaccinated into two sets - the low risk and the high risk
