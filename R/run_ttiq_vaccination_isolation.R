@@ -23,7 +23,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     # How much transmission is reduced
     # tp_multiplier of 0.25 implies a reduction of 75%
     # tp_multiplier of 1 implies a reduction of 0
-  # vaccination_multiplier
+  # ve_onward_transmission
     # relative probability of onward transmission for vaccinated people (constant)
   # p_passive_detection_vaccinated
     # constant
@@ -34,9 +34,9 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
   # for measuring vaccinated
   # vaccinatedness vs foundness
   # we've got to compute weights of all 4 of these:
-  # vacc & found = tp * vaccination_multiplier * (isolation_stringency * tp_multiplier)
+  # vacc & found = tp * ve_onward_transmission * (isolation_stringency * tp_multiplier)
   # !vacc & !found = tp * 1
-  # vacc & !found = tp * vaccination_multiplier
+  # vacc & !found = tp * ve_onward_transmission
   # !vacc & found = tp * tp_multiplier
   
   results <- scenario_vaccination_isolation %>% 
@@ -54,10 +54,11 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     # compute tp multipliers for all combinations people who are vaccinated or
     # not, and detected or not
     mutate(
+      
       # no reduction if vaccinated and unfound
       tp_mult_not_found_not_vacc = 1,
       # only the vaccination reduction if vaccinated and unfound
-      tp_mult_not_found_vacc = vaccination_multiplier,
+      tp_mult_not_found_vacc = ve_onward_transmission,
       # usual reduction if unvaccinated and found
       tp_mult_found_not_vacc = tp_multiplier,
       
@@ -81,10 +82,10 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       
       # split the found and vaccinated into two sets - the low risk and the high risk
       tp_mult_found_vacc_low_risk =
-        low_risk_multiplier * vaccination_multiplier *
+        low_risk_multiplier * ve_onward_transmission *
         (1 - isolation_stringency_vaccinated * (1 - tp_multiplier)),
       
-      tp_mult_found_vacc_high_risk = high_risk_multiplier * vaccination_multiplier *
+      tp_mult_found_vacc_high_risk = high_risk_multiplier * ve_onward_transmission *
         tp_multiplier,
       
       pr_found_given_vacc = 
@@ -148,7 +149,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       baseline_tp_multiplier = weighted_tp_mutliplier_popn
     ) %>%
     select(
-      vaccination_multiplier,
+      ve_onward_transmission,
       p_passive_detection_vaccinated,
       p_active_detection,
       p_passive_detection,
@@ -162,7 +163,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     left_join(
       baseline,
       by = c(
-        "vaccination_multiplier",
+        "ve_onward_transmission",
         "p_passive_detection_vaccinated",
         "p_active_detection",
         "p_passive_detection",

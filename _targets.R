@@ -152,7 +152,11 @@ tar_plan(
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     # vaccination_multiplier is the relative probability of onward 
     # transmission for vaccinated people (constant)
-    vaccination_multiplier = 0.3,
+    
+    # VE for onward transmission with sensitivity test for 50% lower effect
+    # need to replace this with the real assumptions!
+    ve_onward_transmission = 0.3 * c(1, 0.5),
+    
     p_passive_detection_vaccinated = 0.50 * p_passive_detection,
     p_active_detection = p_active_detection,
     p_passive_detection = p_passive_detection,
