@@ -11,7 +11,7 @@
 get_sim_fun <- function (...) {
   distributions <- list(...)
   function(n) {
-    sims <- lapply(distributions, generate, n)
+    sims <- lapply(distributions, sim_delay, n_samples)
     Reduce(
       f = "+",
       x = sims

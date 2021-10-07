@@ -19,7 +19,7 @@ derive_distributions <- function(cases_scenario,
           time_to_interview,
           # full_contact_delay
         ),
-        .fns = derive_poisson_mixture,
+        .fns = create_empirical_dist_mixture,
         .names = "dist_{.col}"
       )
     ) %>% 
@@ -35,11 +35,8 @@ derive_distributions <- function(cases_scenario,
     filter(str_detect(scenario, "current")) %>% 
     mutate(scenario = paste0(scenario, "_case_init")) %>% 
     group_by(scenario) %>%
-    mutate(dist_time_to_interview = dist_mixture(
-      dist_uniform(0,0),
-      dist_time_to_interview,
-      weights = c(prop_current_case_zero, 1 - prop_current_case_zero) 
-    ))
+    mutate(dist_time_to_interview = set_fraction_zero(dist_time_to_interview, fraction_extra_zero)
+    )
   
   bind_rows(
     df_distributions,
