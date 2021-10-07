@@ -53,8 +53,7 @@ tar_plan(
   
   derived_delay_distributions = derive_distributions(
     cases_scenario,
-    # TODO vary this to be 0.2 ... 0.8
-    # was previously just only 0.8
+    # was previously just only 0.8 - now is 0.2, 0.4, 0.6, 0.8
     prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
@@ -149,6 +148,15 @@ tar_plan(
       path = "figs/nsw_ttiq_model_hist.png",
       width = 9,
       height = 6
+    )
+  }),
+  
+  tar_file(plot_tp_reduction_zeros_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction_over_prop_zeros,
+      path = "figs/ttiq_model_hist_zeros.png",
+      width = 10,
+      height = 10
     )
   }),
   
