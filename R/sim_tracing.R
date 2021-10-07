@@ -122,11 +122,17 @@ sim_tracing <- function(derived_delay_distributions,
     # Assemble output dataframe
     tibble(scenario = scenario,
            samples_time_to_interview = replace_na(scenario_samples$interview_date - scenario_samples$notification_date, -2),
-           samples_priority_group = scenario_samples$priority_group) %>%
+           samples_priority_group = scenario_samples$priority_group,
+           samples_vaccinated = scenario_samples$vaccinated
+    ) %>%
       nest(samples_time_to_interview = samples_time_to_interview,
-           samples_priority_group = samples_priority_group) %>%
+           samples_priority_group = samples_priority_group,
+           samples_vaccinated = samples_vaccinated
+           ) %>%
       mutate(samples_time_to_interview = lapply(samples_time_to_interview, function(x) x[[1]]),
-             samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]))
+             samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]),
+             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]])
+      )
   }) %>%
     bind_rows()
   
