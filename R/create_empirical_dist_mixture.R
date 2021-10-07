@@ -9,20 +9,31 @@
 #' @export
 create_empirical_dist_mixture <- function(cases_scenario) {
   
-  # prepare the empirical data part
-  delay_days <- cases_scenario %>% 
-    filter(scenario == "current_nsw") %>% 
-    select(time_to_interview) %>% 
-    mutate(days = time_to_interview) %>% 
-    drop_na
   
   # make sure we get a prob for each day even if the sample lacked them
   bins <- 0:20
   breaks <- c(bins, max(bins) + 1)- 0.5
-  counts <- hist(delay_days$days, breaks = breaks, plot = FALSE)
-  delay_params <- list(
-    days = bins,
-    pmf = counts$density,
-    fraction_extra_zero = 0
-  )   
+  
+  hist_pmf <- function(x, breaks){
+    hist_info <- hist(x, breaks = breaks, plot = FALSE)
+    hist_info$density
+    }
+  
+  # prepare the empirical data part
+  delay_days <- cases_scenario %>% 
+    group_by(scenario) %>%
+    summarise(
+      pmf_test_turnaround_time = hist_pmf(test_turnaround_time, 
+                                          breaks = breaks),
+      pmf_time_to_interview = hist_pmf(time_to_interview, 
+                                       breaks = breaks),
+      pmf_full_contact_delay = hist_pmf(full_contact_delay, 
+                                        breaks = breaks),
+      pmf_test_to_interview = hist_pmf(test_to_interview,
+                                       breaks = breaks)) %>% 
+    mutate(
+      days = bins,
+      fraction_extra_zero = 0) %>% 
+    relocate(days, .before = pmf_test_turnaround_time)
+    
 }
