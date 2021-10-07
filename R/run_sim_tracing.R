@@ -113,7 +113,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         priority_delay_distribution = function(n) rpois(n, priority_delay_average_list[j]),
         f_priority = priority_ranking_function_list[[i]],
         proportion_cases_vaccinated = 0.05,
-        n_samples = 1e2
+        n_samples = 1e4
                       )
       sim_output_name = paste0(priority_ranking_function_list_names[i],
                                '_priority_delay_',
@@ -124,7 +124,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
     }
   }
 names(output_list) = output_names_list
-output_list
+sim_tracing_output_list = output_list
   #example1 = sim_tracing(
   #  derived_delay_distributions,
   #  capacity_ratio = 0.8,
