@@ -65,7 +65,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # 1, should just be the tp multiplier, if isolation stringency is 0,
       # should be 1
       tp_mult_found_vacc = 
-        vaccination_multiplier * (1 - isolation_stringency * (1 - tp_multiplier)),
+        vaccination_multiplier * (1 - isolation_stringency_vaccinated * (1 - tp_multiplier)),
       
       pr_found_given_vacc = 
         1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
@@ -108,7 +108,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
   # get baseline tp multiplier for each vaccination coverage
   baseline <- results %>%
     filter(
-      isolation_stringency == 1
+      isolation_stringency_vaccinated == 1
     ) %>%
     rename(
       baseline_tp_multiplier = weighted_tp_mutliplier_popn

@@ -158,7 +158,7 @@ tar_plan(
     p_passive_detection = p_passive_detection,
     # baseline - if we treated vaccinated people the same as unvaccinated ppl
     tp_multiplier = 0.46,
-    isolation_stringency = seq(0, 1, by = 0.2),
+    isolation_stringency_vaccinated = seq(0, 1, by = 0.2),
     vaccination_coverage = seq(0.7, 0.9, by = 0.1)
   ), 
   
