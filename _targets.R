@@ -46,10 +46,6 @@ tar_plan(
   
   scenario_parameters = create_scenario_parameters(),
   
-  # names too long!
-  derived_empirical_delay_distribution = derive_empirical_dist_mixture(cases_scenario, fraction_extra_zero = 0, n_samples = 1000),
-                                                                    
-  
   derived_delay_distributions = derive_distributions(
     cases_scenario,
     prop_current_case_zero = 0.8
