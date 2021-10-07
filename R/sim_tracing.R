@@ -36,7 +36,7 @@ sim_tracing <- function(derived_delay_distributions,
                         prop_time_delay = 0.2,
                         priority_delay_distribution = NULL,
                         f_priority = NULL,
-                        proportion_cases_vaccinated = 0.8,
+                        proportion_cases_vaccinated = 0.05,
                         n_samples = 1e4) {
   
   generated_samples <- derived_delay_distributions %>%
