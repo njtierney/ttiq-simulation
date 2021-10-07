@@ -9,7 +9,6 @@
 #' @export
 run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, baseline_matrix) {
 
-  
   # some notes on the variables
   
   # isolation_stringency
@@ -19,8 +18,6 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # Someone does full isolation, obeying rules 100% time
     # isolation_stringency of 0.5
       # Someone does full isolation, obeying rules 50% of time
-  # tp 
-    # transmission potential. This is kind of like reff (effectively)
   # tp_multiplier
     # constant (estimated?)
     # How much transmission is reduced
@@ -54,7 +51,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       )
     ) %>%
     ungroup() %>%
-    # compute tp mutlitpliers for all combinations people who are vaccianted or
+    # compute tp multipliers for all combinations people who are vaccinated or
     # not, and detected or not
     mutate(
       # no reduction if vaccinated and unfound
@@ -69,6 +66,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # should be 1
       tp_mult_found_vacc = 
         vaccination_multiplier * (1 - isolation_stringency * (1 - tp_multiplier)),
+      
       pr_found_given_vacc = 
         1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated),
       pr_found_given_not_vacc = 
@@ -144,25 +142,10 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
     )
   # normalise the TP reduction so that it is 'tp_multiplier' when isolation is 1
   
-     # then multiply and sum them together.
-  # 
-  
-  # so above is the tp_multiplier for each group
-  # to then work out the population fraction of each of these groups, we do 
-  # (something like) the following, for each category:
-  # Say, to calculate fraction of cases that are vaccinated vs unvaccinated 
-  # Nick G has a function that takes the inputs of vaccination coverage for the population
-  # and returns the vaccination coverage for cases
   # then, conditional on being vaccinated, we have 
   # Pr(being_found | vaccinated) = (1 - (1 - p_active_detection) * (1 - p_passive_detection_vaccinated))
   # Pr(being_found | !vaccinated) = (1 - (1 - p_active_detection) * (1 - p_passive_detection))
   # weight for vacc & found = Pr(being_found | vaccinated) * Pr(vaccination coverage for cases)
-  
-  # we then 
-  # so then out of this we'll get a tp reduction for these scenarios, 
-  # for each of these groups, output a table and graphic
-  
-  # Repeat this for each of the scenarios
   
 
 }
