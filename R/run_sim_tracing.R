@@ -21,7 +21,8 @@ run_sim_tracing <- function(derived_delay_distributions) {
           desc(notification_date >= sim_day),
           desc(swab_date),
         )
-    }
+    },
+    n_samples = 1e2
   )
   
   list(example1)

@@ -36,6 +36,7 @@ sim_tracing <- function(derived_delay_distributions,
                         prop_time_delay = 0.2,
                         priority_delay_distribution = NULL,
                         f_priority = NULL,
+                        proportion_cases_vaccinated = 0.8,
                         n_samples = 1e4) {
   
   generated_samples <- derived_delay_distributions %>%
@@ -81,7 +82,10 @@ sim_tracing <- function(derived_delay_distributions,
       mutate(swab_date = .swab_date[seq_len(n_samples)],
              notification_date = swab_date + samples_test_turnaround_time)
     # setDT(scenario_samples)
-    
+
+    # Set vaccinated or not
+    scenario_samples <- scenario_samples %>% mutate(vaccinated = runif(nrow(scenario_samples)) <= proportion_cases_vaccinated)
+
     # Simulate queue
     message(glue("Simulating queue for {scenario} over {max(scenario_samples$notification_date)} iterations/days"))
     pb = txtProgressBar(min = 1, max = max(scenario_samples$notification_date), initial = 1) 
