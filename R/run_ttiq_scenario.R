@@ -10,8 +10,6 @@
 run_ttiq_scenario <- function(scenario_df) {
   scenario_df %>%
     mutate(
-      # TODO PRIORITY
-      # return multiple columns
       time_to_isolation_sims = pmap(
         .l = list(
           n_chains = n_chains,

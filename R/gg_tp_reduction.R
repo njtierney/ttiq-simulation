@@ -12,9 +12,20 @@
 gg_tp_reduction <- function(scenario_df_run_tp_multiplier, scenario_parameters) {
 
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
+    # preserve existing behaviour
+    filter(prop_current_case_zero == 0.8 | is.na(prop_current_case_zero)) %>% 
     relocate(time_to_isolation_sims) %>% 
-    mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>%
-    unnest(cols = time_to_isolation_sims) %>% 
+    mutate(
+      across(.cols = c(time_to_isolation_sims,
+                       time_to_active,
+                       time_to_passive),
+             .fns = ~map(.x, c))
+      ) %>% 
+    unnest(
+      cols = c(time_to_isolation_sims,
+               time_to_active,
+               time_to_passive)
+      ) %>% 
     left_join(scenario_parameters, by=c("scenario"="value")) %>%
     mutate(
       scenario = name,

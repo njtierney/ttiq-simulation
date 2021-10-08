@@ -20,6 +20,7 @@ create_dist_sim_fun <- function(derived_delay_distributions) {
         )
     ) %>% 
     select(scenario,
-           sim_tracing_fun)
+           sim_tracing_fun,
+           prop_current_case_zero)
 
 }

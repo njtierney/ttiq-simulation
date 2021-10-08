@@ -78,7 +78,6 @@ time_to_isolation <- function(n_chains,
                             p_passive_detection)
     
     # get the earliest of the delays for each
-    # TODO return each of time_to_active, time_to_passive, and t_infect_isolate
     time_to_active = ifelse(found_by$a, t_infect_isolate_ct_only, Inf)
     time_to_passive = ifelse(found_by$b, t_infect_isolate_passive_only, Inf)
     t_infect_isolate <- pmin(time_to_active, time_to_passive)
@@ -92,8 +91,6 @@ time_to_isolation <- function(n_chains,
     trace_object_infect_isolate[, iteration] <- t_infect_isolate
     trace_object_time_to_active[, iteration] <- time_to_active
     trace_object_time_to_passive[, iteration] <- time_to_passive
-    # TODO
-    # return each of these new trace objects
   }
   
   return(
