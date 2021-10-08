@@ -73,8 +73,8 @@ sim_tracing <- function(derived_delay_distributions,
     .swab_date = numeric(0)
     i = 1
     while (length(.swab_date) < n_samples) {
-      # .swab_date = c(.swab_date, rep(i, rpois(1, rate)))
-      .swab_date = c(.swab_date, rep(i, max(0, rnorm(1, rate, sqrt(0.25*rate)))))
+      .swab_date = c(.swab_date, rep(i, rpois(1, rate)))
+      # .swab_date = c(.swab_date, rep(i, max(0, rnorm(1, rate, sqrt(0.25*rate))))) # experiment with under/overdispersed distributions
       i = i + 1
     }
     # Notify Dept after test is processed
