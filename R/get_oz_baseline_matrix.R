@@ -36,7 +36,7 @@ get_oz_baseline_matrix <- function(population,
   # australia_ngm_unscaled <- apply_age_contribution(australia_contact_matrix$all)
   
   # remove the 'all' matrix, keep the other four settings
-  contact_matrices <- australia_contact_matrix[c("home", "school", "work", "other")]
+  contact_matrices <- contact_matrices[c("home", "school", "work", "other")]
 
   # get setting-specific transmission probability matrices for the same age
   # aggregations
