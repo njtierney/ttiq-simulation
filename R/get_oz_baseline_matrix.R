@@ -24,7 +24,7 @@ get_oz_baseline_matrix <- function(population,
       lower.age.limit = readr::parse_number(as.character(age_group))
     )
   
-  australia_contact_matrix <- predict_setting_contacts(
+  contact_matrices <- predict_setting_contacts(
     contact_model = setting_models,
     population = oz_pop,
     age_breaks = age_limits,
@@ -37,11 +37,16 @@ get_oz_baseline_matrix <- function(population,
   
   # remove the 'all' matrix, keep the other four settings
   contact_matrices <- australia_contact_matrix[c("home", "school", "work", "other")]
+
   # get setting-specific transmission probability matrices for the same age
   # aggregations
   transmission_matrices <- get_setting_transmission_matrices(
     age_breaks = age_limits
   )
+  
+  # remove the 'all' matrix, keep the other four settings
+  contact_matrices <- contact_matrices[names(transmission_matrices)]
+  
   # combine them to get setting-specific (unscaled) next-generation matrices
   next_generation_matrices <- mapply(
     FUN = `*`,
