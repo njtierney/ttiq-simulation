@@ -4,7 +4,7 @@
 #' @author Chris Baker/Logan Wu
 #' @export
    #Diagnostic plots
-   {
+plot_sim_tracing = function (experiment_result) {
   scenario_index = 15
      scenario_samples = experiment_result[[scenario_index]] %>%
        filter(scenario == "current_nsw") %>%
