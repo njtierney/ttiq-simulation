@@ -58,14 +58,14 @@ tar_plan(
   ),
   
   # NOTE: need to check how parameters are used
-  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  # derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
-  tar_file(derived_delay_distributions_csv, {
-    write_csv_return_path(
-      derived_delay_distributions_df, 
-      here("outputs-public/derived_delay_distributions.csv")
-      )
-  }),
+  # tar_file(derived_delay_distributions_csv, {
+  #   write_csv_return_path(
+  #     derived_delay_distributions_df, 
+  #     here("outputs-public/derived_delay_distributions.csv")
+  #     )
+  # }),
   
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   

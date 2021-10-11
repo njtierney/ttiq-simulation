@@ -42,10 +42,10 @@ derive_distributions <- function(cases_scenario,
     group_by(scenario,
              prop_current_case_zero) %>%
     mutate(
-      dist_time_to_interview = map2(
-        .x = dist_time_to_interview, 
-        .y = prop_current_case_zero,
-        .f = mix_in_zeros
+      dist_time_to_interview = dist_inflated(
+        dist = dist_time_to_interview, 
+        prob = prop_current_case_zero,
+        x = 0
         )
     )
   
