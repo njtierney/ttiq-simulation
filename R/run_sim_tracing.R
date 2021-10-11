@@ -104,7 +104,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
   }) %>%
     unlist(recursive=FALSE)
   
-  results = lapply(sim_params, function(x) {
+  results = future_lapply(sim_params, function(x) {
     sim_tracing_output = sim_tracing(
       derived_delay_distributions %>%
         # only using 'optimal' for now
