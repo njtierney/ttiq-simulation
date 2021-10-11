@@ -15,7 +15,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         # Priorities, in order of appearance
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         desc(notification_date >= sim_day), # notified today first (maximise day 0s)
-        swab_date, # newest first
+        desc(swab_date), # newest first
       )
   }
   
@@ -29,7 +29,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         vaccinated, # vaccinated FALSE first
         desc(notification_date >= sim_day), # notified today first (maximise day 0s)
-        desc(swab_date), # oldest first
+        swab_date, # oldest first
       )
   }
   
@@ -42,7 +42,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         vaccinated, # vaccinated FALSE first
         desc(notification_date >= sim_day), # notified today first (maximise day 0s)
-        swab_date, # newest first
+        desc(swab_date), # newest first
       )
   }
   
@@ -55,7 +55,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         vaccinated, # vaccinated FALSE first
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         desc(notification_date >= sim_day), # notified today first (maximise day 0s)
-        desc(swab_date), # oldest first
+        swab_date, # oldest first
       )
   }
   
@@ -68,7 +68,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         vaccinated, # vaccinated FALSE first
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         desc(notification_date >= sim_day), # notified today first (maximise day 0s)
-        swab_date, # newest first
+        desc(swab_date), # newest first
       )
   }
   priority_ranking_vaccine_priority_old_notification_old_swab <- function(x, sim_day, notification_time) {
@@ -80,7 +80,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         vaccinated, # vaccinated FALSE first
         desc(priority_group & (notification_date + priority_info_delay) <= sim_day), # priority group when status is available after delay
         notification_date >= sim_day, # notified today last
-        desc(swab_date), # oldest first
+        swab_date, # oldest first
       )
   }
   

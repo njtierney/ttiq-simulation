@@ -49,7 +49,8 @@ withr::with_dir(here::here(), {
       plot_scenario_vaccination_isolation,
       plot_hist_delay_samples_v_data,
       plot_tp_reduction,
-      scenario_df_run_plots
+      scenario_df_run_plots,
+      experiment_plots
       )
     )
 })
@@ -178,7 +179,21 @@ scenario_df_run
   
 ```
 
+## Queueing orders {.tabset .tabset-pills}
 
+```{r, echo=FALSE}
+# Construct chunks for each LPHU plot/table
+out = lapply(names(experiment_plots), function(x) {
+  paste0(
+    paste0("### ", x, "\n"),          # Section title
+    paste0("```{r ", x %>% str_replace("\\.", "_"), ", echo=FALSE}\n"),   # Chunk header
+    paste0("experiment_plots$`", x, "`\n"),       # Chunk content
+    "```\n",                          # End chunk
+    collapse="\n") # Assemble code
+})
+```
+
+`r paste(knitr::knit(text = paste(out, collapse="\n")))`
 
 ## Reproducibility
 

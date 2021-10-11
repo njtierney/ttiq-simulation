@@ -18,7 +18,7 @@ plot_sim_tracing = function (experiment_result) {
       labs(title = x %>%
               paste("Priority function:", .) %>%
               str_replace("\\.rate", ", \u03bb="),
-           subtitle = glue("Interview capacity of {capacity_ratio} \u00d7 case rate"),
+           subtitle = glue("Interview capacity of {capacity_ratio} \u00d7 interviewable case rate"),
            fill = "Interviewed\n(to show NAs)")
       
       p2 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
@@ -31,5 +31,6 @@ plot_sim_tracing = function (experiment_result) {
       
       p1 / p2
    }
-   plots = lapply(names(experiment_result), plot)
+   plots = lapply(names(experiment_result), plot) %>%
+      setNames(names(experiment_result))
 }
