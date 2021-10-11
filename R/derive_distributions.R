@@ -19,10 +19,12 @@ derive_distributions <- function(cases_scenario,
           time_to_interview,
           # full_contact_delay
         ),
-        .fns = create_empirical_dist_mixture,
+        .fns = create_empirical_dist,
         .names = "dist_{.col}"
       )
     ) %>% 
+    # TODO: modify this so we can inflate the zeros
+    # 
     # check: are we going to get rid of this dist_poisson step?
     mutate(dist_isol_swab = dist_poisson(1),
            .before = dist_test_turnaround_time)
@@ -39,21 +41,13 @@ derive_distributions <- function(cases_scenario,
              .after = scenario) %>% 
     group_by(scenario,
              prop_current_case_zero) %>%
-    
-    # new changes to establishing distributions means that we 
-    # need to consider how to do this step below
-    # mutate(
-    #   dist_time_to_interview = set_fraction_zero(
-    #     dist_time_to_interview,
-    #     fraction_extra_zero
-    #   )
-    # )
-    
-    mutate(dist_time_to_interview = dist_mixture(
-      dist_degenerate(0),
-      dist_time_to_interview,
-      weights = c(prop_current_case_zero, 1 - prop_current_case_zero) 
-    ))
+    mutate(
+      dist_time_to_interview = map2(
+        .x = dist_time_to_interview, 
+        .y = prop_current_case_zero,
+        .f = mix_in_zeros
+        )
+    )
   
   bind_rows(
     df_distributions,

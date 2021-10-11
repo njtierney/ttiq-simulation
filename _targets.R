@@ -57,7 +57,7 @@ tar_plan(
     prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
-  # NOTE: Might need to not do this anymore
+  # NOTE: need to check how parameters are used
   derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
   tar_file(derived_delay_distributions_csv, {
