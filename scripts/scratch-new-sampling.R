@@ -12,6 +12,8 @@ hist_pmf <- function(x,
   hist_info$density
 }
 
+
+
 sample(x[1:21],
        size = 1000,
        replace = TRUE,
