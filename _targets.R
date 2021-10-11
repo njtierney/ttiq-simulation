@@ -223,6 +223,24 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  tar_file(plot_scenario_vaccination_isolation_path, {
+    ggsave_write_path(
+      plot = plot_scenario_vaccination_isolation,
+      path = "figs/plot_scenario_vaccination_isolation.png",
+      width = 10,
+      height = 10
+    )
+  }),
+  
+  tar_file(plot_scenario_vaccination_isolation_unfaceted_path, {
+    ggsave_write_path(
+      plot = plot_scenario_vaccination_isolation_unfaceted,
+      path = "figs/plot_scenario_vaccination_isolation_unfaceted.png",
+      width = 10,
+      height = 10
+    )
+  }),
+  
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
