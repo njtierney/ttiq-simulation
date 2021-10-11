@@ -13,6 +13,8 @@
 create_scenario_df <- function(n_iterations,
                                n_chains,
                                sim_tracing_funs,
+                               passive_detection_given_symptoms,
+                               pr_symptoms,
                                p_active_detection,
                                p_passive_detection,
                                passive_distribution) {
@@ -24,10 +26,13 @@ create_scenario_df <- function(n_iterations,
       n_chains = n_chains,
       gi_meanlog = 1.375738,
       gi_sdlog = 0.5665299,
+      passive_detection_given_symptoms = passive_detection_given_symptoms,
+      pr_symptoms = pr_symptoms,
       p_active_detection = p_active_detection,
       p_passive_detection = p_passive_detection,
       passive_distribution = passive_distribution,
       r_start = 7.82
+      
     )
   
 }

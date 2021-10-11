@@ -7,7 +7,7 @@
 #' @return A customised character string
 #' @export
 as.character.distribution <- function(x) {
-  sapply(x, function(xx) {
+  vapply(vec_data(x), function(xx) {
     if (inherits(xx, "dist_poisson")) {
       glue::glue("l={xx$l}")
     } else {
@@ -18,6 +18,6 @@ as.character.distribution <- function(x) {
       }
       glue::glue("l={pois_dist$l},p={xx$w[2][[1]]}")
     }
-  }) %>%
-    as.character()
+  },
+  FUN.VALUE = character(1L))
 }

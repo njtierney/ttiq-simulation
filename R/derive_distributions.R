@@ -8,7 +8,7 @@
 #' @author Nicholas Tierney
 #' @export
 derive_distributions <- function(cases_scenario,
-                                 prop_current_case_zero = 0.5) {
+                                 prop_current_case_zero) {
   
   df_distributions <- cases_scenario %>% 
     group_by(scenario) %>% 
@@ -34,9 +34,13 @@ derive_distributions <- function(cases_scenario,
     # be put into another step outside of this function?
     filter(str_detect(scenario, "current")) %>% 
     mutate(scenario = paste0(scenario, "_case_init")) %>% 
-    group_by(scenario) %>%
+    expand_grid(prop_current_case_zero = prop_current_case_zero) %>% 
+    relocate(prop_current_case_zero, 
+             .after = scenario) %>% 
+    group_by(scenario,
+             prop_current_case_zero) %>%
     mutate(dist_time_to_interview = dist_mixture(
-      dist_uniform(0,0),
+      dist_degenerate(0),
       dist_time_to_interview,
       weights = c(prop_current_case_zero, 1 - prop_current_case_zero) 
     ))
