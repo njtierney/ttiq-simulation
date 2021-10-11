@@ -5,7 +5,8 @@
 #' @return list of simulation results
 #' @export
 run_sim_tracing <- function(derived_delay_distributions) {
-
+  
+  # Define arbitrary ranking functions
   priority_ranking_priority_new_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
@@ -17,8 +18,8 @@ run_sim_tracing <- function(derived_delay_distributions) {
         swab_date, # newest first
       )
   }
-
-
+  
+  
   priority_ranking_priority_vaccine_old_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
@@ -31,8 +32,8 @@ run_sim_tracing <- function(derived_delay_distributions) {
         desc(swab_date), # oldest first
       )
   }
-
-    priority_ranking_priority_vaccine_new_swab <- function(x, sim_day, notification_time) {
+  
+  priority_ranking_priority_vaccine_new_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
         # Whether case is eligible to be interviewed
@@ -44,7 +45,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         swab_date, # newest first
       )
   }
-
+  
   priority_ranking_vaccine_priority_old_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
@@ -57,8 +58,8 @@ run_sim_tracing <- function(derived_delay_distributions) {
         desc(swab_date), # oldest first
       )
   }
-
-    priority_ranking_vaccine_priority_new_swab <- function(x, sim_day, notification_time) {
+  
+  priority_ranking_vaccine_priority_new_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
         # Whether case is eligible to be interviewed
@@ -70,7 +71,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
         swab_date, # newest first
       )
   }
-    priority_ranking_vaccine_priority_old_notification_old_swab <- function(x, sim_day, notification_time) {
+  priority_ranking_vaccine_priority_old_notification_old_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
         # Whether case is eligible to be interviewed
@@ -82,60 +83,41 @@ run_sim_tracing <- function(derived_delay_distributions) {
         desc(swab_date), # oldest first
       )
   }
-
-  priority_ranking_function_list_names = c('priority_ranking_priority_new_swab',
-                                           'priority_ranking_priority_vaccine_old_swab',
-                                           'priority_ranking_priority_vaccine_new_swab',
-                                           'priority_ranking_vaccine_priority_old_swab',
-                                           'priority_ranking_vaccine_priority_new_swab',
-                                           'priority_ranking_vaccine_priority_old_notification_old_swab'
-                            )
-
-  priority_ranking_function_list = c(priority_ranking_priority_new_swab,
-                                     priority_ranking_priority_vaccine_old_swab,
-                                     priority_ranking_priority_vaccine_new_swab,
-                                     priority_ranking_vaccine_priority_old_swab,
-                                     priority_ranking_vaccine_priority_new_swab,
-                                     priority_ranking_vaccine_priority_old_notification_old_swab
-                            )
-
-  priority_delay_average_list = c(0, 1, 2)
-
-  output_list = list()
-  output_names_list = c()
-  for (i in 1:length(priority_ranking_function_list)){
-    for (j in 1:length(priority_delay_average_list)){
-      sim_tracing_output = sim_tracing(
-        derived_delay_distributions,
-        capacity_ratio = 0.8,
-        prop_priority = 0.2,
-        prop_time_delay = 0.2,
-        priority_delay_distribution = function(n) rpois(n, priority_delay_average_list[j]),
-        f_priority = priority_ranking_function_list[[i]],
-        proportion_cases_vaccinated = 0.05,
-        n_samples = 1e4
-                      )
-      sim_output_name = paste0(priority_ranking_function_list_names[i],
-                               '_priority_delay_',
-                               priority_delay_average_list[j])
-      output_list = append(output_list, list(sim_tracing_output))
-      output_names_list = c(output_names_list, sim_output_name)
-      print(c(i,j))
-    }
-  }
-names(output_list) = output_names_list
-  output_list
-  #example1 = sim_tracing(
-  #  derived_delay_distributions,
-  #  capacity_ratio = 0.8,
-  #  prop_priority = 0.2,
-  #  prop_time_delay = 0.2,
-  #  priority_delay_distribution = function(n) rpois(n, 2),
-  #  f_priority = priority_ranking_1,
-  #  proportion_cases_vaccinated = 0.8,
-  #  n_samples = 1e4
-  #)
-  #
-  #list(example1)
+  
+  ranking_functions = list(
+    'priority_new_swab'  = priority_ranking_priority_new_swab,
+    'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
+    'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
+    'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
+    'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab,
+    'vaccine_priority_old_notification_old_swab' = priority_ranking_vaccine_priority_old_notification_old_swab
+  )
+  
+  priority_delay_averages = c(rate0=0, rate1=1, rate2=2)
+  
+  # Create a list crossing combinations of input parameters for each run
+  sim_params = lapply(ranking_functions, function(x) {
+    lapply(priority_delay_averages, function(y) {
+      list(f = x,
+           priority_delay = y)
+    })
+  }) %>%
+    unlist(recursive=FALSE)
+  
+  results = lapply(sim_params, function(x) {
+    sim_tracing_output = sim_tracing(
+      derived_delay_distributions %>%
+        # only using 'optimal' for now
+        filter(scenario == "optimal"),
+      capacity_ratio = 0.8,
+      prop_priority = 0.2,
+      prop_time_delay = 0.2,
+      priority_delay_distribution = function(n) rpois(n, x$priority_delay),
+      f_priority = x$f,
+      proportion_cases_vaccinated = 0.05,
+      n_samples = 1e4
+    )
+  })
+  
 }
 #sim_tracing_output_list = run_sim_tracing(derived_delay_distributions)

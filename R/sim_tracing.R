@@ -131,37 +131,13 @@ sim_tracing <- function(derived_delay_distributions,
            ) %>%
       mutate(samples_time_to_interview = lapply(samples_time_to_interview, function(x) x[[1]]),
              samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]),
-             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]])
+             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]]),
+             capacity_ratio = capacity_ratio
       )
   }) %>%
     bind_rows()
   
-  # Return a dataframe with additional columns
+  # Return a dataframe with simulated columns
   generated_samples = generated_samples %>%
     left_join(queue_samples, by="scenario")
-  
-  
-  # Diagnostic plots
-  # {
-  #   scenario_samples = generated_samples %>%
-  #     filter(scenario == "current_nsw") %>%
-  #     unnest(cols = starts_with("samples_"))
-  #   xmax = max(scenario_samples$samples_time_to_interview)
-  #   p1 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
-  #     geom_bar() +
-  #     coord_cartesian(xlim=c(-2, NA)) +
-  #     scale_x_continuous(breaks = c(-2, 0:xmax), labels=c("Missed", 0:xmax)) +
-  #     labs(title = glue("Interview capacity of {capacity/rate} x rate"),
-  #          fill = "Interviewed\n(to show NAs)")
-  #   
-  #   p2 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
-  #     geom_bar() +
-  #     facet_wrap(vars(samples_priority_group)) +
-  #     coord_cartesian(xlim=c(-2, NA)) +
-  #     scale_x_continuous(breaks = c(-2, 0:xmax), labels=c("Missed", 0:xmax)) +
-  #     labs(title = glue("Facet by priority group"),
-  #          fill = "Interviewed\n(to show NAs)")
-  #   
-  #   p1 / p2
-  #   }
 }
