@@ -40,7 +40,9 @@ time_to_isolation <- function(n_chains,
                                 mean = 14, 
                                 sd = 5))
   
-  trace_object <- matrix(NA, nrow = n_chains, ncol = n_iterations)
+  trace_object_infect_isolate <- matrix(NA, nrow = n_chains, ncol = n_iterations)
+  trace_object_time_to_active <- matrix(NA, nrow = n_chains, ncol = n_iterations)
+  trace_object_time_to_passive <- matrix(NA, nrow = n_chains, ncol = n_iterations)
   # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
   # times from infection to isolation
   for (iteration in seq_len(n_iterations)) {
@@ -86,9 +88,17 @@ time_to_isolation <- function(n_chains,
     # TP reduction
     
     # record the time from infection to isolation in this step
-    trace_object[, iteration] <- t_infect_isolate
+    trace_object_infect_isolate[, iteration] <- t_infect_isolate
+    trace_object_time_to_active[, iteration] <- time_to_active
+    trace_object_time_to_passive[, iteration] <- time_to_passive
   }
   
-  trace_object
+  return(
+    list(
+      time_to_isolation_sims = trace_object_infect_isolate,
+      time_to_active = trace_object_time_to_active,
+      time_to_passive = trace_object_time_to_passive
+    )
+  )
 }
 

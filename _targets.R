@@ -15,6 +15,11 @@ tar_plan(
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
+  tar_file(casual_vic_path, 
+           "data/vic/Linelist_casual_20210917.xlsx"),
+  
+  casual_vic = read_casual_vic(casual_vic_path),
+  
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
     swab_date_var = earliest_detected,
@@ -48,11 +53,12 @@ tar_plan(
   
   derived_delay_distributions = derive_distributions(
     cases_scenario,
-    prop_current_case_zero = 0.8
+    # was previously just only 0.8 - now is 0.2, 0.4, 0.6, 0.8
+    prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
-  derived_delay_distributions_df = 
-    dist_params_to_df(derived_delay_distributions),
+  # NOTE: Might need to not do this anymore
+  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
   tar_file(derived_delay_distributions_csv, {
     write_csv_return_path(
@@ -88,7 +94,10 @@ tar_plan(
   }),
   
   p_active_detection = 0.9,
-  p_passive_detection = 0.3,
+  passive_detection_given_symptoms = 0.5,
+  # (this will change as a function of vaccination coverage)
+  pr_symptoms = 0.6,
+  p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
@@ -99,6 +108,8 @@ tar_plan(
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = p_active_detection,
+    passive_detection_given_symptoms = passive_detection_given_symptoms,
+    pr_symptoms = pr_symptoms,
     # the probability of being found via passive detection (based on symptoms)
     # if not by contact tracing
     p_passive_detection = p_passive_detection,
@@ -115,8 +126,22 @@ tar_plan(
     scenario_df_run
   ),
   
+  ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
+  
+  tar_file(scenario_df_run_tp_multiplier_csv,{
+    write_csv_return_path(
+      x = ttiq_scenario_prepared,
+      file = "outputs/ttiq_scenario_run.csv.gz"
+    )
+  }),
+  
   plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
                                       scenario_parameters),
+  
+  plot_tp_reduction_over_prop_zeros = gg_tp_reduction_prop_zeros(
+    scenario_df_run_tp_multiplier,
+    scenario_parameters
+    ),
   
   tar_file(plot_tp_reduction_path, {
     ggsave_write_path(
@@ -127,19 +152,62 @@ tar_plan(
     )
   }),
   
+  tar_file(plot_tp_reduction_zeros_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction_over_prop_zeros,
+      path = "figs/ttiq_model_hist_zeros.png",
+      width = 10,
+      height = 10
+    )
+  }),
+  
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
-    # vaccination_multiplier is the relative probability of onward 
-    # transmission for vaccinated people (constant)
-    vaccination_multiplier = 0.3,
-    p_passive_detection_vaccinated = 0.50 * p_passive_detection,
+    
+    # VE for onward transmission with sensitivity test for 50% lower effect
+    # need to replace this with the real assumptions based on fractions of each type!
+    ve_onward_transmission = 0.5 * c(1, 0.5),
+    
+    ve_susceptibility = 0.73,
+
+    # VE for symptoms in breakthrough infections
+    ve_symptoms = 0.78,
+    
+    # the reduction in test seeking for vaccinated symptomatic infections
+    # relative to unvaccinated symptomatic infections
+    rel_test_seeking_vaccinated = 1,
+    
+    # whether to remove all passive detection for the vaccinated?
+    no_passive_detection_vaccinated = c(FALSE, TRUE),
+
+    # the fraction of contacts of known cases that are found by downstream
+    # contact tracing from the source case
     p_active_detection = p_active_detection,
+    
+    # the cases that are found by by presenting for a test due to showing
+    # symptoms (if not found by contact tracing first)
     p_passive_detection = p_passive_detection,
-    # baseline - if we treated vaccinated people the same as unvaccinated ppl
+    
+    # baseline TP multiplier - if we treated vaccinated people the same as
+    # unvaccinated ppl
     tp_multiplier = 0.46,
-    isolation_stringency = seq(0, 1, by = 0.2),
+    
+    # isolation stringency for the vaccinated
+    isolation_stringency_vaccinated = seq(0, 1, by = 0.2),
+    
+    # what fraction of vaccinated cases are considered low-risk (as opposed to
+    # high-risk) and therefore have this reduced stringency?
+    fraction_vaccinated_low_risk = c(0, 0.5, 1),
+    
+    # what is the ratio of TP between low risk (those where vaccinated cases are
+    # allowed lower stringency) and high risk (those where they are not)
+    # settings? expressed as fraction = TP_low/TP_high
+    vacc_setting_risk_ratio = c(0.75, 0.5, 0.25),
+    
+    # what is the vaccination coverage
     vaccination_coverage = seq(0.7, 0.9, by = 0.1)
+    
   ), 
   
   scenario_run_vaccination_isolation = run_ttiq_vaccination_isolation(
@@ -155,9 +223,24 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
-  # Out of all of the people identified as casual contacts
   # How many casual cases get covid?
-  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic),
+  
+  casual_cases = filter_casual_cases(cases_vic),
+  
+  vic_casual_cases_covid_monthly = casual_cases_get_covid_monthly(cases_vic,
+                                                                  casual_cases),
+  
+  plot_vic_casual_cases_monthly = gg_casual_cases_covid_monthly(
+    vic_casual_cases_covid_monthly
+  ),
+  
+  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic,
+                                                               casual_cases,
+                                                               casual_vic),
+  
+  vic_statement_on_casual_cases = generate_statement_on_casual_cases(
+    vic_casual_cases_get_covid
+    ),
   
   nsw_delays = read_nsw_delays(cases_nsw_path),
   

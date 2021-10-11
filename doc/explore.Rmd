@@ -47,8 +47,6 @@ withr::with_dir(here::here(), {
       delay_samples_against_data,
       prepared_cases_for_plots,
       plot_scenario_vaccination_isolation,
-      plot_cases_nsw_raw_delay_long,
-      plot_cases_nsw_delays,
       plot_hist_delay_samples_v_data,
       plot_tp_reduction,
       scenario_df_run_plots
@@ -142,15 +140,6 @@ plot_hist_delay_samples_v_data
 ```{r plot-nsw-tp-reduction}
 plot_tp_reduction
 ```
-
-```{r plot-cases-nsw-raw-delay-long}
-plot_cases_nsw_raw_delay_long
-```
-
-```{r plot-cases-nsw-delays}
-plot_cases_nsw_delays
-```
-
 
 ## Analysis
 
