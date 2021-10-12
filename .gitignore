@@ -4,6 +4,7 @@
 
 # ignore everything in the data folder
 data/
+not_synced/
 
 # ignore figures in docs
 doc/*/figure-html/
