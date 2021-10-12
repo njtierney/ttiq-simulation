@@ -222,6 +222,15 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  # What is the age- and vaccine adjusted clinical fraction of cases
+  
+  age_w_clinical_fraction  =  get_clinical_fraction(
+    ve_symptoms = 0.78,
+    ve_onward_transmission = 0.5,
+    ve_susceptibility = 0.73,
+    vaccination_coverage = 0.7,
+    baseline_matrix = baseline_matrix()),
+
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
