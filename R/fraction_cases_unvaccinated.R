@@ -48,7 +48,7 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
   
   # normalise age-weighted sum - 
   
-  age_weight <- colSums(stable_state)/sum(stable_state[1:34])
+  age_weight <- stable_state/sum(stable_state[1:34])
 # sum((n_cases_per_age/total_N_cases * pr_symptomatic_per_age)...)
   
   davies_clinical_fraction <- read_susceptibility_clinical_fraction_age() %>% 
