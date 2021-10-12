@@ -36,8 +36,8 @@ test_that("plot_tp_reduction_over_prop_zeros works", {
                               plot_tp_reduction_over_prop_zeros)
 })
 
-test_that("plot_scenario_vaccination_isolation_unfaceted works", {
-  vdiffr::expect_doppelganger("plot_scenario_vaccination_isolation_unfaceted",
-                              plot_scenario_vaccination_isolation_unfaceted)
-})
-
+# test_that("plot_scenario_vaccination_isolation_unfaceted works", {
+#   vdiffr::expect_doppelganger("plot_scenario_vaccination_isolation_unfaceted",
+#                               plot_scenario_vaccination_isolation_unfaceted)
+# })
+# 
