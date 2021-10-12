@@ -46,9 +46,10 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
   fraction_cases_unvaccinated <- 
     sum(stable_state[1:17]) / sum(stable_state[1:34])
   
-  #age-weighted sum - 
+  # normalise age-weighted sum - 
   
-#  sum((n_cases_per_age/total_N_cases * pr_symptomatic_per_age)...)
+  age_weight <- colSums(stable_state)/sum(stable_state[1:34])
+# sum((n_cases_per_age/total_N_cases * pr_symptomatic_per_age)...)
   
   davies_clinical_fraction <- read_susceptibility_clinical_fraction_age() %>% 
     select(age_group, clinical_fraction_mean) %>% 
@@ -58,8 +59,9 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
   
   clinical_fractions <- rep(davies_clinical_fraction, times = 2)
   
-  # normalise the result so that it sums to one
-  age_weighted_clinical_fractions <- clinical_fractions/sum(clinical_fractions)
+  age_weighted_clinical_fractions <- age_weight * clinical_fractions
+  
+  # normalise the result so that it sums to one - Wait - this goes earlier I think?
   
   # multiply the RHS vaccinated cases by 1 - vaccine effectiveness (around 0.76? - taking midpoint of AZ and mRNA) so 0.24 to reduce the age-weighted clinical fraction for vaccinated
   
