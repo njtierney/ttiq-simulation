@@ -59,6 +59,3 @@ renv/
 
 # outputs folder
 outputs/
-
-# ignore testthat snapshots for the time being
-tests/testthat/_snaps/
