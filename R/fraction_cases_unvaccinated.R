@@ -43,8 +43,34 @@ fraction_cases_unvaccinated <- function(efficacy_susceptibility,
   
   stable_state <- Re(eigen(vax_structured_matrix)$vectors[, 1])
   
+  #function could be changed to just return stable_state
+  # rename the above to something like "stable_state"?
+  # then the function, `fraction_cases_unvaccinated` does the below step:
   fraction_cases_unvaccinated <- 
     sum(stable_state[1:17]) / sum(stable_state[1:34])
+  
+  # and another function takes in `stable_state` and does the below
+  # operations:
+  
+  # so a workflow:
+      # fraction_cases_unvaccinated(
+      # efficacy_susceptibility = ve_susceptibility,
+      # efficacy_onward = ve_onward_transmission,
+      # coverage_any_vaccine = vaccination_coverage,
+      # baseline_matrix = baseline_matrix
+      # )
+      # >> inside `fraction_cases_unvaccinated` it does:
+         # >> stable_state <- stable_state(
+              # efficacy_susceptibility = ve_susceptibility,
+              # efficacy_onward = ve_onward_transmission,
+              # coverage_any_vaccine = vaccination_coverage,
+              # baseline_matrix = baseline_matrix
+         # )
+        # fraction_cases_unvaccinated <- sum(stable_state[1:17]) / sum(stable_state[1:34])
+        # return(fraction_cases_unvaccinated)
+     # then there is another step to return the vaccine_adjusted_clinical_fraction
+     # vaccine_adjusted_clinical_fraction(stable_state)
+     # does the below:
   
   # normalise age-weighted sum - 
   
