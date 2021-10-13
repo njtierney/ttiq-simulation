@@ -5,6 +5,9 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     keep_md: true
+    toc: yes
+    toc_float:
+      collapsed: no
 ---
 
 ```{r setup, include=FALSE}

@@ -94,14 +94,18 @@ sim_tracing <- function(derived_delay_distributions,
 
       scenario_samples = scenario_samples %>%
         #                               Case has been notified         no interview yet        less than 2 weeks old              if notified today, not notified too late
-        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
-        f_priority(sim_day, notification_time) %>%
-        mutate(interview_date = ifelse(
-          # Condition on whether case is eligible to be interviewed
-          # Within capacity and      able to be interviewed
-          row_number() <= capacity & eligible_for_interview,
-          sim_day,         # Interview
-          interview_date)) # No interview
+        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & !(notification_date==sim_day & notification_time > prop_time_delay),
+               row = row_number()) %>%
+        f_priority(sim_day, notification_time)
+      # print(scenario_samples$interview_date %>% head)
+      scenario_samples$interview_date[scenario_samples$row <= capacity & scenario_samples$eligible_for_interview] <- sim_day
+      # scenario_samples = scenario_samples %>%
+      #   mutate(interview_date = ifelse(
+      #     # Condition on whether case is eligible to be interviewed
+      #     # Within capacity and      able to be interviewed
+      #     (row <= capacity) & eligible_for_interview,
+      #     sim_day,         # Interview
+      #     interview_date)) # No interview
       
       # DT version (contact Michael Lydeamore)
       # Arrange in order of priorities
@@ -131,8 +135,7 @@ sim_tracing <- function(derived_delay_distributions,
            ) %>%
       mutate(samples_time_to_interview = lapply(samples_time_to_interview, function(x) x[[1]]),
              samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]),
-             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]]),
-             capacity_ratio = capacity_ratio
+             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]])
       )
   }) %>%
     bind_rows()
@@ -140,4 +143,7 @@ sim_tracing <- function(derived_delay_distributions,
   # Return a dataframe with simulated columns
   generated_samples = generated_samples %>%
     left_join(queue_samples, by="scenario")
+  generated_samples$capacity_ratio = capacity_ratio
+  
+  return(generated_samples)
 }
