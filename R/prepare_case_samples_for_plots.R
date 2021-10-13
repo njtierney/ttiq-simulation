@@ -12,6 +12,9 @@
 prepare_case_samples_for_plots <- function(delay_samples_against_data, scenario_parameters) {
 
   delay_samples_against_data %>% 
+    # remove the extra scenarios with extra zeros being 0.2, 0.4, 0.6
+    filter(is.na(prop_current_case_zero) | prop_current_case_zero == 0.8) %>% 
+    select(-prop_current_case_zero) %>% 
     rename(
       other_delays = isol_swab,
       swab_to_notification = test_turnaround_time,

@@ -206,7 +206,7 @@ tar_plan(
     # what is the ratio of TP between low risk (those where vaccinated cases are
     # allowed lower stringency) and high risk (those where they are not)
     # settings? expressed as fraction = TP_low/TP_high
-    vacc_setting_risk_ratio = c(0.75, 0.5, 0.25),
+    vacc_setting_risk_ratio = c(1, 0.75, 0.5, 0.25),
     
     # what is the vaccination coverage
     vaccination_coverage = seq(0.7, 0.9, by = 0.1)
