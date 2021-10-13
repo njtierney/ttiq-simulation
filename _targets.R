@@ -140,6 +140,8 @@ tar_plan(
     scenario_df_run
   ),
   
+  plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
+  
   ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
   
   tar_file(scenario_df_run_tp_multiplier_csv,{
