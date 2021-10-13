@@ -4,7 +4,7 @@
 #'
 #' @return list of simulation results
 #' @export
-run_sim_tracing <- function(derived_delay_distributions) {
+run_sim_tracing <- function(derived_delay_distributions, n_samples = 1e4) {
   
   # Define arbitrary ranking functions
   priority_ranking_priority_new_swab <- function(x, sim_day, notification_time) {
@@ -115,7 +115,7 @@ run_sim_tracing <- function(derived_delay_distributions) {
       priority_delay_distribution = function(n) rpois(n, x$priority_delay),
       f_priority = x$f,
       proportion_cases_vaccinated = 0.05,
-      n_samples = 1e4
+      n_samples = n_samples
     )
   })
   

@@ -67,17 +67,27 @@ tar_plan(
   #     )
   # }),
   
-  delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
+  experiment_result = run_sim_tracing(derived_delay_distributions,
+                                      n_samples = 1000),
+  
+  experiment_plots = plot_sim_tracing(experiment_result),
+  
+  tidied_queue_simulation = tidy_queue_simulation(experiment_result),
+  
+  derived_queue_distributions = derive_distributions_queue(
+    tidied_queue_simulation
+  ),
+  
+  combined_delay_w_queue = bind_rows(derived_delay_distributions,
+                                     derived_queue_distributions),
+  
+  delay_dist_funs = create_dist_sim_fun(combined_delay_w_queue),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
   
   delay_samples_against_data = add_data_to_delay_samples(delay_samples,
                                                          cases_scenario),
-  
-  experiment_result = run_sim_tracing(derived_delay_distributions),
-  
-  experiment_plots = plot_sim_tracing(experiment_result),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
     delay_samples_against_data,
