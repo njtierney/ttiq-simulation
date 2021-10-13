@@ -45,7 +45,7 @@ create(dep_source_paths = "./packages.R")
 
 To update the lockfile
 
-# Managing conflicts
+# Managing package conflicts
 
 To make sure the right package function names are called, and avoid pain, for example, with `dplyr::select`, we use `conflicted` in the `packages.R` file.
 
@@ -59,3 +59,33 @@ conflict_prefer("select", "dplyr")
 Means that `filter` and `select` will always be `dplyr::filter` and `dplyr::select`.
 
 In addition, any conflicts that come up will cause an error.
+
+# Running tests
+
+You can run regression tests against the images created by running:
+
+```r
+testthat::test_dir("tests/testthat")
+```
+
+This will then compare the current plots in targets against a "golden standard"
+plots in `_snaps`.
+
+Note that there might be some warnings - these are usually warnings from ggplot
+that say something like:
+
+> Removed 6 rows containing missing values (geom_col)
+
+These are typically known cases where we have NA values in an experiment grid
+as there might not be valid values for a given combination of parameters.
+
+The testing for these plots are created in `tests/testthat/test-plots.R`
+
+To review existing plots against new ones, run:
+
+```r
+testthat::snapshot_review("test-plots")
+```
+
+Note that the tests are not run as part of the targets workflow, as it is a
+separate step of the workflow.

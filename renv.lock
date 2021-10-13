@@ -123,6 +123,13 @@
       "Repository": "CRAN",
       "Hash": "dc5f7a6598bb025d20d66bb758f12879"
     },
+    "brio": {
+      "Package": "brio",
+      "Version": "1.1.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "2f01e16ff9571fe70381c7b9ae560dc4"
+    },
     "broom": {
       "Package": "broom",
       "Version": "0.7.9",
@@ -195,8 +202,8 @@
       "RemoteRepo": "conmat",
       "RemoteUsername": "njtierney",
       "RemoteRef": "HEAD",
-      "RemoteSha": "9b87528e7699310e7c9ce48222dccc1bf3450696",
-      "Hash": "92c81397f3133763b7e265200f2a5409"
+      "RemoteSha": "2cd517cd4c210b482407e7020103b7fd8ffc25d9",
+      "Hash": "d5db379cab5863cd34d6a2a64f03243f"
     },
     "countrycode": {
       "Package": "countrycode",
@@ -247,6 +254,20 @@
       "Repository": "CRAN",
       "Hash": "1f37fa4ab2f5f7eded42f78b9a887182"
     },
+    "desc": {
+      "Package": "desc",
+      "Version": "1.4.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "28763d08fadd0b733e3cee9dab4e12fe"
+    },
+    "diffobj": {
+      "Package": "diffobj",
+      "Version": "0.3.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "feb5b7455eba422a2c110bb89852e6a3"
+    },
     "digest": {
       "Package": "digest",
       "Version": "0.6.28",
@@ -263,8 +284,8 @@
       "RemoteRepo": "distributional",
       "RemoteUsername": "mitchelloharawild",
       "RemoteRef": "HEAD",
-      "RemoteSha": "e7c50f1088581af68239a81052aca6abc17fb81d",
-      "Hash": "e536ce83edfa30601a7ef591befc6d78"
+      "RemoteSha": "82e2919efc871c3eb447fb23122c38818622d0dc",
+      "Hash": "69a0b28b67dde732508d53bb28b36bca"
     },
     "dotenv": {
       "Package": "dotenv",
@@ -637,12 +658,26 @@
       "Repository": "CRAN",
       "Hash": "01f28d4278f15c76cddbea05899c5d6f"
     },
+    "pkgload": {
+      "Package": "pkgload",
+      "Version": "1.2.2",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "53139eedf68b98eecd5289664969c3f2"
+    },
     "plyr": {
       "Package": "plyr",
       "Version": "1.8.6",
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "ec0e5ab4e5f851f6ef32cd1d1984957f"
+    },
+    "praise": {
+      "Package": "praise",
+      "Version": "1.0.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "a555924add98c99d2f411e37e7d25e9f"
     },
     "prettyunits": {
       "Package": "prettyunits",
@@ -845,6 +880,13 @@
       "Repository": "CRAN",
       "Hash": "857c34fc118c677cf6bf39e9816faf5c"
     },
+    "testthat": {
+      "Package": "testthat",
+      "Version": "3.0.4",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "575216c9946ca70016c3ffb9c31709ba"
+    },
     "tibble": {
       "Package": "tibble",
       "Version": "3.1.5",
@@ -928,6 +970,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9c3b3a3f947c7936cea7485349247e5b"
+    },
+    "waldo": {
+      "Package": "waldo",
+      "Version": "0.3.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ad8cfff5694ac5b3c354f8f2044bd976"
     },
     "withr": {
       "Package": "withr",
