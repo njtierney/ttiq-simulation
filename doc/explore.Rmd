@@ -185,6 +185,24 @@ scenario_df_run
 
 ## Queueing orders {.tabset .tabset-pills}
 
+Queues are run for a variety of parameter combinations.
+
+- Queueing strategy
+  - **vaccine_priority_new** Ordered by unvaccinated first, then priority groups (if known), then newest swab date (e.g. unvaccinated people have highest priority regardless of swab)
+  - **priority_vaccine_new** Ordered by priority groups (if known) first, then unvaccinated, then newest swab date
+  - **random_** Random
+  - **old** Ordered by unvaccinated, then priority, then oldest swab date
+- Capacities relative to the desired **interviewable** case rate (not all cases must be interviewed, e.g. young children)
+  - **capacity40pc** 40%
+  - **capacity70pc** 70%
+  - **capacity100pc** 100%
+- The age at which cases to be called are discarded
+  - **max_5d** After 5 days
+  - **max_14d** After 14 days
+- Delays in the caller receiving info that prioritises certain cases. 
+  - **delayzero** Instantaneous (e.g. Vic Test Tracker or pre-swab survey)
+  - **delaypoisson1** Mean 1 day delay (e.g. pre-interview screening call for +ve cases)
+
 ```{r, echo=FALSE}
 # NOTE: couldn't get to run on machine, using the output of the below
 # code to generate the chunks pasted below

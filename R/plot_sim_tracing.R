@@ -29,7 +29,15 @@ plot_sim_tracing = function (experiment_result) {
       labs(subtitle = glue("Faceted by priority group"),
            fill = "Interviewed\n(to show NAs)")
       
-      p1 / p2
+      p3 = ggplot(scenario_samples, aes(x=samples_time_to_interview, fill=samples_time_to_interview >= 0)) +
+         geom_bar() +
+         facet_wrap(vars(samples_vaccinated)) +
+         coord_cartesian(xlim=c(-2, NA)) +
+         scale_x_continuous(breaks = c(-2, 0:xmax), labels=c("Missed", 0:xmax)) +
+         labs(subtitle = glue("Faceted by vaccination status"),
+              fill = "Interviewed\n(to show NAs)")
+      
+      p1 / p2 / p3
    }
    plots = lapply(names(experiment_result), plot) %>%
       setNames(names(experiment_result))
