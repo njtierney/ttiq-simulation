@@ -8,7 +8,7 @@
 #
 
 library(shiny)
-library(shinyjqui)
+# library(shinyjqui)
 library(targets)
 source("../../packages.R")
 lapply(list.files("../../R", full.names = TRUE), source)
