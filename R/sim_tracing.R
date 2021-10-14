@@ -95,7 +95,7 @@ sim_tracing <- function(derived_delay_distributions,
 
       scenario_samples = scenario_samples %>%
         #                               Case has been notified         no interview yet        less than 2 weeks old              if notified today, not notified too late
-        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-max_interview_delay) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
+        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date >= (sim_day-max_interview_delay) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
         f_priority(sim_day, notification_time) %>%
         mutate(interview_date = ifelse(
           # Condition on whether case is eligible to be interviewed
