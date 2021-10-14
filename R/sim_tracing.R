@@ -32,6 +32,7 @@
 #' @export
 sim_tracing <- function(derived_delay_distributions,
                         capacity_ratio = 0.8,
+                        max_interview_delay = 5,
                         prop_priority = 0.4,
                         prop_time_delay = 0.2,
                         priority_delay_distribution = NULL,
@@ -94,7 +95,7 @@ sim_tracing <- function(derived_delay_distributions,
 
       scenario_samples = scenario_samples %>%
         #                               Case has been notified         no interview yet        less than 2 weeks old              if notified today, not notified too late
-        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-14) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
+        mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date > (sim_day-max_interview_delay) & !(notification_date==sim_day & notification_time > prop_time_delay)) %>%
         f_priority(sim_day, notification_time) %>%
         mutate(interview_date = ifelse(
           # Condition on whether case is eligible to be interviewed
@@ -131,13 +132,15 @@ sim_tracing <- function(derived_delay_distributions,
            ) %>%
       mutate(samples_time_to_interview = lapply(samples_time_to_interview, function(x) x[[1]]),
              samples_priority_group = lapply(samples_priority_group, function(x) x[[1]]),
-             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]]),
-             capacity_ratio = capacity_ratio
+             samples_vaccinated = lapply(samples_vaccinated, function(x) x[[1]])
       )
   }) %>%
     bind_rows()
   
   # Return a dataframe with simulated columns
   generated_samples = generated_samples %>%
-    left_join(queue_samples, by="scenario")
+    left_join(queue_samples, by="scenario") %>%
+    mutate(capacity_ratio = capacity_ratio)
+  
+  return(generated_samples)
 }

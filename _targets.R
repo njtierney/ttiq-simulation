@@ -347,7 +347,7 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
   
 )
 

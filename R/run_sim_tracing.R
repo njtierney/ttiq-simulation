@@ -19,6 +19,18 @@ run_sim_tracing <- function(derived_delay_distributions, n_samples = 1e4) {
       )
   }
   
+  random_swab <- function(x, sim_day, notification_time) {
+    x %>%
+      mutate(ix = runif(n())) %>%
+      arrange(
+        # Whether case is eligible to be interviewed
+        desc(eligible_for_interview),
+        # Priorities, in order of appearance
+        ix
+      ) %>%
+      select(-ix)
+  }
+  
   
   priority_ranking_priority_vaccine_old_swab <- function(x, sim_day, notification_time) {
     x %>%
@@ -87,32 +99,43 @@ run_sim_tracing <- function(derived_delay_distributions, n_samples = 1e4) {
   ranking_functions = list(
     'priority_new_swab'  = priority_ranking_priority_new_swab,
     'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
-    'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
-    'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
+    # 'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
+    # 'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
     'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab,
-    'vaccine_priority_old_notification_old_swab' = priority_ranking_vaccine_priority_old_notification_old_swab
+    'random_swab' = random_swab
+    # 'vaccine_priority_old_notification_old_swab' = priority_ranking_vaccine_priority_old_notification_old_swab
   )
   
-  priority_delay_averages = c(rate0=0, rate1=1, rate2=2)
+  priority_delay_function = list(
+    delayzero = function(n) rep(0, n),
+    delaypoisson1 = function(n) rpois(n, 1)
+  )
+  
+  capacity_ratios = c(capacity30pct=0.3, capacity50pct=0.5, capacity80pct=0.8)
   
   # Create a list crossing combinations of input parameters for each run
   sim_params = lapply(ranking_functions, function(x) {
-    lapply(priority_delay_averages, function(y) {
-      list(f = x,
-           priority_delay = y)
-    })
+    lapply(priority_delay_function, function(y) {
+      lapply(capacity_ratios, function(z) {
+        list(f = x,
+             priority_delay_fn = y,
+             capacity_ratio = z)
+      })
+    }) %>%
+      unlist(recursive=FALSE)
   }) %>%
     unlist(recursive=FALSE)
+  message("Searching over ", length(sim_params), " elements of `sim_params`")
   
   results = future_lapply(sim_params, function(x) {
     sim_tracing_output = sim_tracing(
       derived_delay_distributions %>%
         # only using 'optimal' for now
         filter(scenario == "optimal"),
-      capacity_ratio = 0.8,
+      capacity_ratio = x$capacity_ratio,
       prop_priority = 0.2,
       prop_time_delay = 0.2,
-      priority_delay_distribution = function(n) rpois(n, x$priority_delay),
+      priority_delay_distribution = x$priority_delay_fn,
       f_priority = x$f,
       proportion_cases_vaccinated = 0.05,
       n_samples = n_samples
