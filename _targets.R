@@ -68,20 +68,13 @@ tar_plan(
   # }),
   
   experiment_result = run_sim_tracing(derived_delay_distributions,
-                                      n_samples = 1000),
+                                      n_samples = 100),
   
   experiment_plots = plot_sim_tracing(experiment_result),
   
-  tidied_queue_simulation = tidy_queue_simulation(experiment_result),
+  samples_df_queue = tidy_queue_simulation(experiment_result),
   
-  derived_queue_distributions = derive_distributions_queue(
-    tidied_queue_simulation
-  ),
-  
-  combined_delay_w_queue = bind_rows(derived_delay_distributions,
-                                     derived_queue_distributions),
-  
-  delay_dist_funs = create_dist_sim_fun(combined_delay_w_queue),
+  delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
@@ -113,12 +106,14 @@ tar_plan(
   pr_symptoms = 0.6,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
+  samples_df =  generate_samples_df_delays(delay_dist_funs),
+  
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 1000,
-    n_chains = 50,
+    n_iterations = 50000,
     # parameters for sim_tracing
-    sim_tracing_funs = delay_dist_funs,
+    # samples = samples_df,
+    sim_tracing_funs = samples_df,
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = p_active_detection,
@@ -138,6 +133,33 @@ tar_plan(
   
   scenario_df_run_tp_multiplier = calculate_tp_multiplier(
     scenario_df_run
+  ),
+
+  scenario_df_queue = create_scenario_df(
+    # these terms are fixed for each simulation
+    n_iterations = 50000,
+    # parameters for sim_tracing
+    # samples = samples_df,
+    sim_tracing_funs = samples_df,
+    # the probability of ever being found via contact tracing if not by passive
+    # detection
+    p_active_detection = p_active_detection,
+    passive_detection_given_symptoms = passive_detection_given_symptoms,
+    pr_symptoms = pr_symptoms,
+    # the probability of being found via passive detection (based on symptoms)
+    # if not by contact tracing
+    p_passive_detection = p_passive_detection,
+    # if found by passive case detection (assuming contact tracing not in
+    # place), the distribution of times from infection to detection
+    passive_distribution = list(get_passive_distribution())
+  ),
+  
+  scenario_df_run_queue = run_ttiq_scenario(
+    scenario_df_queue
+  ),
+  
+  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier(
+    scenario_df_run_queue
   ),
   
   plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),

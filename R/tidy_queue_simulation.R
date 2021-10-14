@@ -9,7 +9,7 @@
 #' @export
 tidy_queue_simulation <- function(experiment_result) {
 
-  bind_rows(
+  df <- bind_rows(
     experiment_result,
     .id = "queue_type"
     ) %>% 
@@ -33,5 +33,19 @@ tidy_queue_simulation <- function(experiment_result) {
     select(- priority_growth_rate_num,
            -priority_type,
            -priority_growth_rate)
-
+  
+  df %>% 
+    unnest(cols = everything()) %>% 
+    mutate(
+      tracing_delay = samples_isol_swab + 
+        samples_test_turnaround_time + 
+        samples_time_to_interview,
+      .after = scenario
+      ) %>% 
+    rename(vaccinated = samples_vaccinated,
+           priority = samples_priority_group) %>% 
+    relocate(vaccinated,
+             priority,
+             .after = tracing_delay)
+  
 }
