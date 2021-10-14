@@ -18,6 +18,7 @@ sim_gi_truncated <- function(n,
   # truncnorm is evaluating control flow in a vector of logicals to check b > a,
   # which is triggering a warning. Suppress, since we know we're never flipping
   # the intervals
+  # if (infection_to_isolation < 0){browser()}
   suppressWarnings(
     rtrunc(
       n = n,

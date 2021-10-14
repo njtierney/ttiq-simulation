@@ -41,6 +41,7 @@ time_to_isolation <- function(n_iterations,
   trace_object_infect_isolate <-  rep.int(NA, times = n_iterations)
   trace_object_time_to_active <-  rep.int(NA, times = n_iterations)
   trace_object_time_to_passive <- rep.int(NA, times = n_iterations)
+  trace_object_person_missed <- rep.int(FALSE, times = n_iterations)
   
   # simulate the delay from isolation of case to isolation of (infected)
   # contact, based on contact tracing alone
@@ -53,10 +54,18 @@ time_to_isolation <- function(n_iterations,
   # 
   resampled <- samples[rows, ]
   
+  # replace negative values with Inf for the moment
+  # the negative values are in samples_time_to_interview - 
+  # not necessarily tracing_delay (which could theoretically be positive)
+  resampled_negative <- resampled$samples_time_to_interview < 0
+  resampled$tracing_delay[resampled_negative] <- Inf
+  
   # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
   # times from infection to isolation
   for (iteration in seq_len(n_iterations)) {
+    
     # simulate a generation interval
+    # if (t_infect_isolate < 0){browser()}
     t_infect_infect <- sim_gi_truncated(
       n = 1,
       infection_to_isolation = t_infect_isolate,
@@ -64,7 +73,7 @@ time_to_isolation <- function(n_iterations,
       sdlog = gi_sdlog
     )
     
-    t_isolate_case_isolate_contact <- resampled$tracing_delay[iteration]
+    t_isolate_case_isolate_contact <-  resampled$tracing_delay[iteration]
     # compute the infection to isolation for the (infected) contact, *if* they
     # were found by contact tracing and not passive detection, based on:
       # infection to isolation for the case
@@ -79,9 +88,17 @@ time_to_isolation <- function(n_iterations,
     
     # assuming they are found by either active, passive, or both, sample which
     # would find them
-    found_by <- r_if_either(1,
-                            p_active_detection,
-                            p_passive_detection)
+    if (is.infinite(t_infect_isolate_ct_only)){
+      found_by <- r_if_either(1,
+                              0,
+                              p_passive_detection)
+      # count when this happens
+      trace_object_person_missed[iteration] <- TRUE
+    } else {
+      found_by <- r_if_either(1,
+                              p_active_detection,
+                              p_passive_detection)
+    }
     
     # get the earliest of the delays for each
     time_to_active = ifelse(found_by$a, t_infect_isolate_ct_only, Inf)
@@ -103,8 +120,10 @@ time_to_isolation <- function(n_iterations,
     list(
       time_to_isolation_sims = trace_object_infect_isolate,
       time_to_active = trace_object_time_to_active,
-      time_to_passive = trace_object_time_to_passive
+      time_to_passive = trace_object_time_to_passive,
+      person_missed = trace_object_person_missed
     )
   )
+  
 }
 

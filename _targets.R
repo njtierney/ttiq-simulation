@@ -3,7 +3,6 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
-
 tar_plan(
   
   tar_file(cases_nsw_path, 
@@ -140,7 +139,7 @@ tar_plan(
     n_iterations = 50000,
     # parameters for sim_tracing
     # samples = samples_df,
-    sim_tracing_funs = samples_df,
+    sim_tracing_funs = samples_df_queue,
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = p_active_detection,
@@ -163,6 +162,8 @@ tar_plan(
   ),
   
   plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
+  
+  plot_simple_tp_queue = gg_simple_tp(scenario_df_run_tp_multiplier_queue),
   
   ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
   
