@@ -188,110 +188,20 @@ scenario_df_run
 ```{r, echo=FALSE}
 # NOTE: couldn't get to run on machine, using the output of the below
 # code to generate the chunks pasted below
-# # Construct chunks for each LPHU plot/table
-# out = lapply(names(experiment_plots), function(x) {
-#   paste0(
-#     paste0("### ", x, "\n"),          # Section title
-#     paste0("```{r ", x %>% str_replace("\\.", "_"), ", echo=FALSE}\n"),   # Chunk header
-#     paste0("experiment_plots$`", x, "`\n"),       # Chunk content
-#     "```\n",                          # End chunk
-#     collapse="\n") # Assemble code
-# })
+# Construct chunks for each LPHU plot/table
+out = lapply(names(experiment_plots), function(x) {
+  paste0(
+    paste0("### ", x, "\n"),          # Section title
+    paste0("```{r ", x %>% str_replace("\\.", "_"), ", echo=FALSE}\n"),   # Chunk header
+    paste0("experiment_plots$`", x, "`\n"),       # Chunk content
+    "```\n",                          # End chunk
+    collapse="\n") # Assemble code
+})
 # paste(out, collapse="\n"))
-# `r paste(knitr::knit(text = paste(out, collapse="\n")))`
+
 ```
 
-
-
-### priority_new_swab.rate0
-```{r priority_new_swab_rate0, echo=FALSE}
-experiment_plots$`priority_new_swab.rate0`
-```
-
-### priority_new_swab.rate1
-```{r priority_new_swab_rate1, echo=FALSE}
-experiment_plots$`priority_new_swab.rate1`
-```
-
-### priority_new_swab.rate2
-```{r priority_new_swab_rate2, echo=FALSE}
-experiment_plots$`priority_new_swab.rate2`
-```
-
-### priority_vaccine_old_swab.rate0
-```{r priority_vaccine_old_swab_rate0, echo=FALSE}
-experiment_plots$`priority_vaccine_old_swab.rate0`
-```
-
-### priority_vaccine_old_swab.rate1
-```{r priority_vaccine_old_swab_rate1, echo=FALSE}
-experiment_plots$`priority_vaccine_old_swab.rate1`
-```
-
-### priority_vaccine_old_swab.rate2
-```{r priority_vaccine_old_swab_rate2, echo=FALSE}
-experiment_plots$`priority_vaccine_old_swab.rate2`
-```
-
-### priority_vaccine_new_swab.rate0
-```{r priority_vaccine_new_swab_rate0, echo=FALSE}
-experiment_plots$`priority_vaccine_new_swab.rate0`
-```
-
-### priority_vaccine_new_swab.rate1
-```{r priority_vaccine_new_swab_rate1, echo=FALSE}
-experiment_plots$`priority_vaccine_new_swab.rate1`
-```
-
-### priority_vaccine_new_swab.rate2
-```{r priority_vaccine_new_swab_rate2, echo=FALSE}
-experiment_plots$`priority_vaccine_new_swab.rate2`
-```
-
-### vaccine_priority_old_swab.rate0
-```{r vaccine_priority_old_swab_rate0, echo=FALSE}
-experiment_plots$`vaccine_priority_old_swab.rate0`
-```
-
-### vaccine_priority_old_swab.rate1
-```{r vaccine_priority_old_swab_rate1, echo=FALSE}
-experiment_plots$`vaccine_priority_old_swab.rate1`
-```
-
-### vaccine_priority_old_swab.rate2
-```{r vaccine_priority_old_swab_rate2, echo=FALSE}
-experiment_plots$`vaccine_priority_old_swab.rate2`
-```
-
-### vaccine_priority_new_swab.rate0
-```{r vaccine_priority_new_swab_rate0, echo=FALSE}
-experiment_plots$`vaccine_priority_new_swab.rate0`
-```
-
-### vaccine_priority_new_swab.rate1
-```{r vaccine_priority_new_swab_rate1, echo=FALSE}
-experiment_plots$`vaccine_priority_new_swab.rate1`
-```
-
-### vaccine_priority_new_swab.rate2
-```{r vaccine_priority_new_swab_rate2, echo=FALSE}
-experiment_plots$`vaccine_priority_new_swab.rate2`
-```
-
-### vaccine_priority_old_notification_old_swab.rate0
-```{r vaccine_priority_old_notification_old_swab_rate0, echo=FALSE}
-experiment_plots$`vaccine_priority_old_notification_old_swab.rate0`
-```
-
-### vaccine_priority_old_notification_old_swab.rate1
-```{r vaccine_priority_old_notification_old_swab_rate1, echo=FALSE}
-experiment_plots$`vaccine_priority_old_notification_old_swab.rate1`
-```
-
-### vaccine_priority_old_notification_old_swab.rate2
-```{r vaccine_priority_old_notification_old_swab_rate2, echo=FALSE}
-experiment_plots$`vaccine_priority_old_notification_old_swab.rate2`
-```
+`r paste(knitr::knit(text = paste(out, collapse="\n")))`
 
 ## Reproducibility
 

@@ -60,3 +60,6 @@ renv/
 
 # outputs folder
 outputs/
+
+# Rmarkdown intermediate files
+**/*_files/*

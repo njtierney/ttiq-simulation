@@ -19,6 +19,18 @@ run_sim_tracing <- function(derived_delay_distributions) {
       )
   }
   
+  random_swab <- function(x, sim_day, notification_time) {
+    x %>%
+      mutate(ix = runif(n())) %>%
+      arrange(
+        # Whether case is eligible to be interviewed
+        desc(eligible_for_interview),
+        # Priorities, in order of appearance
+        ix
+      ) %>%
+      select(-ix)
+  }
+  
   
   priority_ranking_priority_vaccine_old_swab <- function(x, sim_day, notification_time) {
     x %>%
@@ -85,16 +97,17 @@ run_sim_tracing <- function(derived_delay_distributions) {
   }
   
   ranking_functions = list(
-    # 'priority_new_swab'  = priority_ranking_priority_new_swab,
-    # 'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
+    'priority_new_swab'  = priority_ranking_priority_new_swab,
+    'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
     # 'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
     # 'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
-    'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab#,
+    'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab,
+    'random_swab' = random_swab
     # 'vaccine_priority_old_notification_old_swab' = priority_ranking_vaccine_priority_old_notification_old_swab
   )
   
   priority_delay_function = list(
-    # delayzero = function(n) rep(0, n),
+    delayzero = function(n) rep(0, n),
     delaypoisson1 = function(n) rpois(n, 1)
   )
   
@@ -112,13 +125,14 @@ run_sim_tracing <- function(derived_delay_distributions) {
       unlist(recursive=FALSE)
   }) %>%
     unlist(recursive=FALSE)
+  message("Searching over ", length(sim_params), " elements of `sim_params`")
   
-  results = lapply(sim_params, function(x) {
+  results = future_lapply(sim_params, function(x) {
     sim_tracing_output = sim_tracing(
       derived_delay_distributions %>%
         # only using 'optimal' for now
         filter(scenario == "optimal"),
-      capacity_ratio = x$z,
+      capacity_ratio = x$capacity_ratio,
       prop_priority = 0.2,
       prop_time_delay = 0.2,
       priority_delay_distribution = x$priority_delay_fn,
