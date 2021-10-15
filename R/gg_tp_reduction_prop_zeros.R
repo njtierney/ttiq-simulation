@@ -31,13 +31,24 @@ gg_tp_reduction_prop_zeros <- function(scenario_df_run_tp_multiplier,
   cases_tp_reduction <- scenario_df_run_tp_multiplier %>% 
     relocate(time_to_isolation_sims) %>% 
     # improve the names of the scenarios
-    mutate(scenario = case_when(
-      is.na(prop_current_case_zero) ~ scenario,
-      
-      TRUE ~ as.character(glue(
-        "{scenario}_{percent(prop_current_case_zero, suffix = '_pct_zeros')}"
-      ))
-    )) %>% 
+    mutate(
+      scenario = case_when(
+        is.na(prop_current_case_zero) ~ scenario,
+        TRUE ~ as.character(
+          glue(
+            "{scenario}_{percent(prop_current_case_zero, suffix = '_pct_zeros')}"
+            )
+          )
+        )
+      ) %>% 
+    # remove added details to scenario, used earlier
+    # TODO: fix this upstream in the data processing, but not 100% necessary
+    mutate(
+      scenario = str_remove_all(
+        string = scenario,
+        pattern = "_0\\.2|_0\\.4|_0\\.6|_0\\.8"
+      )
+    ) %>% 
     mutate(
       across(.cols = c(time_to_isolation_sims,
                        time_to_active,
@@ -72,6 +83,7 @@ gg_tp_reduction_prop_zeros <- function(scenario_df_run_tp_multiplier,
       by = "scenario"
     ) %>% 
     mutate(
+      scenario = as_factor(scenario),
       scenario = fct_relevel(
         scenario,
         c(

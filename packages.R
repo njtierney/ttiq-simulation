@@ -39,5 +39,6 @@ library(truncdist)
 library(tidyverse)
 library(vctrs)
 library(RColorBrewer)
+library(future.apply)
 
 message("packages loaded!")

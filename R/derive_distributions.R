@@ -52,6 +52,9 @@ derive_distributions <- function(cases_scenario,
   bind_rows(
     df_distributions,
     current_case
-  )
+  ) %>% 
+    mutate(scenario = as.character(glue("{scenario}_{prop_current_case_zero}")),
+           scenario = str_remove_all(scenario,
+                                     "_NA"))
   
 }

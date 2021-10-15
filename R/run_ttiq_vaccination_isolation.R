@@ -119,12 +119,12 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
           weight_vacc_found_high_risk
       ) == 1,
       
-      # check that all the numerical checks pass
-      all_checks = all(
-        across(
-          starts_with("check")
-        )
-      )
+      # # check that all the numerical checks pass
+      # all_checks = all(
+      #   across(
+      #     starts_with("check")
+      #   )
+      # )
     
     ) %>% 
     # pull(sanity_check) %>% all()
