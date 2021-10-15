@@ -28,7 +28,14 @@ tidy_queue_scenario <- function(queue_scenarios) {
       scenario = glue(
         "{scenario}_{priority_type}_{priority_growth_rate}_{capacity}_{max}"
       )
-    )
+    ) %>% 
+  # only `samples_time_to_interview` contains negative values (-2), which 
+    # indicates individuals who were missed by passive and active tracing.
+    # we are replacing these with Inf.
+    mutate(samples_time_to_interview = map(
+      .x = samples_time_to_interview,
+      .f = ~impute_inf(x = .x, value = -2)
+    ))
   
   df_samples <- df %>%
     rowwise() %>% 
@@ -63,7 +70,7 @@ tidy_queue_scenario <- function(queue_scenarios) {
     group_by(scenario) %>% 
     nest(samples = -scenario)
   
-  df %>% 
+  df_joined <- df %>% 
     select(scenario,
            priority_type,
            priority_growth_rate,
@@ -74,5 +81,7 @@ tidy_queue_scenario <- function(queue_scenarios) {
       df_samples,
       by = "scenario"
     )
+  
+  df_joined
   
 }

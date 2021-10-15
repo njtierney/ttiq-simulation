@@ -101,7 +101,7 @@ tar_plan(
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 50000,
+    n_iterations = 1000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df,
@@ -135,7 +135,7 @@ tar_plan(
 
   scenario_df_queue = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 50000,
+    n_iterations = 1000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df_queue,
