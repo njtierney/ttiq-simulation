@@ -26,6 +26,13 @@ gg_tp_reduction <- function(scenario_df_run_tp_multiplier, scenario_parameters) 
                time_to_active,
                time_to_passive)
       ) %>% 
+    # rename the case intitiated 0.8
+    mutate(
+      scenario = str_remove_all(
+        string = scenario,
+        pattern = "_0\\.8"
+        )
+      ) %>% 
     left_join(scenario_parameters, by=c("scenario"="value")) %>%
     mutate(
       scenario = name,
