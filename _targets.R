@@ -101,7 +101,7 @@ tar_plan(
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 50000,
+    n_iterations = 1000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df,
@@ -132,10 +132,26 @@ tar_plan(
   plot_queue_scenarios = gg_queue_scenarios(queue_scenarios),
   
   samples_df_queue = tidy_queue_scenario(queue_scenarios),
-
+  
+  # pull out the tidied queueing delays corresponding to specified scenarios
+  # split that into two tibbles, one for vaccination status = TRUE, one for vaccination status = FALSE
+  queue_splits = split_queue_scenarios_by_vaccination(
+    samples_df_queue,
+    scenario = "random_swab"
+    ),
+  
+  # save those as two separate files (vaccinated/unvaccinated) for each scenario
+  tar_file(
+    queue_splits_path,{
+      write_csv_queue_splits(
+        queue_splits
+      )
+    }
+  ),
+  
   scenario_df_queue = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 50000,
+    n_iterations = 1000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df_queue,

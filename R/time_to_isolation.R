@@ -54,12 +54,6 @@ time_to_isolation <- function(n_iterations,
   # 
   resampled <- samples[rows, ]
   
-  # replace negative values with Inf for the moment
-  # the negative values are in samples_time_to_interview - 
-  # not necessarily tracing_delay (which could theoretically be positive)
-  resampled_negative <- resampled$samples_time_to_interview < 0
-  resampled$tracing_delay[resampled_negative] <- Inf
-  
   # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
   # times from infection to isolation
   for (iteration in seq_len(n_iterations)) {
