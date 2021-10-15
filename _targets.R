@@ -65,14 +65,6 @@ tar_plan(
   #     here("outputs-public/derived_delay_distributions.csv")
   #     )
   # }),
-  
-  experiment_result = run_sim_tracing(derived_delay_distributions,
-                                      n_samples = 100),
-  
-  experiment_plots = plot_sim_tracing(experiment_result),
-  
-  samples_df_queue = tidy_queue_simulation(experiment_result),
-  
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
@@ -133,6 +125,13 @@ tar_plan(
   scenario_df_run_tp_multiplier = calculate_tp_multiplier(
     scenario_df_run
   ),
+  
+  queue_scenarios = run_queue_scenarios(derived_delay_distributions,
+                                          n_samples = 100),
+  
+  plot_queue_scenarios = gg_queue_scenarios(queue_scenarios),
+  
+  samples_df_queue = tidy_queue_scenario(queue_scenarios),
 
   scenario_df_queue = create_scenario_df(
     # these terms are fixed for each simulation

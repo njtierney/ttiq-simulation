@@ -1,10 +1,11 @@
 #' Runs experiments with `sim_tracing()`
 #'
 #' @param derived_delay_distributions Dataframe of fitted delay distributions
+#' @param n_samples How many samples to run
 #'
 #' @return list of simulation results
 #' @export
-run_sim_tracing <- function(derived_delay_distributions, n_samples = 1e4) {
+run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
   
   # Define arbitrary ranking functions
   priority_ranking_priority_new_swab <- function(x, sim_day, notification_time) {

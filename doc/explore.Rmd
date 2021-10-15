@@ -54,7 +54,7 @@ withr::with_dir(here::here(), {
       plot_hist_delay_samples_v_data,
       plot_tp_reduction,
       scenario_df_run_plots,
-      experiment_plots
+      plot_queue_scenarios
       )
     )
 })
@@ -207,11 +207,11 @@ Queues are run for a variety of parameter combinations.
 # NOTE: couldn't get to run on machine, using the output of the below
 # code to generate the chunks pasted below
 # Construct chunks for each LPHU plot/table
-out = lapply(names(experiment_plots), function(x) {
+out = lapply(names(plot_queue_scenarios), function(x) {
   paste0(
     paste0("### ", x, "\n"),          # Section title
     paste0("```{r ", x %>% str_replace("\\.", "_"), ", echo=FALSE}\n"),   # Chunk header
-    paste0("experiment_plots$`", x, "`\n"),       # Chunk content
+    paste0("plot_queue_scenarios$`", x, "`\n"),       # Chunk content
     "```\n",                          # End chunk
     collapse="\n") # Assemble code
 })

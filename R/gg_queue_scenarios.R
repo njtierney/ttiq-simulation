@@ -4,9 +4,9 @@
 #' @author Chris Baker/Logan Wu
 #' @export
 #Diagnostic plots
-plot_sim_tracing = function (experiment_result) {
+gg_queue_scenarios = function (queue_scenarios) {
    plot = function(x) {
-      scenario_samples = experiment_result[[x]] %>%
+      scenario_samples = queue_scenarios[[x]] %>%
          head(1) %>%
          unnest(cols = starts_with("samples_"))
       capacity_ratio = scenario_samples$capacity_ratio[1]
@@ -39,6 +39,6 @@ plot_sim_tracing = function (experiment_result) {
       
       p1 / p2 / p3
    }
-   plots = lapply(names(experiment_result), plot) %>%
-      setNames(names(experiment_result))
+   plots = lapply(names(queue_scenarios), plot) %>%
+      setNames(names(queue_scenarios))
 }

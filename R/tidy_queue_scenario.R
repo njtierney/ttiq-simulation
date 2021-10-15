@@ -3,14 +3,14 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param experiment_result
+#' @param queue_scenarios
 #' @return
 #' @author Nicholas Tierney
 #' @export
-tidy_queue_simulation <- function(experiment_result) {
+tidy_queue_scenario <- function(queue_scenarios) {
 
   df <- bind_rows(
-    experiment_result,
+    queue_scenarios,
     .id = "queue_type"
     ) %>% 
     separate(
