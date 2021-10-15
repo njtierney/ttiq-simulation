@@ -224,13 +224,24 @@ tar_plan(
   
   # What is the age- and vaccine adjusted clinical fraction of cases
   
-  age_w_clinical_fraction  =  get_clinical_fraction(
+  age_vacc_adjusted_clinical_fraction  =  get_clinical_fraction(
     ve_symptoms = 0.78,
     ve_onward_transmission = 0.5,
     ve_susceptibility = 0.73,
     vaccination_coverage = 0.7,
     baseline_matrix = baseline_matrix()),
 
+  plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_clinical_fraction),
+  
+  tar_file(plot_clinical_fraction_path, {
+    ggsave_write_path(
+      plot = plot_adjusted_clinical_fraction,
+      path = "figs/age_vaccine_clinical_fraction.png",
+      width = 9,
+      height = 3.5)
+    }),
+  
+  
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
