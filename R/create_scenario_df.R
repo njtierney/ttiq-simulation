@@ -11,7 +11,6 @@
 #' @author Nicholas Tierney
 #' @export
 create_scenario_df <- function(n_iterations,
-                               n_chains,
                                sim_tracing_funs,
                                passive_detection_given_symptoms,
                                pr_symptoms,
@@ -23,7 +22,6 @@ create_scenario_df <- function(n_iterations,
   sim_tracing_funs %>%
     mutate(
       n_iterations = n_iterations,
-      n_chains = n_chains,
       gi_meanlog = 1.375738,
       gi_sdlog = 0.5665299,
       passive_detection_given_symptoms = passive_detection_given_symptoms,
