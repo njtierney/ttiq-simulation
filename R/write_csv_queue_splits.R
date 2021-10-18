@@ -7,10 +7,14 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-write_csv_queue_splits <- function(queue_splits) {
+write_csv_queue_splits <- function(queue_splits,
+                                   file_paths) {
   
   # save those as two separate files (vaccinated/unvaccinated) for each scenario
-  file_paths <- glue("outputs/{names(queue_splits)}.csv.gz")
+  dir <- dirname(file_paths)
+  if (!dir.exists(dir)) {
+    dir.create(dir)
+  }
 
   walk2(
     .x = queue_splits,

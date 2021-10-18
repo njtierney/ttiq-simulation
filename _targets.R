@@ -56,6 +56,22 @@ tar_plan(
     prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
+  # independently sample from component delay distributions, from Eamon
+  
+  # get the probabilities of every number of days for each delay
+  optimal_delay_samples = sample_optimal_delays(
+    derived_delay_distributions
+  ),
+  
+  tar_file(
+    optimal_delay_samples_path, {
+      write_csv_return_path(
+        x = optimal_delay_samples,
+        file = "outputs/optimal_delay_samples.csv"
+      )
+    }
+  ),
+  
   # NOTE: need to check how parameters are used
   # derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
   
@@ -143,7 +159,8 @@ tar_plan(
   tar_file(
     queue_splits_path,{
       write_csv_queue_splits(
-        queue_splits
+        queue_splits = queue_splits,
+        file_paths = glue("outputs/{names(queue_splits)}.csv")
       )
     }
   ),
@@ -184,7 +201,7 @@ tar_plan(
   tar_file(scenario_df_run_tp_multiplier_csv,{
     write_csv_return_path(
       x = ttiq_scenario_prepared,
-      file = "outputs/ttiq_scenario_run.csv.gz"
+      file = "outputs/ttiq_scenario_run.csv"
     )
   }),
   
