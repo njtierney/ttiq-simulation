@@ -198,7 +198,7 @@ server <- function(input, output) {
     })
     
     output$plot <- renderPlot({
-        plot_sim_tracing(list(sim_tracing_output()) %>% setNames(input$ranking_function))[[1]]
+        gg_queue_scenarios(list(sim_tracing_output()) %>% setNames(input$ranking_function))[[1]]
     },
     height = 800,
     res = 108)
