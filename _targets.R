@@ -162,16 +162,23 @@ tar_plan(
   
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
+  ve_onward_transmission = 0.5 * c(1, 0.5),
+  
+  ve_susceptibility = 0.73,
+  
+  # VE for symptoms in breakthrough infections
+  ve_symptoms = 0.78,
+  
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     
     # VE for onward transmission with sensitivity test for 50% lower effect
     # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = 0.5 * c(1, 0.5),
+    ve_onward_transmission = ve_onward_transmission,
     
-    ve_susceptibility = 0.73,
+    ve_susceptibility = ve_susceptibility,
 
     # VE for symptoms in breakthrough infections
-    ve_symptoms = 0.78,
+    ve_symptoms = ve_symptoms,
     
     # the reduction in test seeking for vaccinated symptomatic infections
     # relative to unvaccinated symptomatic infections
@@ -224,29 +231,32 @@ tar_plan(
   
   # What is the age- and vaccine adjusted clinical fraction of cases
   
-  scenario_infections_clinical_fraction = get_clinical_fraction_scenarios(
+  scenario_clinical_fraction = get_clinical_fraction_scenarios(
     # VE for onward transmission with sensitivity test for 50% lower effect
     # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = 0.5 * c(1, 0.5),
+    ve_onward_transmission = ve_onward_transmission,
     
-    ve_susceptibility = 0.73,
+    ve_susceptibility = ve_susceptibility,
     
     # VE for symptoms in breakthrough infections
-    ve_symptoms = 0.78,
+    ve_symptoms = ve_symptoms,
 
     # what is the vaccination coverage
-    vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1)),
+    vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1)
+    
+    ),
   
   age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-    ve_symptoms = 0.78,  # adjust this for AZ vs Pfizer?
-    ve_onward_transmission = 0.5, 
-    ve_susceptibility = 0.73,
-    vaccination_coverage = 0.7,  # want this to work as 
-    baseline_matrix = baseline_matrix()),
+    scenario_clinical_fraction, 
+    oz_baseline_matrix
+    ),
+
+  fraction_cases_vaccinated = get_frac_vaccinated(
+    age_vacc_adjusted_cases, 
+    vaccination_coverage),
   
-  fraction_cases_vaccinated = get_vaccinated(age_vacc_adjusted_cases),
-  
-  fraction_cases_symptomatic = get_symptomatic(age_vacc_adjusted_cases),
+  fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
+                                                    vaccination_coverage),
   
   plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
   
