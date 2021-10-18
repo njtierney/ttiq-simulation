@@ -38,5 +38,6 @@ library(truncdist)
 library(tidyverse)
 library(vctrs)
 library(RColorBrewer)
+library(tinter)
 
 message("packages loaded!")
