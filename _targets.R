@@ -136,8 +136,7 @@ tar_plan(
   # pull out the tidied queueing delays corresponding to specified scenarios
   # split that into two tibbles, one for vaccination status = TRUE, one for vaccination status = FALSE
   queue_splits = split_queue_scenarios_by_vaccination(
-    samples_df_queue,
-    scenario = "random_swab"
+    samples_df_queue
     ),
   
   # save those as two separate files (vaccinated/unvaccinated) for each scenario

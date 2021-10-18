@@ -8,14 +8,10 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-split_queue_scenarios_by_vaccination <- function(samples_df_queue, 
-                                                 scenario = "random_swab") {
+split_queue_scenarios_by_vaccination <- function(samples_df_queue) {
 
   # pull out the tidied queueing delays corresponding to specified scenarios
   samples_list <- samples_df_queue %>% 
-    filter(
-      str_detect(scenario, "random_swab")
-    ) %>% 
     unnest_wider(col = samples) %>% 
     unnest(cols = everything()) %>% 
   # split that into two tibbles, one for vaccination status = TRUE, one for vaccination status = FALSE
