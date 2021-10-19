@@ -88,6 +88,10 @@ tar_plan(
     n_samples = 10000
     ),
   
+  scenario_test_turnaround_time_probs = parameters_test_turnaround_time(
+    derived_delay_distributions
+  ),
+  
   tar_file(scenario_test_turnaround_time_sims_path,{
     write_csv_return_path(scenario_test_turnaround_time_sims,
                           "outputs/scenario_test_turnaround_time_sims.csv")
