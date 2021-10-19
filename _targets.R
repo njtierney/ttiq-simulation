@@ -394,9 +394,54 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
+  tar_file(dim_age_band_path,
+           "data/rollout/dim_age_band.csv"),
+  
+  tar_file(sa2_lookup_path,
+           "data/rollout/dim_sa2.csv"),
+  
+  tar_file(sa4_lookup_path,
+           "data/rollout/dim_sa4.csv"),
+  
+  tar_file(dim_time_path,
+           "data/rollout/dim_time.csv"),
+  
+  tar_file(dim_vaccine_path,
+           "data/rollout/dim_vaccine.csv"),
+  
+  tar_file(populations_path,
+           "data/rollout/populations_sa2.csv"),
+  
+  tar_file(vaccinations_path,
+           "data/rollout/vaccinations.csv"),
+  
+  dim_age_band = read_csv(dim_age_band_path),
+  sa2_lookup = read_csv(sa2_lookup_path),
+  sa4_lookup = read_csv(sa4_lookup_path),
+  dim_time = read_csv(dim_time_path),
+  dim_vaccine = read_csv(dim_vaccine_path),
+  populations_raw = read_csv(populations_path),
+  vaccinations_raw = read_csv(vaccinations_path),
+  
+  populations = tidy_populations(populations_raw,
+                                 sa2_lookup),
+  
+  vaccinations = tidy_vaccinations(vaccinations_raw,
+                                   dim_age_band,
+                                   dim_time,
+                                   dim_vaccine,
+                                   populations),
+  
+  
+  vaccintation_total = total_vaccinations(vaccinations_raw),
+  
+  age_lookup = create_age_lookup(dim_age_band_path),
   
 )
+
+
 
 
 # analyse NSW data to get distributions of these delays (blue + yellow graphs)
