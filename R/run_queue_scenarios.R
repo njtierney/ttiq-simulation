@@ -46,6 +46,19 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
       )
   }
   
+  
+  priority_ranking_vaccine_new_swab <- function(x, sim_day, notification_time) {
+    x %>%
+      arrange(
+        # Whether case is eligible to be interviewed
+        desc(eligible_for_interview),
+        # Priorities, in order of appearance
+        vaccinated, # vaccinated FALSE first
+        desc(notification_date >= sim_day), # notified today first (maximise day 0s)
+        desc(swab_date), # newest first
+      )
+  }
+  
   priority_ranking_priority_vaccine_new_swab <- function(x, sim_day, notification_time) {
     x %>%
       arrange(
@@ -100,6 +113,7 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
   ranking_functions = list(
     # 'priority_new_swab'  = priority_ranking_priority_new_swab,
     # 'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
+    'vaccine_new_swab' = priority_ranking_vaccine_new_swab,
     'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
     # 'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
     'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab#,
