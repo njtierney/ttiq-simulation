@@ -58,7 +58,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # no reduction if vaccinated and unfound
       tp_mult_not_found_not_vacc = 1,
       # only the vaccination reduction if vaccinated and unfound
-      tp_mult_not_found_vacc = ve_onward_transmission,
+      tp_mult_not_found_vacc = 1 - ve_onward_transmission,
       # usual reduction if unvaccinated and found
       tp_mult_found_not_vacc = tp_multiplier,
       
@@ -70,14 +70,15 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       # Now we split these by high vs low risk settings
       
       # compute the TP multipliers for high-risk vs low-risk settings
-      high_risk_multiplier = 1 / ((1 - fraction_vaccinated_low_risk) * (vacc_setting_risk_ratio - 1) + 1),
+      high_risk_multiplier = 1 /
+        (fraction_vaccinated_low_risk * (vacc_setting_risk_ratio - 1) + 1),
       low_risk_multiplier = high_risk_multiplier * vacc_setting_risk_ratio,
       
       # check these balance out to a multiplier of 1 across all the vaccinated
       # found cases
       check_risk_multiplier_balances = (
-        high_risk_multiplier * fraction_vaccinated_low_risk +
-          low_risk_multiplier * (1 - fraction_vaccinated_low_risk)
+        high_risk_multiplier * (1 - fraction_vaccinated_low_risk) +
+          low_risk_multiplier * fraction_vaccinated_low_risk
       ) == 1,
       check_risk_multiplier_matches_ratio = (
         low_risk_multiplier / high_risk_multiplier == vacc_setting_risk_ratio
@@ -85,7 +86,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
       
       # split the found and vaccinated into two sets - the low risk and the high risk
       tp_mult_found_vacc_low_risk =
-        low_risk_multiplier * ve_onward_transmission *
+        low_risk_multiplier * (1 - ve_onward_transmission) *
         (1 - isolation_stringency_vaccinated * (1 - tp_multiplier)),
       
       tp_mult_found_vacc_high_risk = high_risk_multiplier * ve_onward_transmission *
@@ -118,12 +119,12 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
           weight_vacc_found_high_risk
       ) == 1,
       
-      # check that all the numerical checks pass
-      all_checks = all(
-        across(
-          starts_with("check")
-        )
-      )
+      # # check that all the numerical checks pass
+      # all_checks = all(
+      #   across(
+      #     starts_with("check")
+      #   )
+      # )
     
     ) %>% 
     # pull(sanity_check) %>% all()

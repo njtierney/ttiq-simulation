@@ -12,14 +12,13 @@ run_ttiq_scenario <- function(scenario_df) {
     mutate(
       time_to_isolation_sims = pmap(
         .l = list(
-          n_chains = n_chains,
           n_iterations = n_iterations,
           gi_meanlog = gi_meanlog,
           gi_sdlog = gi_sdlog,
           p_active_detection = p_active_detection,
           p_passive_detection = p_passive_detection,
           passive_distribution = passive_distribution,
-          sim_tracing_fun = sim_tracing_fun
+          samples = samples
         ),
         .f = time_to_isolation
       )

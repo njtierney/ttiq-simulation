@@ -5,6 +5,9 @@ date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
     keep_md: true
+    toc: true
+    toc_float:
+      collapsed: no
 ---
 
 ```{r setup, include=FALSE}
@@ -13,7 +16,8 @@ knitr::opts_chunk$set(
   fig.height=10,
   fig.width = 10,
   dev = "png",
-  dpi = 300
+  dpi = 300,
+  root.dir = "doc"
   )
 ## target knits Rmds in their own session, so load libraries here.
 ## source("here::here(packages.R"))
@@ -49,7 +53,8 @@ withr::with_dir(here::here(), {
       plot_scenario_vaccination_isolation,
       plot_hist_delay_samples_v_data,
       plot_tp_reduction,
-      scenario_df_run_plots
+      scenario_df_run_plots,
+      plot_queue_scenarios
       )
     )
 })
@@ -178,7 +183,43 @@ scenario_df_run
   
 ```
 
+## Queueing orders {.tabset .tabset-pills}
 
+Queues are run for a variety of parameter combinations.
+
+- Queueing strategy
+  - **vaccine_priority_new** Ordered by unvaccinated first, then priority groups (if known), then newest swab date (e.g. unvaccinated people have highest priority regardless of swab)
+  - **priority_vaccine_new** Ordered by priority groups (if known) first, then unvaccinated, then newest swab date
+  - **random_** Random
+  - **old** Ordered by unvaccinated, then priority, then oldest swab date
+- Capacities relative to the desired **interviewable** case rate (not all cases must be interviewed, e.g. young children)
+  - **capacity40pc** 40%
+  - **capacity70pc** 70%
+  - **capacity100pc** 100%
+- The age at which cases to be called are discarded
+  - **max_5d** After 5 days
+  - **max_14d** After 14 days
+- Delays in the caller receiving info that prioritises certain cases. 
+  - **delayzero** Instantaneous (e.g. Vic Test Tracker or pre-swab survey)
+  - **delaypoisson1** Mean 1 day delay (e.g. pre-interview screening call for +ve cases)
+
+```{r, echo=FALSE}
+# NOTE: couldn't get to run on machine, using the output of the below
+# code to generate the chunks pasted below
+# Construct chunks for each LPHU plot/table
+out = lapply(names(plot_queue_scenarios), function(x) {
+  paste0(
+    paste0("### ", x, "\n"),          # Section title
+    paste0("```{r ", x %>% str_replace("\\.", "_"), ", echo=FALSE}\n"),   # Chunk header
+    paste0("plot_queue_scenarios$`", x, "`\n"),       # Chunk content
+    "```\n",                          # End chunk
+    collapse="\n") # Assemble code
+})
+# paste(out, collapse="\n"))
+
+```
+
+`r paste(knitr::knit(text = paste(out, collapse="\n")))`
 
 ## Reproducibility
 

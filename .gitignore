@@ -60,3 +60,9 @@ renv/
 
 # outputs folder
 outputs/
+
+# Rmarkdown intermediate files
+**/*_files/*
+
+# ignore zip file
+*.zip

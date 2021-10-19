@@ -3,7 +3,6 @@
 #' .. content for \details{} ..
 #'
 #' @title
-#' @param n_chains
 #' @param n_iterations
 #' @param gi_meanlog
 #' @param gi_sdlog
@@ -14,14 +13,13 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-time_to_isolation <- function(n_chains,
-                              n_iterations,
+time_to_isolation <- function(n_iterations,
                               gi_meanlog,
                               gi_sdlog,
                               p_active_detection,
                               p_passive_detection,
                               passive_distribution,
-                              sim_tracing_fun) {
+                              samples) {
   # use a Gibbs Sampler to convert distributions of time from:
       # "infector isolation" to "infectee isolation" into 
       # distributions of time from "infection" to "isolation" of cases
@@ -36,29 +34,40 @@ time_to_isolation <- function(n_chains,
   
   # times from infection to isolation for the initial cases in each chain
   # initial values
-  t_infect_isolate <- abs(rnorm(n = n_chains, 
+  t_infect_isolate <- abs(rnorm(n = 1, 
                                 mean = 14, 
                                 sd = 5))
   
-  trace_object_infect_isolate <- matrix(NA, nrow = n_chains, ncol = n_iterations)
-  trace_object_time_to_active <- matrix(NA, nrow = n_chains, ncol = n_iterations)
-  trace_object_time_to_passive <- matrix(NA, nrow = n_chains, ncol = n_iterations)
+  trace_object_infect_isolate <-  rep.int(NA, times = n_iterations)
+  trace_object_time_to_active <-  rep.int(NA, times = n_iterations)
+  trace_object_time_to_passive <- rep.int(NA, times = n_iterations)
+  trace_object_person_missed <- rep.int(FALSE, times = n_iterations)
+  
+  # simulate the delay from isolation of case to isolation of (infected)
+  # contact, based on contact tracing alone
+  # (independent of the other random variables)
+  rows <- sample.int(
+    n = nrow(samples),
+    size = n_iterations,
+    replace = TRUE
+  )
+  # 
+  resampled <- samples[rows, ]
+  
   # Gibbs sample multiple Markov chains in parallel to obtain the distribution of
   # times from infection to isolation
   for (iteration in seq_len(n_iterations)) {
+    
     # simulate a generation interval
+    # if (t_infect_isolate < 0){browser()}
     t_infect_infect <- sim_gi_truncated(
-      n = n_chains,
+      n = 1,
       infection_to_isolation = t_infect_isolate,
       meanlog = gi_meanlog,
       sdlog = gi_sdlog
     )
-  
-    # simulate the delay from isolation of case to isolation of (infected)
-    # contact, based on contact tracing alone
-    # (independent of the other random variables)
-    t_isolate_case_isolate_contact <- sim_tracing_fun(n_chains)
     
+    t_isolate_case_isolate_contact <-  resampled$tracing_delay[iteration]
     # compute the infection to isolation for the (infected) contact, *if* they
     # were found by contact tracing and not passive detection, based on:
       # infection to isolation for the case
@@ -69,13 +78,21 @@ time_to_isolation <- function(n_chains,
     
     # compute infection to isolation for the contact *if* they
     # were found by passive detection and not contact tracing
-    t_infect_isolate_passive_only <- generate(passive_distribution, n_chains)[[1]]
+    t_infect_isolate_passive_only <- generate(passive_distribution, 1)[[1]]
     
     # assuming they are found by either active, passive, or both, sample which
     # would find them
-    found_by <- r_if_either(n_chains,
-                            p_active_detection,
-                            p_passive_detection)
+    if (is.infinite(t_infect_isolate_ct_only)){
+      found_by <- r_if_either(1,
+                              0,
+                              p_passive_detection)
+      # count when this happens
+      trace_object_person_missed[iteration] <- TRUE
+    } else {
+      found_by <- r_if_either(1,
+                              p_active_detection,
+                              p_passive_detection)
+    }
     
     # get the earliest of the delays for each
     time_to_active = ifelse(found_by$a, t_infect_isolate_ct_only, Inf)
@@ -88,17 +105,19 @@ time_to_isolation <- function(n_chains,
     # TP reduction
     
     # record the time from infection to isolation in this step
-    trace_object_infect_isolate[, iteration] <- t_infect_isolate
-    trace_object_time_to_active[, iteration] <- time_to_active
-    trace_object_time_to_passive[, iteration] <- time_to_passive
+    trace_object_infect_isolate[iteration] <- t_infect_isolate
+    trace_object_time_to_active[iteration] <- time_to_active
+    trace_object_time_to_passive[iteration] <- time_to_passive
   }
   
   return(
     list(
       time_to_isolation_sims = trace_object_infect_isolate,
       time_to_active = trace_object_time_to_active,
-      time_to_passive = trace_object_time_to_passive
+      time_to_passive = trace_object_time_to_passive,
+      person_missed = trace_object_person_missed
     )
   )
+  
 }
 

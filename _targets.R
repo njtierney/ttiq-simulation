@@ -3,7 +3,6 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
-
 tar_plan(
   
   tar_file(cases_nsw_path, 
@@ -57,16 +56,46 @@ tar_plan(
     prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
-  derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  # independently sample from component delay distributions, from Eamon
   
-  tar_file(derived_delay_distributions_csv, {
-    write_csv_return_path(
-      derived_delay_distributions_df, 
-      here("outputs-public/derived_delay_distributions.csv")
+  # get the probabilities of every number of days for each delay
+  optimal_delay_samples = sample_optimal_delays(
+    derived_delay_distributions
+  ),
+  
+  tar_file(
+    optimal_delay_samples_path, {
+      write_csv_return_path(
+        x = optimal_delay_samples,
+        file = "outputs/optimal_delay_samples.csv"
       )
-  }),
+    }
+  ),
   
+  # NOTE: need to check how parameters are used
+  # derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
+  
+  # tar_file(derived_delay_distributions_csv, {
+  #   write_csv_return_path(
+  #     derived_delay_distributions_df, 
+  #     here("outputs-public/derived_delay_distributions.csv")
+  #     )
+  # }),
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
+  
+  scenario_test_turnaround_time_sims = simulate_test_turnaround_time(
+    derived_delay_distributions = derived_delay_distributions,
+    n_samples = 10000
+    ),
+  
+  scenario_test_turnaround_time_probs = parameters_test_turnaround_time(
+    derived_delay_distributions
+  ),
+  
+  tar_file(scenario_test_turnaround_time_sims_path,{
+    write_csv_return_path(scenario_test_turnaround_time_sims,
+                          "outputs/scenario_test_turnaround_time_sims.csv")
+  }),
   
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
@@ -98,12 +127,15 @@ tar_plan(
   pr_symptoms = 0.6,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
+  samples_df =  generate_samples_df_delays(delay_dist_funs,
+                                           n_samples = 10000),
+  
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 1000,
-    n_chains = 50,
+    n_iterations = 10000,
     # parameters for sim_tracing
-    sim_tracing_funs = delay_dist_funs,
+    # samples = samples_df,
+    sim_tracing_funs = samples_df,
     # the probability of ever being found via contact tracing if not by passive
     # detection
     p_active_detection = p_active_detection,
@@ -125,12 +157,66 @@ tar_plan(
     scenario_df_run
   ),
   
+  queue_scenarios = run_queue_scenarios(derived_delay_distributions,
+                                          n_samples = 100),
+  
+  plot_queue_scenarios = gg_queue_scenarios(queue_scenarios),
+  
+  samples_df_queue = tidy_queue_scenario(queue_scenarios),
+  
+  # pull out the tidied queueing delays corresponding to specified scenarios
+  # split that into two tibbles, one for vaccination status = TRUE, one for vaccination status = FALSE
+  queue_splits = split_queue_scenarios_by_vaccination(
+    samples_df_queue
+    ),
+  
+  # save those as two separate files (vaccinated/unvaccinated) for each scenario
+  tar_file(
+    queue_splits_path,{
+      write_csv_queue_splits(
+        queue_splits = queue_splits,
+        file_paths = glue("outputs/{names(queue_splits)}.csv")
+      )
+    }
+  ),
+  
+  scenario_df_queue = create_scenario_df(
+    # these terms are fixed for each simulation
+    n_iterations = 1000,
+    # parameters for sim_tracing
+    # samples = samples_df,
+    sim_tracing_funs = samples_df_queue,
+    # the probability of ever being found via contact tracing if not by passive
+    # detection
+    p_active_detection = p_active_detection,
+    passive_detection_given_symptoms = passive_detection_given_symptoms,
+    pr_symptoms = pr_symptoms,
+    # the probability of being found via passive detection (based on symptoms)
+    # if not by contact tracing
+    p_passive_detection = p_passive_detection,
+    # if found by passive case detection (assuming contact tracing not in
+    # place), the distribution of times from infection to detection
+    passive_distribution = list(get_passive_distribution())
+  ),
+  
+  scenario_df_run_queue = run_ttiq_scenario(
+    scenario_df_queue
+  ),
+  
+  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier(
+    scenario_df_run_queue
+  ),
+  
+  plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
+  
+  plot_simple_tp_queue = gg_simple_tp(scenario_df_run_tp_multiplier_queue),
+  
   ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
   
   tar_file(scenario_df_run_tp_multiplier_csv,{
     write_csv_return_path(
       x = ttiq_scenario_prepared,
-      file = "outputs/ttiq_scenario_run.csv.gz"
+      file = "outputs/ttiq_scenario_run.csv"
     )
   }),
   
@@ -209,7 +295,7 @@ tar_plan(
     # what is the ratio of TP between low risk (those where vaccinated cases are
     # allowed lower stringency) and high risk (those where they are not)
     # settings? expressed as fraction = TP_low/TP_high
-    vacc_setting_risk_ratio = c(0.75, 0.5, 0.25),
+    vacc_setting_risk_ratio = c(1, 0.75, 0.5, 0.25),
     
     # what is the vaccination coverage
     vaccination_coverage = seq(0.7, 0.9, by = 0.1)
@@ -268,7 +354,24 @@ tar_plan(
       height = 3.5)
     }),
   
+  tar_file(plot_scenario_vaccination_isolation_path, {
+    ggsave_write_path(
+      plot = plot_scenario_vaccination_isolation,
+      path = "figs/plot_scenario_vaccination_isolation.png",
+      width = 10,
+      height = 10
+    )
+  }),
   
+  tar_file(plot_scenario_vaccination_isolation_unfaceted_path, {
+    ggsave_write_path(
+      plot = plot_scenario_vaccination_isolation_unfaceted,
+      path = "figs/plot_scenario_vaccination_isolation_unfaceted.png",
+      width = 10,
+      height = 10
+    )
+  }),
+
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
@@ -337,7 +440,7 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
   
 )
 
