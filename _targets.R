@@ -83,6 +83,16 @@ tar_plan(
   # }),
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
+  scenario_test_turnaround_time_sims = simulate_test_turnaround_time(
+    derived_delay_distributions = derived_delay_distributions,
+    n_samples = 10000
+    ),
+  
+  tar_file(scenario_test_turnaround_time_sims_path,{
+    write_csv_return_path(scenario_test_turnaround_time_sims,
+                          "outputs/scenario_test_turnaround_time_sims.csv")
+  }),
+  
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
   
@@ -113,11 +123,12 @@ tar_plan(
   pr_symptoms = 0.6,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
-  samples_df =  generate_samples_df_delays(delay_dist_funs),
+  samples_df =  generate_samples_df_delays(delay_dist_funs,
+                                           n_samples = 10000),
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 1000,
+    n_iterations = 10000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df,
