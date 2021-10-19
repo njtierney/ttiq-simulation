@@ -434,6 +434,12 @@ tar_plan(
                                    dim_vaccine,
                                    populations),
   
+  vaccination_age_band = create_vaccination_age_band(vaccinations),
+  
+  aggregated_populations = aggregate_populations_to_vaccinations_age_band(
+    populations_raw,
+    vaccination_age_band
+  ),
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
