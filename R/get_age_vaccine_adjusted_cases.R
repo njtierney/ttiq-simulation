@@ -11,9 +11,13 @@
 #' @return
 #' @author dhduncan
 #' @export
-get_age_vaccine_adjusted_cases <- function(scenario_clinical_fraction,
-# c(0.5, 0.7, 0.8, 0.9, 0.95, 1), # but Chris only needs one for now - 0.8
-                                           baseline_matrix) {
+get_age_vaccine_adjusted_cases <- function(
+        scenario_clinical_fraction,
+      # c(0.5, 0.7, 0.8, 0.9, 0.95, 1), # but Chris only needs one for now - 0.8
+      baseline_matrix,
+      detection_asymptomatic = 1,
+      detection_symptomatic = 1
+) {
 
 # baseline matrix or oz_baseline_matrix?
   stable_state_df <- scenario_clinical_fraction %>% 
@@ -54,19 +58,44 @@ get_age_vaccine_adjusted_cases <- function(scenario_clinical_fraction,
   # applying one 
   frac_vax_symptomatic_df <- stable_state_df %>% 
     group_by(scenario_id) %>% 
-    mutate(
-      clinical_fraction_vax = clinical_fraction_unvax * (1- ve_symptoms),
+      mutate(
+        clinical_fraction_unvax = clinical_fraction_unvax,
+        clinical_fraction_vax = clinical_fraction_unvax * (1- ve_symptoms)
+      ) %>% 
+    summarise(
       unvax_symptomatic = sum(age_weight_unvax * clinical_fraction_unvax),
       unvax_asymptomatic = sum(age_weight_unvax * (1 - clinical_fraction_unvax)),
       vax_symptomatic = sum(age_weight_vax * clinical_fraction_vax),
       vax_asymptomatic = sum(age_weight_vax * (1 - clinical_fraction_vax)),
+    ) %>% 
+    mutate(
+      across(
+        ends_with( "_symptomatic"),
+        ~.x * detection_symptomatic
+      ),
+      across(
+        ends_with( "_asymptomatic"),
+        ~.x * detection_asymptomatic
+      ),
       all_cases = unvax_symptomatic + unvax_asymptomatic + vax_symptomatic + vax_asymptomatic,
       frac_unvax_symptomatic = unvax_symptomatic / all_cases,
       frac_unvax_asymptomatic = unvax_asymptomatic / all_cases,
       frac_vax_symptomatic = vax_symptomatic / all_cases,
       frac_vax_asymptomatic = vax_asymptomatic / all_cases
     ) %>% 
-    ungroup()
+    select(
+      scenario_id,
+      frac_unvax_symptomatic,
+      frac_unvax_asymptomatic,
+      frac_vax_symptomatic,
+      frac_vax_asymptomatic
+    ) %>% 
+    ungroup()  %>% 
+    rowwise() %>% 
+    mutate(
+      sum_check = sum(across(starts_with("frac_"))),
+      .before = everything()
+    )
   
   df_age_vaccine_adjusted_cases <- frac_vax_symptomatic_df %>% 
     pivot_longer(
@@ -75,14 +104,8 @@ get_age_vaccine_adjusted_cases <- function(scenario_clinical_fraction,
       values_to = "fraction"
     ) 
   
-  # age_vaccine_adjusted_cases <- tibble(
-  #   status = c("Unvaccinated & symptomatic",
-  #              "Unvaccinated & asymptomatic",
-  #              "Vaccinated & symptomatic",
-  #              "Vaccinated & asymptomatic"),
-  #   fraction = c(frac_unvax_symptomatic, frac_unvax_asymptomatic, frac_vax_symptomatic, frac_vax_asymptomatic)
-  # )
+  # join on scenarios
   
-  return(age_vaccine_adjusted_cases)
+  return(df_age_vaccine_adjusted_cases)
 
 }
