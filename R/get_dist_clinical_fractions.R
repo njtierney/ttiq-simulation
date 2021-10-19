@@ -14,7 +14,7 @@
 get_dist_clinical_fraction <- function(ve_symptoms = ve_symptoms, 
                                   ve_susceptibility = ve_susceptibility,
                                   ve_onward_transmission = ve_onward_transmission,           vaccination_coverage = vaccination_coverage,
-                                  baseline_matrix = baseline_matrix()) {
+                                  baseline_matrix) {
 
 
   stable_state <- get_stable_state(

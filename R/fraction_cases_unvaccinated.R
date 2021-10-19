@@ -12,7 +12,7 @@
 fraction_cases_unvaccinated <- function(efficacy_susceptibility,
                                         efficacy_onward,
                                         coverage_any_vaccine,
-                                        baseline_matrix = baseline_matrix()) {
+                                        baseline_matrix) {
 
   stable_state <- get_stable_state(
     efficacy_susceptibility = ve_susceptibility,

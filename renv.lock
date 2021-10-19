@@ -158,6 +158,13 @@
       "Repository": "CRAN",
       "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
     },
+    "chk": {
+      "Package": "chk",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "939568bb61a614bff3eb00249f102b85"
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.0.1",
@@ -377,6 +384,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9c56382c3e53f0b4fc0fc16d88fc3974"
+    },
+    "future.apply": {
+      "Package": "future.apply",
+      "Version": "1.8.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f568ce73d3d59582b0f7babd0eb33d07"
     },
     "gargle": {
       "Package": "gargle",
@@ -772,10 +786,10 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.11",
+      "Version": "0.4.12",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "515f341d3affe0de9e4a7f762efb0456"
+      "Hash": "0879f5388fe6e4d56d7ef0b7ccb031e5"
     },
     "rmarkdown": {
       "Package": "rmarkdown",
@@ -914,6 +928,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "fc4c72b6ae9bb283416bd59a3303bbab"
+    },
+    "tinter": {
+      "Package": "tinter",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7fa9bbcbcfc8a7f8bf2e1cf16bb14313"
     },
     "tinytex": {
       "Package": "tinytex",
