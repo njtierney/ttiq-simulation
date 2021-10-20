@@ -11,7 +11,7 @@ tidy_vaccinations <- function(vaccinations_raw,
                               dim_age_band,
                               dim_time,
                               dim_vaccine,
-                              populations) {
+                              aggregated_populations) {
 
   partial_df <- vaccinations_raw %>% 
     left_join(dim_vaccine,
@@ -43,9 +43,16 @@ tidy_vaccinations <- function(vaccinations_raw,
     relocate(time_dose_2, 
              .after = time_dose_1)
   
-  partial_df
+  sort(unique(partial_df$age_band_id))
+  sort(unique(aggregated_populations$vac_age_group))
   
-  # unique(partial_df$age_band_id)
+  partial_df %>% 
+    left_join(select(aggregated_populations,
+                     ,
+              by = c("sa4_code16",
+                     "age_band_id" = "vac_age_group"))
+  
+  x# unique(partial_df$age_band_id)
   # populations
   
   

@@ -428,18 +428,19 @@ tar_plan(
   populations = tidy_populations(populations_raw,
                                  sa2_lookup),
   
+  aggregated_populations = aggregate_populations_to_vaccinations_age_band(
+    populations
+  ),
+  
   vaccinations = tidy_vaccinations(vaccinations_raw,
                                    dim_age_band,
                                    dim_time,
                                    dim_vaccine,
-                                   populations),
+                                   aggregated_populations),
   
   vaccination_age_band = create_vaccination_age_band(vaccinations),
   
-  aggregated_populations = aggregate_populations_to_vaccinations_age_band(
-    populations_raw,
-    vaccination_age_band
-  ),
+  
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
