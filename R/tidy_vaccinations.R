@@ -86,28 +86,36 @@ tidy_vaccinations <- function(vaccinations_raw,
   # currently the numbers don't quite add up, they are 
   # not collapsing over the SA4 group properley
   # # Create all combinations of SA4, date, vaccine, and dose
-  # expand_grid(
-  #   sa4_code16 = unique(vaccinations_enriched$sa4_code16),
-  #   date = unique(vaccinations_with_population$date),
-  #   vaccine = unique(vaccinations_with_population$vaccine),
-  #   dose = unique(vaccinations_with_population$dose)
-  # ) %>%
-  # # add on the "0-11" group
-  #   mutate(vac_age_group = "0-11") %>%
-  # # then join on the aggregated 0-11 population data
-  #   left_join({
-  #     aggregated_short %>%
-  #       filter(vac_age_group == "0-11")
-  #   },
-  #   by = c("sa4_code16",
-  #          "vac_age_group")
-  #   ) %>%
-  #   group_by(date,
-  #            vaccine,
-  #            dose,
-  #            vac_age_group) %>%
-  #   summarise(population = sum(population)) %>% 
-  #   mutate(num_people = 0)
+  df_younglings <- expand_grid(
+    sa4_code16 = unique(vaccinations_enriched$sa4_code16),
+    date = unique(vaccinations_with_population$date),
+    vaccine = unique(vaccinations_with_population$vaccine),
+    dose = unique(vaccinations_with_population$dose)
+  ) %>% 
+  # add on the "0-11" group
+    mutate(vac_age_group = "0-11") %>%
+  # then join on the aggregated 0-11 population data
+    left_join({
+      aggregated_short %>%
+        filter(vac_age_group == "0-11")
+    },
+    by = c("sa4_code16",
+           "vac_age_group")
+    ) %>% 
+    mutate(num_people = 0)
+  
+  df_younglings %>% 
+    group_by(date,
+             vaccine,
+             dose,
+             vac_age_group) %>% 
+    mutate(num_people = sum(num_people)) %>% 
+    ungroup() %>% 
+    select(-sa4_code16) %>% 
+    distinct()
+  
+  head(df_younglings)
+  tail(df_younglings)
   
   
   
