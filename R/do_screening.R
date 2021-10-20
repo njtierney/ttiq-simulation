@@ -12,18 +12,19 @@ do_screening <- function(infections) {
   # apply passive detection to infections, and put them in isolation as soon as
   # they are detected
   
-  # only detectable if they are not in isolation, are symptomatic, and are
-  # exactly 5 days post infection
+  # only detectable if they are not in isolation and are symptomatic
   detectable <- infections$symptomatic &
-    !is.finite(infections$isolation_day) &
-    (.abm_globals$day - infections$infection_day) == 5
+    !is.finite(infections$isolation_day)
+    
+    
+  # is the day of test seeking
+  days_since_infection <- .abm_globals$day - infections$infection_day 
   
-  # then they have a 50% probability of detection
-  p_detection <- ifelse(
-    detectable,
-    .abm_parameters$passive_detection_given_symptoms,
-    0
-  )
+  # they have a 50% probability of detection overall, scaled by the probability
+  # that this is the day of detection
+  p_detection <- .abm_parameters$passive_detection_given_symptoms *
+    time_to_symptomatic_test_pmf(days_since_infection) *
+    detectable
   
   detected <- rbinom(nrow(infections), 1, p_detection)
   
