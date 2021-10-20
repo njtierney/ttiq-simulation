@@ -8,32 +8,14 @@
 #' @return
 #' @author Nick Golding
 #' @export
-infect <- function(infections, parameters, day) {
+infect <- function(infections, day) {
   
-  # simulate new infections for each of these
-  onward_infections <- rpois(
-    nrow(infections),
-    infectiousness(infections, parameters, day)
-  )
-  
-  n_new <- sum(onward_infections)
-  
-  if (n_new > 0) {
-    new_infections <- data.frame(
-      id = max(infections$id) + seq_len(n_new),
-      source_id = rep(infections$id, onward_infections),
-      infection_day = day,
-      isolation_day = Inf,
-      vaccinated = rbinom(n_new, 1, parameters$vaccination_coverage),
-      symptomatic = rbinom(n_new, 1, parameters$clinical_fraction)
-    )
-  } else {
-    new_infections <- NULL
-  }
-  
+  # add on new infections for this timesteps, infecting the vaccinated and
+  # unvaccinated populations separately
   rbind(
     infections,
-    new_infections
+    new_infections(infections, day, vaccinated = TRUE),
+    new_infections(infections, day, vaccinated = FALSE)
   )
   
 }
