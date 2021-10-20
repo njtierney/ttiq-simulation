@@ -14,14 +14,22 @@ setup_abm <- function(...) {
   
   # defining default arguments
   args <- list(
+    
+    # pre-vaccination R to aim for
     R = 3.62,
+
+    # vaccination effects on transmission    
+    vaccination_coverage = 0.92,
     # incorporate correction for onward transmission to account for reduction in
     # infectiousness due to being symptomatic
     ve_onward = 0.5 * 0.6,
     ve_susceptibility = 0.73,
-    vaccination_coverage = 0.8,
-    asymptomatic_relative_infectiousness = 0.5,
+    ve_symptoms = 0.72,
+    
     clinical_fraction = 0.4,
+    asymptomatic_relative_infectiousness = 0.5,
+    passive_detection_given_symptoms = 0.5,
+    
     n_days = 365
   )
   

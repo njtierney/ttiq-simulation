@@ -27,6 +27,9 @@ sim_abm <- function(
     # infect people
     infections <- infect(infections)
     
+    # do passive detection
+    infections <- do_screening(infections)
+    
     # quit if we hit the maximum total infections
     if (nrow(infections) >= max_infections) {
       break()
