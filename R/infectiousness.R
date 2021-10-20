@@ -21,7 +21,7 @@ infectiousness <- function(infections) {
   
   vaccination_multiplier <- ifelse(
     infections$vaccinated,
-    .abm_parameters$ve_onward,
+    1 - .abm_parameters$ve_onward,
     1
   )
   

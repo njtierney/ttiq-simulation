@@ -12,11 +12,13 @@ new_infections <- function(infections, vaccinated = FALSE) {
   # infect new people, differently for if
   
   if (vaccinated) {
-    infectiousness_multiplier <- .abm_parameters$ve_susceptibility
+    infectiousness_multiplier <- 1 - .abm_parameters$ve_susceptibility
     fraction <- .abm_parameters$vaccination_coverage
+    clinical_fraction_multiplier <- 1 - .abm_parameters$ve_symptoms
   } else {
     infectiousness_multiplier <- 1
     fraction <- 1 - .abm_parameters$vaccination_coverage
+    clinical_fraction_multiplier <- 1
   }
   
   # simulate onward infections
@@ -26,6 +28,8 @@ new_infections <- function(infections, vaccinated = FALSE) {
     infectiousness * fraction
   )
   
+  p_symptoms <- clinical_fraction_multiplier * .abm_parameters$clinical_fraction
+  
   n_new <- sum(onward_infections)
   
   if (n_new > 0) {
@@ -34,13 +38,12 @@ new_infections <- function(infections, vaccinated = FALSE) {
       source_id = rep(infections$id, onward_infections),
       infection_day = .abm_globals$day,
       isolation_day = Inf,
-      vaccinated = rbinom(n_new, 1, .abm_parameters$vaccination_coverage),
-      symptomatic = rbinom(n_new, 1, .abm_parameters$clinical_fraction)
+      vaccinated = vaccinated,
+      symptomatic = rbinom(n_new, 1, p_symptoms)
     )
   } else {
     new_infections <- NULL
   }
-  
   
   .abm_globals$highest_id <<- .abm_globals$highest_id + n_new
   
