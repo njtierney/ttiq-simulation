@@ -13,7 +13,7 @@ tidy_vaccinations <- function(vaccinations_raw,
                               dim_vaccine,
                               aggregated_populations) {
 
-  partial_df <- vaccinations_raw %>% 
+  vaccinations_enriched <- vaccinations_raw %>% 
     left_join(dim_vaccine,
               by = "vaccine") %>% 
     select(-vaccine) %>% 
@@ -41,16 +41,69 @@ tidy_vaccinations <- function(vaccinations_raw,
     select(-time_dose_2) %>% 
     rename(time_dose_2 = week_starting) %>% 
     relocate(time_dose_2, 
-             .after = time_dose_1)
+             .after = time_dose_1) %>% 
+    pivot_longer(
+      cols = c(
+        time_dose_1,
+        time_dose_2
+        ),
+      names_to = "dose",
+      values_to = "date",
+      names_prefix = "time_dose_"
+    ) %>% 
+    relocate(num_people,
+             .after = everything()) %>% 
+    group_by(sa4_code16,
+             age_band_id,
+             vaccine,
+             dose,
+             date) %>% 
+    summarise(num_people = sum(num_people),
+              .groups = "drop")
   
-  sort(unique(partial_df$age_band_id))
-  sort(unique(aggregated_populations$vac_age_group))
+  aggregated_short <- aggregated_populations %>% 
+    select(sa4_code16,
+           vac_age_group,
+           population)
   
-  partial_df %>% 
-    left_join(select(aggregated_populations,
-                     ,
+  vaccinations_with_population <- vaccinations_enriched %>% 
+    left_join(aggregated_short,
               by = c("sa4_code16",
-                     "age_band_id" = "vac_age_group"))
+                     "age_band_id" = "vac_age_group"))  %>% 
+    group_by(age_band_id,
+             vaccine,
+             dose,
+             date) %>% 
+    summarise(num_people = sum(num_people),
+              population = sum(population),
+              .groups = "drop")
+  
+  # still need to add on the vaccination 0-11 age group
+    # expand_grid(
+    #   sa4_code16 = unique(vaccinations_enriched$sa4_code16),
+    #   date = unique(vaccinations_with_population$date),
+    #   vaccine = unique(vaccinations_with_population$vaccine),
+    #   dose = unique(vaccinations_with_population$dose)
+    # ) %>% 
+    #   mutate(vac_age_group = "0-11") %>% 
+    #   left_join({
+    #     aggregated_short %>% 
+    #       filter(vac_age_group == "0-11")
+    #   },
+    #   by = c("sa4_code16",
+    #          "vac_age_group")
+    #   ) %>% 
+    #   distinct() %>% 
+    #   group_by(date,
+    #            vaccine,
+    #            dose,
+    #            vac_age_group) %>% 
+    #   summarise(population = sum(population))
+    #   mutate(num_people = 0) 
+  
+  vaccinations_with_population
+  
+  
   
   x# unique(partial_df$age_band_id)
   # populations
