@@ -26,9 +26,16 @@ setup_abm <- function(...) {
     ve_susceptibility = 0.73,
     ve_symptoms = 0.72,
     
+    # symptomaticity and passive detection
     clinical_fraction = 0.4,
     asymptomatic_relative_infectiousness = 0.5,
     passive_detection_given_symptoms = 0.5,
+    
+    # probability of an infectee being found by contact tracing from the source
+    p_active_detection = 0.95,
+    
+    # placeholder for delays
+    isolation_to_interview_samples = rpois(1e3, 2),
     
     n_days = 365
   )

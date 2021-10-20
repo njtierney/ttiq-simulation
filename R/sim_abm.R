@@ -30,6 +30,9 @@ sim_abm <- function(
     # do passive detection
     infections <- do_screening(infections)
     
+    # do contact tracing for any people put into isolation today
+    infections <- do_contact_tracing(infections)
+    
     # quit if we hit the maximum total infections
     if (nrow(infections) >= max_infections) {
       break()

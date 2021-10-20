@@ -14,6 +14,7 @@ sim_initial_infections <- function(n = 100) {
     source_id = NA,
     infection_day = ceiling(runif(n, -7, 0)),
     isolation_day = Inf,
+    case_found_by = NA,
     vaccinated = rbinom(n, 1, .abm_parameters$vaccination_coverage),
     symptomatic = rbinom(n, 1, .abm_parameters$clinical_fraction)
   )

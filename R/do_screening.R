@@ -34,6 +34,12 @@ do_screening <- function(infections) {
     infections$isolation_day
   )
   
+  infections$case_found_by <- ifelse(
+    detected,
+    "screening",
+    infections$case_found_by
+  )
+  
   infections
 
 }
