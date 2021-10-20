@@ -30,6 +30,7 @@ setup_abm <- function(...) {
     clinical_fraction = 0.8,
     passive_detection_given_symptoms = 0.5,
     asymptomatic_relative_infectiousness = 0.5,
+    vaccination_test_seeking_multiplier = 1,
     
     # probability of an infectee being found by contact tracing from the source
     p_active_detection = 0.95,

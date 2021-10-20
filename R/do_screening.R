@@ -20,10 +20,18 @@ do_screening <- function(infections) {
   # is the day of test seeking
   days_since_infection <- .abm_globals$day - infections$infection_day 
   
-  # they have a 50% probability of detection overall, scaled by the probability
-  # that this is the day of detection
+  # a multiplier on detection for the vaccinated
+  vaccination_multiplier <- ifelse(
+    infections$vaccinated,
+    .abm_parameters$vaccination_test_seeking_multiplier,
+    1
+  )
+  
+  # they have a 50% probability of detection overall, or possibly lower if
+  # vaccinated, scaled by the probability that this is the day of detection
   p_detection <- .abm_parameters$passive_detection_given_symptoms *
     time_to_symptomatic_test_pmf(days_since_infection) *
+    vaccination_multiplier *
     detectable
   
   detected <- rbinom(nrow(infections), 1, p_detection)

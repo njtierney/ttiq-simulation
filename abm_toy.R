@@ -1,8 +1,9 @@
 res <- sim_abm(
   infections = sim_initial_infections(30),
     parameters = setup_abm(
-    R = 1.2,
-    vaccination_coverage = 0
+      R = 3.5,
+      vaccination_coverage = 0.9,
+      vaccination_test_seeking_multiplier = 0
   ),
   max_infections = 10000
 )
@@ -36,4 +37,14 @@ res %>%
     xintercept = 5,
     linetype = 2
   )
+
+time_to_isolation <- res$isolation_day - res$infection_day
+tp_multiplier <- tp_reduction(
+  time_to_isolation,
+  meanlog = 1.375738,
+  sdlog = 0.5665299
+)
+
+# percentage reduction
+100 * (1 - tp_multiplier)
 
