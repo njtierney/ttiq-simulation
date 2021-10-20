@@ -22,8 +22,10 @@ sim_abm <- function(
   days <- seq_len(parameters$n_days)
   for (day in days) {
     
+    .abm_globals$day <<- day
+    
     # infect people
-    infections <- infect(infections, day)
+    infections <- infect(infections)
     
     # quit if we hit the maximum total infections
     if (nrow(infections) >= max_infections) {

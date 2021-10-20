@@ -8,13 +8,13 @@
 #' @return
 #' @author Nick Golding
 #' @export
-infectiousness <- function(infections, day) {
+infectiousness <- function(infections) {
   # compute infectiousness from GI distribution, isolation status, vaccination_status etc.
   
-  day_diff <- day - infections$infection_day
+  day_diff <- .abm_globals$day - infections$infection_day
   
   isolation_multiplier <- ifelse(
-    isolated(infections, day),
+    isolated(infections),
     0,
     1
   )

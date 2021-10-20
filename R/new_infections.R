@@ -7,7 +7,7 @@
 #' @return
 #' @author Nick Golding
 #' @export
-new_infections <- function(infections, day, vaccinated = FALSE) {
+new_infections <- function(infections, vaccinated = FALSE) {
   
   # infect new people, differently for if
   
@@ -20,7 +20,7 @@ new_infections <- function(infections, day, vaccinated = FALSE) {
   }
   
   # simulate onward infections
-  infectiousness <- infectiousness(infections, day) * infectiousness_multiplier
+  infectiousness <- infectiousness(infections) * infectiousness_multiplier
   onward_infections <- rpois(
     nrow(infections),
     infectiousness * fraction
@@ -32,7 +32,7 @@ new_infections <- function(infections, day, vaccinated = FALSE) {
     new_infections <- data.frame(
       id = .abm_globals$highest_id + seq_len(n_new),
       source_id = rep(infections$id, onward_infections),
-      infection_day = day,
+      infection_day = .abm_globals$day,
       isolation_day = Inf,
       vaccinated = rbinom(n_new, 1, .abm_parameters$vaccination_coverage),
       symptomatic = rbinom(n_new, 1, .abm_parameters$clinical_fraction)

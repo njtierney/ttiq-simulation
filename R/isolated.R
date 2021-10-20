@@ -8,6 +8,6 @@
 #' @return
 #' @author Nick Golding
 #' @export
-isolated <- function(infections, day) {
-  (infections$isolation_day - day) < 14
+isolated <- function(infections) {
+  (infections$isolation_day - .abm_globals$day) < 14
 }

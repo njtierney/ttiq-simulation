@@ -8,14 +8,14 @@
 #' @return
 #' @author Nick Golding
 #' @export
-infect <- function(infections, day) {
+infect <- function(infections) {
   
   # add on new infections for this timesteps, infecting the vaccinated and
   # unvaccinated populations separately
   rbind(
     infections,
-    new_infections(infections, day, vaccinated = TRUE),
-    new_infections(infections, day, vaccinated = FALSE)
+    new_infections(infections, vaccinated = TRUE),
+    new_infections(infections, vaccinated = FALSE)
   )
   
 }
