@@ -440,7 +440,7 @@ tar_plan(
   
   vaccination_age_band = create_vaccination_age_band(vaccinations),
   
-  
+  vaccination_coverage = create_vaccination_coverage(vaccinations),
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
