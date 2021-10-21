@@ -9,13 +9,13 @@
 #' @export
 get_valid_abm_sample <- function(parameters,
                                  initial_infections = 100,
-                                 min_infections = 1000,
-                                 min_days = 30,
-                                 max_infections = min_infections * 10,
-                                 max_days = 365,
-                                 exclude_days_start = 14,
+                                 min_infections = 100,
+                                 min_days = 0, #20,
+                                 max_infections = Inf,#min_infections * 100,
+                                 max_days = 50, #min_days * 5,
+                                 exclude_days_start = 7,
                                  exclude_days_end = 14,
-                                 max_tries = 10) {
+                                 max_tries = 20) {
   
   # run the abm multiple times to make sure there are sufficient useful samples to
   # analyse
@@ -40,21 +40,26 @@ get_valid_abm_sample <- function(parameters,
       )  
     
     valid_infections <- nrow(sim_valid)
-    valid_days <- diff(range(sim_valid$infection_day))
     
+    if (valid_infections > 0) {
+      valid_days <- diff(range(sim_valid$infection_day))
+    } else {
+      valid_days <- 0
+    }
+      
     # check if this is enough
     successful <- valid_infections > min_infections &
       valid_days > min_days
     
   }
   
-  if (try > max_tries) {
+  if (try >= max_tries) {
     stop ("insufficient samples")
   }
   
   # return *all* the samples, since new infections in end period count toward
   # denominator of TP
-  sim_valid
+  sim
   
 }
 

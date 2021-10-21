@@ -13,7 +13,7 @@ setup_abm <- function(
   R = 3.62,
   
   # vaccination effects on transmission    
-  vaccination_coverage = 0.92,
+  vaccination_coverage = 0.9,
   # incorporate correction for onward transmission to account for reduction in
   # infectiousness due to being symptomatic
   ve_onward = 0.5 * 0.6,
@@ -34,7 +34,7 @@ setup_abm <- function(
   # whether to do downstream contact tracing
   contact_tracing = TRUE,
   # placeholder for delays
-  isolation_to_interview_samples = rpois(1e3, 0.5)
+  isolation_to_interview_samples = get_optimal_isol_interview_samples()
 ) {
   
   args <- list(
@@ -53,7 +53,7 @@ setup_abm <- function(
     isolation_to_interview_samples = isolation_to_interview_samples
   )
   
-  # correct R for reduced infectiousness of symptomatics
+  # correct R for reduced infectiousness of asymptomatics
   args$R_star <- with(
     args,
     R / ((1 - clinical_fraction) + clinical_fraction * asymptomatic_relative_infectiousness)

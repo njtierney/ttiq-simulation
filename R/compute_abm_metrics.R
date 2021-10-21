@@ -11,7 +11,7 @@ compute_abm_metrics <- function(abm_result) {
 # analyse multiple ABM simulations and pull out relevant metrics
   
   # compute the numbers of onward transmissions for all sources
-  transmissions <- res %>%
+  transmissions <- abm_result %>%
     group_by(
       simulation,
       source_id
@@ -23,13 +23,13 @@ compute_abm_metrics <- function(abm_result) {
   
   # find source infections that we can trust onward infection for, and join on
   # their number of transmissions 
-  sources <- res %>%
+  sources <- abm_result %>%
     filter(
       # find sources to consider (exclude those during burn in and last two weeks
       # due to truncation of onward infection)
       !is.na(source_id) &
         infection_day > 14 &
-        infection_day < (max(infection_day) - 20)
+        infection_day < (max(infection_day) - 14)
       # find infections to keep - the sources and those infected by these sources
     ) %>%
     select(
@@ -42,6 +42,8 @@ compute_abm_metrics <- function(abm_result) {
     mutate(
       transmissions = replace_na(transmissions, 0),
       found = !is.na(case_found_by),
+      traced = found & case_found_by == "contact_tracing",
+      screened = found & case_found_by == "screening",
       infection_to_isolation = isolation_day - infection_day
     )
   
@@ -49,14 +51,16 @@ compute_abm_metrics <- function(abm_result) {
     group_by(simulation) %>%
     summarise(
       TP = mean(transmissions),
-      ascertainment = mean(found)
+      ascertainment = mean(found),
+      tracing = mean(traced),
+      screening = mean(screened),
     ) %>%
     summarise(
       across(
-        c(TP, ascertainment),
+        c(TP, ascertainment, tracing, screening),
         .fns = list(
           mean = ~mean(.x),
-          variance = ~ var(.x)
+          variance = ~var(.x)
         )
       )
     ) %>%
