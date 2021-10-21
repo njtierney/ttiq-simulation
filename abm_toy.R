@@ -1,7 +1,8 @@
 parameters <- setup_abm(
-  R = 4,
+  R = 5,
   vaccination_coverage = 0.9,
   vaccination_test_seeking_multiplier = 1,
+  passive_detection_given_symptoms = 0.8,
   screening = TRUE,
   contact_tracing = TRUE
 )
@@ -9,7 +10,8 @@ parameters <- setup_abm(
 res <- sim_abm(
   infections = sim_initial_infections(30),
   parameters = parameters,
-  max_infections = 10000
+  max_infections = 10000,
+  max_days = 365
 )
 
 hist(res$infection_day, breaks = 365)
@@ -70,12 +72,15 @@ sources %>%
 # split TPs by factors for sanity checking
 sources %>%
   group_by(
-    vaccinated,
+    found,
     symptomatic,
-    found
+    vaccinated,
   ) %>%
   summarise(
     TP = mean(transmissions),
+  ) %>%
+  arrange(
+    found, desc(symptomatic),
+    vaccinated
   )
-
 

@@ -11,7 +11,8 @@
 sim_abm <- function(
   infections = sim_initial_infections(100),
   parameters = setup_abm(),
-  max_infections = Inf
+  max_days = 365,
+  max_infections = 1e4
 ) {
   
   # put the parameters and some mutable variables in the global environment, to
@@ -19,7 +20,7 @@ sim_abm <- function(
   .abm_parameters <<- parameters
   .abm_globals <<- list(highest_id = 0)
   
-  days <- seq_len(parameters$n_days)
+  days <- seq_len(max_days)
   for (day in days) {
     
     .abm_globals$day <<- day
