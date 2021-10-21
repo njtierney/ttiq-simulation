@@ -30,14 +30,14 @@ parameters <- setup_abm(
   R = 4.5,
   vaccination_coverage = 0.9,
   vaccination_test_seeking_multiplier = 1,
-  passive_detection_given_symptoms = 0.8,
+  passive_detection_given_symptoms = 0.5,
   screening = TRUE,
   contact_tracing = TRUE,
   isolation_to_interview_samples = optimal_isol_interview_samples
 )
 
 res <- sim_abm(
-  infections = sim_initial_infections(30),
+  infections = sim_initial_infections(500),
   parameters = parameters,
   max_infections = 10000,
   max_days = 365
@@ -61,7 +61,7 @@ sources <- res %>%
     # find sources to consider (exclude those during burn in and last two weeks
     # due to truncation of onward infection)
     !is.na(source_id) &
-      infection_day > 28 &
+      infection_day > 14 &
       infection_day < (max(infection_day) - 14)
     # find infections to keep - the sources and those infected by these sources
   ) %>%
@@ -117,36 +117,41 @@ sources %>%
   )
 
 
-
-
-
-
-# check the CT delay (source isolation day to infectee isolation day, for
-# infectees found by contact tracing) has the same distribution as expected delays
-res %>%
+# check simulated delays match the expected
+delays <- res %>%
   filter(
-    case_found_by == "contact_tracing"
+    !is.na(source_id)
   ) %>%
   select(
-    id = source_id,
     contact_id = id,
-    contact_isolation_day = isolation_day
+    id = source_id,
+    contact_isolation_day = isolation_day,
+    contact_infection_day = infection_day,
+    contact_case_found_by = case_found_by
   ) %>%
   left_join(
     sources,
     by = "id"
   ) %>%
   select(
-    source_isolation_day = isolation_day,
-    contact_isolation_day,
     source_id = id,
-    contact_id
-  ) %>%
-  filter(
-    !is.na(source_isolation_day)
+    contact_id,
+    source_isolation_day = isolation_day,
+    source_infection_day = infection_day,
+    contact_isolation_day,
+    contact_infection_day,
+    contact_case_found_by
   ) %>%
   mutate(
-    contact_tracing_delay = contact_isolation_day - source_isolation_day
+    contact_tracing_delay = contact_isolation_day - source_isolation_day,
+    generation_interval = contact_infection_day - source_infection_day
+  )
+
+# check the CT delay (source isolation day to infectee isolation day, for
+# infectees found by contact tracing) has the same distribution as expected delays
+delays %>%
+  filter(
+    contact_case_found_by == "contact_tracing"
   ) %>%
   ggplot(
     aes(
@@ -156,8 +161,12 @@ res %>%
   geom_histogram(
     binwidth = 1,
     colour = "white"
+  ) +
+  coord_cartesian(
+    xlim = c(0, 10)
   )
 
+# inputs
 tibble(
   contact_tracing_delay = optimal_isol_interview_samples + rpois(length(optimal_isol_interview_samples), 0.5)
 ) %>%
@@ -169,4 +178,40 @@ tibble(
   geom_histogram(
     binwidth = 1,
     colour = "white"
+  ) +
+  coord_cartesian(
+    xlim = c(0, 10)
   )
+
+gi_density <- tibble(
+  days = 0:20
+) %>%
+  mutate(
+    pmf = gi_pmf_discrete(days)
+  )
+
+# check generation interval distribution 
+gi_delays <- delays %>%
+  filter(
+    is.finite(generation_interval)
+  )
+
+# this should only match in the absence of TTIQ, TTIQ shifts it left
+gi_delays %>%
+  ggplot(
+    aes(
+      x = generation_interval
+    )
+  ) +
+  geom_histogram(
+    binwidth = 1,
+    colour = "white"
+  ) +
+  geom_line(
+    aes(
+      y = pmf * nrow(gi_delays),
+      x = days
+    ),
+    data = gi_density
+  )
+
