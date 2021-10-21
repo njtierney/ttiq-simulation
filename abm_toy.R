@@ -1,50 +1,81 @@
+parameters <- setup_abm(
+  R = 4,
+  vaccination_coverage = 0.9,
+  vaccination_test_seeking_multiplier = 1,
+  screening = TRUE,
+  contact_tracing = TRUE
+)
+
 res <- sim_abm(
   infections = sim_initial_infections(30),
-    parameters = setup_abm(
-      R = 3.5,
-      vaccination_coverage = 0.9,
-      vaccination_test_seeking_multiplier = 0
-  ),
+  parameters = parameters,
   max_infections = 10000
 )
 
 hist(res$infection_day, breaks = 365)
 
-res$isolation_day - res$infection_day
+# compute the numbers of onward transmissions for all sources
+transmissions <- res %>%
+  group_by(
+    source_id
+  ) %>%
+  summarise(
+    transmissions = n()
+  )
 
-ascertainment <- mean(!is.na(res$case_found_by))
-ascertainment
-
-# plot times to isolation
-res %>%
+# find source infections that we can trust onward infection for, and join on
+# their number of transmissions 
+sources <- res %>%
   filter(
-    !is.na(case_found_by)
+    # find sources to consider (exclude those during burn in and last two weeks
+    # due to truncation of onward infection)
+    !is.na(source_id) &
+      infection_day > 14 &
+      infection_day < (max(infection_day) - 14)
+    # find infections to keep - the sources and those infected by these sources
+  ) %>%
+  select(
+    -source_id
+  ) %>%
+  left_join(
+    transmissions,
+    by = c(id = "source_id")
   ) %>%
   mutate(
+    transmissions = replace_na(transmissions, 0),
+    found = !is.na(case_found_by),
     infection_to_isolation = isolation_day - infection_day
-  ) %>%
+  )
+
+sources %>%
+  summarise(
+    TP = mean(transmissions),
+    ascertainment = mean(found)
+  )
+
+sources %>%
   ggplot(
-    aes(
-      x = infection_to_isolation
-    )
+    aes(x = infection_to_isolation)
   ) +
   geom_histogram(
     binwidth = 1,
-    color = "white"
+    colour = "white"
   ) +
-  theme_minimal() +
   geom_vline(
     xintercept = 5,
     linetype = 2
+  ) +
+  theme_minimal()
+
+# split TPs by factors for sanity checking
+sources %>%
+  group_by(
+    vaccinated,
+    symptomatic,
+    found
+  ) %>%
+  summarise(
+    TP = mean(transmissions),
   )
 
-time_to_isolation <- res$isolation_day - res$infection_day
-tp_multiplier <- tp_reduction(
-  time_to_isolation,
-  meanlog = 1.375738,
-  sdlog = 0.5665299
-)
-
-# percentage reduction
-100 * (1 - tp_multiplier)
 

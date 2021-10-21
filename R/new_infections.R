@@ -9,7 +9,7 @@
 #' @export
 new_infections <- function(infections, vaccinated = FALSE) {
   
-  # infect new people, differently for if
+  # infect new people, differently for if the new infections are vaccinated
   
   if (vaccinated) {
     infectiousness_multiplier <- 1 - .abm_parameters$ve_susceptibility

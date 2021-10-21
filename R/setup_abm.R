@@ -15,9 +15,10 @@ setup_abm <- function(...) {
   # defining default arguments
   args <- list(
     
-    # pre-vaccination R to aim for
+    # pre-vaccination R to aim for, and maximum number of days
     R = 3.62,
-
+    n_days = 365,
+    
     # vaccination effects on transmission    
     vaccination_coverage = 0.92,
     # incorporate correction for onward transmission to account for reduction in
@@ -32,13 +33,16 @@ setup_abm <- function(...) {
     asymptomatic_relative_infectiousness = 0.5,
     vaccination_test_seeking_multiplier = 1,
     
+    # whether to do screening of symptomatics
+    screening = TRUE,
     # probability of an infectee being found by contact tracing from the source
     p_active_detection = 0.95,
     
+    # whether to do downstream contact tracing
+    contact_tracing = TRUE,
     # placeholder for delays
-    isolation_to_interview_samples = rpois(1e3, 0.5),
+    isolation_to_interview_samples = rpois(1e3, 0.5)
     
-    n_days = 365
   )
   
   # check validity of arguments
