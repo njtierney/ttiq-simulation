@@ -427,7 +427,7 @@ tar_plan(
   
   populations = tidy_populations(populations_raw,
                                  sa2_lookup),
-  
+   
   aggregated_populations = aggregate_populations_to_vaccinations_age_band(
     populations
   ),
@@ -443,9 +443,15 @@ tar_plan(
   
   vaccination_coverage = create_vaccination_coverage(vaccinations),
   
+  plot_vaccination_coverage = gg_vaccination_coverage(vaccination_coverage),
+  
   vaccination_coverage_milestones = coverage_milestones(vaccination_coverage),
   
-  plot_vaccination_coverage = gg_vaccination_coverage(vaccination_coverage),
+  vaccination_coverage_age_group_at_milestone = 
+    age_group_coverage_at_milestones(
+      vaccination_coverage,
+      vaccination_coverage_milestones
+    ),
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
