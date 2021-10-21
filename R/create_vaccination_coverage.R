@@ -9,28 +9,24 @@
 #' @export
 create_vaccination_coverage <- function(vaccinations) {
 
-  vaccinations %>% 
-    group_by(age_band_id,
-             vaccine,
-             time_dose_1,
-             time_dose_2) %>% 
-    summarise(population = sum(population))
-  
   vaccination_coverage <- vaccinations %>% 
-    group_by(ste_name16,
-             age_band_id,
-             vaccine) %>% 
+    pivot_wider(
+      names_from = vaccine,
+      values_from = n_vaccinated
+    ) %>% 
+    mutate(
+      n_vaccinated = AstraZeneca + Pfizer
+    ) %>% 
+    select(-AstraZeneca,
+           -Pfizer) %>% 
+    relocate(population,
+             .after = everything()) %>% 
+    group_by(age_band_id) %>% 
     arrange(time_dose_2) %>% 
     mutate(cumulative_n_vac = cumsum(n_vaccinated),
            cumulative_prop_vac = cumulative_n_vac / population) %>% 
     ungroup() 
   
-    ggplot(vaccination_coverage,
-           aes(x = time_dose_2,
-               y = cumulative_prop_vac,
-               colour = ste_name16)) + 
-    geom_line() +
-    facet_grid(age_band_id~vaccine,
-               scales = "free") 
+  vaccination_coverage
 
 }

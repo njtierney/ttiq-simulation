@@ -443,6 +443,10 @@ tar_plan(
   
   vaccination_coverage = create_vaccination_coverage(vaccinations),
   
+  vaccination_coverage_milestones = coverage_milestones(vaccination_coverage),
+  
+  plot_vaccination_coverage = gg_vaccination_coverage(vaccination_coverage),
+  
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
   age_lookup = create_age_lookup(dim_age_band_path),

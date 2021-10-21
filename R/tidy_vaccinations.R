@@ -50,67 +50,69 @@ tidy_vaccinations <- function(vaccinations_raw,
       select(sa4_lookup, sa4_code16, STE_NAME16),
       by = "sa4_code16"
     ) %>% 
-    rename(ste_name16 = STE_NAME16)
-  
-  # vaccinations_resummed <- vaccinations_enriched %>% 
-  #   group_by(sa4_code16,
-  #            age_band_id,
-  #            vaccine) %>% 
-  #   summarise(num_people = sum(num_people),
-  #             .groups = "drop")
-  
-  # aggregated_short <- aggregated_populations %>% 
+    rename(ste_name16 = STE_NAME16) %>% 
+    relocate(ste_name16,
+             sa4_code16,
+             .before = everything()) %>% 
+    group_by(ste_name16,
+             age_band_id,
+             vaccine,
+             time_dose_1,
+             time_dose_2) %>% 
+    summarise(
+      num_people = sum(num_people),
+      .groups = "drop"
+    ) %>% 
+    add_row(ste_name16 = "Australian Capital Territory",
+            age_band_id = "0-11",
+            vaccine = "Pfizer",
+            time_dose_1 = as_date("2020-12-14"),
+            time_dose_2 = as_date("2021-02-22"),
+            num_people = 0,
+            .before = 1) %>% 
+    complete(
+      ste_name16,
+      age_band_id,
+      vaccine,
+      time_dose_1,
+      time_dose_2,
+      fill = list(num_people = 0)
+    ) 
   
   population_state_age <- aggregated_populations %>%
     distinct(ste_name16,
              vac_age_group,
-             population)
+             population) %>% 
+    relocate(ste_name16,
+             vac_age_group,
+             population) 
   
   vaccinations_with_population <- vaccinations_enriched %>% 
     left_join(population_state_age,
               by = c("ste_name16",
-                     "age_band_id" = "vac_age_group"))  %>% 
-    select(-sa4_code16) %>% 
-    distinct() %>% 
-    relocate(ste_name16,
-             .before = everything())
-  
-  # # Adding on the vaccination 0-11 age group
-  # TODO
-  # currently the numbers don't quite add up, they are 
-  # not collapsing over the SA4 group properley
-  # # Create all combinations of SA4, date, vaccine, and dose
-  df_younglings <- expand_grid(
-    ste_name16 = unique(vaccinations_enriched$ste_name16),
-    vaccine = unique(vaccinations_with_population$vaccine),
-    time_dose_1 = unique(vaccinations_with_population$time_dose_1),
-    time_dose_2 = unique(vaccinations_with_population$time_dose_2),
-  # add on the "0-11" group
-    vac_age_group = "0-11"
-  ) %>% 
-  # then join on the aggregated 0-11 population data
-    left_join({
-      population_state_age %>%
-        filter(vac_age_group == "0-11")
-    },
-    by = c("ste_name16",
-           "vac_age_group")
-    ) %>% 
-    mutate(num_people = 0) %>% 
-    relocate(ste_name16,
-             vac_age_group,
+                     "age_band_id" = "vac_age_group")) %>% 
+    # ensure that the state populations are the same
+    group_by(age_band_id,
              vaccine,
              time_dose_1,
-             time_dose_2,
-             num_people,
-             population) %>% 
-    rename(age_band_id = vac_age_group)
-  
-  bind_rows(
-    df_younglings,
-    vaccinations_with_population
-  ) %>% 
+             time_dose_2) %>% 
+    summarise(
+      num_people = sum(num_people),
+      population = sum(population),
+      .groups = "drop"
+    ) %>% 
     rename(n_vaccinated = num_people)
   
-
+  ## population sums to australia
+  # oz_pop <- vaccinations_with_population %>% 
+  #   distinct(age_band_id,
+  #            population) %>% 
+  #   pull(population) %>% 
+  #   sum() %>% 
+  #   comma()
+  # oz_pop
+  
+  
+  vaccinations_with_population
+  
 }
