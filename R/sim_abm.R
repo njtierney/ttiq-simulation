@@ -28,7 +28,8 @@ sim_abm <- function(
     # infect people
     infections <- infect(infections)
     
-    # do passive detection
+    # do passive detection (before contact tracing, so we can contact trace from
+    # them)
     if (parameters$screening) {
       infections <- do_screening(infections)
     }

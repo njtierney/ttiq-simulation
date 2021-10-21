@@ -1,10 +1,39 @@
+
+# get contact tracing delays for optimal period
+optimal_isol_interview_samples <- read_csv(
+  "outputs/optimal_delay_samples.csv",
+  col_types = cols(
+    time_to_swab = col_double(),
+    test_turnaround_time = col_double(),
+    time_to_interview = col_double(),
+    time_to_isolation = col_double()
+  )
+) %>%
+  # drop the time from source interview to isolation, since that is different
+  # for each contact, and sampled independently
+  select(
+    -time_to_isolation
+  ) %>%
+  mutate(
+    tracing_delay = Reduce(
+      "+",
+      across(
+        everything()
+      )
+    )
+  ) %>%
+  pull(tracing_delay)
+
+
+
 parameters <- setup_abm(
-  R = 5,
+  R = 4,
   vaccination_coverage = 0.9,
   vaccination_test_seeking_multiplier = 1,
   passive_detection_given_symptoms = 0.8,
   screening = TRUE,
-  contact_tracing = TRUE
+  contact_tracing = TRUE,
+  isolation_to_interview_samples = optimal_isol_interview_samples
 )
 
 res <- sim_abm(
@@ -56,6 +85,9 @@ sources %>%
   )
 
 sources %>%
+  filter(
+    case_found_by == "contact_tracing"
+  ) %>%
   ggplot(
     aes(x = infection_to_isolation)
   ) +
@@ -83,4 +115,8 @@ sources %>%
     found, desc(symptomatic),
     vaccinated
   )
+
+
+# check the CT delay (source isolation day to infectee isolation day, for
+# infectees found by contact tracing) has the same distribution as expected delays
 

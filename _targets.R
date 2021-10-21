@@ -5,17 +5,42 @@ source("./packages.R")
 lapply(list.files("./R", full.names = TRUE), source)
 tar_plan(
   
-  tar_file(cases_nsw_path, 
-           "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  user = case_when(
+    Sys.info()["nodename"] == "6300L-148079-M.local" ~ "Nick G",
+    TRUE ~ "Sensible people"  
+  ),
   
-  tar_file(cases_vic_path, 
-           "data/Linelist_Cases_20210917.xlsx"),
+  data_path = case_when(
+    user == "Nick G" ~ "~/not_synced",
+    TRUE ~ "data"
+  ),
+  
+  tar_file(
+    cases_nsw_path, 
+    file.path(
+      data_path,
+      "CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"
+    )
+  ),
+  
+  tar_file(
+    cases_vic_path, 
+    file.path(
+      data_path,
+      "Linelist_Cases_20210917.xlsx"
+    )
+  ),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
-  tar_file(casual_vic_path, 
-           "data/vic/Linelist_casual_20210917.xlsx"),
+  tar_file(
+    casual_vic_path,
+    file.path(
+      data_path,
+      "vic/Linelist_casual_20210917.xlsx"
+    )
+  ),
   
   casual_vic = read_casual_vic(casual_vic_path),
   
