@@ -12,17 +12,17 @@ new_infections <- function(infections, vaccinated = FALSE) {
   # infect new people, differently for if the new infections are vaccinated
   
   if (vaccinated) {
-    infectiousness_multiplier <- 1 - .abm_parameters$ve_susceptibility
+    susceptibility_multiplier <- 1 - .abm_parameters$ve_susceptibility
     fraction <- .abm_parameters$vaccination_coverage
     clinical_fraction_multiplier <- 1 - .abm_parameters$ve_symptoms
   } else {
-    infectiousness_multiplier <- 1
+    susceptibility_multiplier <- 1
     fraction <- 1 - .abm_parameters$vaccination_coverage
     clinical_fraction_multiplier <- 1
   }
   
   # simulate onward infections
-  infectiousness <- infectiousness(infections) * infectiousness_multiplier
+  infectiousness <- infectiousness(infections) * susceptibility_multiplier
   onward_infections <- rpois(
     nrow(infections),
     infectiousness * fraction
