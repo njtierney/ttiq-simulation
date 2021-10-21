@@ -15,9 +15,12 @@ get_age_vaccine_adjusted_cases <- function(
         scenario_clinical_fraction,
       # c(0.5, 0.7, 0.8, 0.9, 0.95, 1), # but Chris only needs one for now - 0.8
       baseline_matrix,
-      detection_asymptomatic = 1,
-      detection_symptomatic = 1
-) {
+      detection_vaccinated_asymptomatic = 1,
+      detection_vaccinated_symptomatic = 1,
+      detection_unvaccinated_asymptomatic = 1,
+      detection_unvaccinated_symptomatic = 1
+      
+      ) {
 
 # baseline matrix or oz_baseline_matrix?
   stable_state_df <- scenario_clinical_fraction %>% 
@@ -25,7 +28,7 @@ get_age_vaccine_adjusted_cases <- function(
     mutate(stable_state = list(get_stable_state(
         efficacy_susceptibility = ve_susceptibility,
         efficacy_onward = ve_onward_transmission,
-        coverage_any_vaccine = vaccination_coverage,
+        coverage_any_vaccine = vaccination_coverage_vec,
         baseline_matrix = baseline_matrix
     ))) %>% 
     # age_weight_unvax <- stable_state[1:17]
@@ -69,14 +72,11 @@ get_age_vaccine_adjusted_cases <- function(
       vax_asymptomatic = sum(age_weight_vax * (1 - clinical_fraction_vax)),
     ) %>% 
     mutate(
-      across(
-        ends_with( "_symptomatic"),
-        ~.x * detection_symptomatic
-      ),
-      across(
-        ends_with( "_asymptomatic"),
-        ~.x * detection_asymptomatic
-      ),
+      unvax_symptomatic = unvax_symptomatic * detection_unvaccinated_symptomatic,
+      vax_symptomatic = vax_symptomatic * detection_vaccinated_symptomatic,
+      unvax_asymptomatic = unvax_asymptomatic * detection_unvaccinated_asymptomatic,
+      vax_asymptomatic = vax_asymptomatic * detection_vaccinated_asymptomatic,
+      
       all_cases = unvax_symptomatic + unvax_asymptomatic + vax_symptomatic + vax_asymptomatic,
       frac_unvax_symptomatic = unvax_symptomatic / all_cases,
       frac_unvax_asymptomatic = unvax_asymptomatic / all_cases,

@@ -7,16 +7,26 @@
 #' @return
 #' @author dhduncan
 #' @export
-gg_dist_adjusted_clinical_fraction <- function(age_vacc_adjusted_cases) {
+gg_adjusted_clinical_fraction <- function(age_vacc_adjusted_cases) {
 
-  df <- tibble(age_group = rep(pull(age_classes()[1]), 2),
-               vaccine_status = rep(c("none", "full complement\n(of any)"), 
-                                    each = nrow(age_classes())),
-               adj_clinical_fraction = dist_age_vacc_adjusted_cases) %>% 
+  df <- tibble(
+    age_group = rep(
+      pull(age_classes()[1]),
+      2
+    ),
+    vaccine_status = rep(
+      c("none", "full complement\n(of any)"), 
+      each = nrow(age_classes())
+    ),
+    adj_clinical_fraction = age_vacc_adjusted_cases
+  ) %>% 
     mutate(
-      vaccine_status = factor(vaccine_status, 
-                              levels = c("none", "full complement\n(of any)"),
-                              ordered = TRUE))
+      vaccine_status = factor(
+        vaccine_status, 
+        levels = c("none", "full complement\n(of any)"),
+        ordered = TRUE
+      )
+    )
   
   ggplot(test,
          aes(x = fct_inorder(age_group), 
