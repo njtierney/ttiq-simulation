@@ -27,7 +27,7 @@ optimal_isol_interview_samples <- read_csv(
 
 
 parameters <- setup_abm(
-  R = 4,
+  R = 4.5,
   vaccination_coverage = 0.9,
   vaccination_test_seeking_multiplier = 1,
   passive_detection_given_symptoms = 0.8,
@@ -61,7 +61,7 @@ sources <- res %>%
     # find sources to consider (exclude those during burn in and last two weeks
     # due to truncation of onward infection)
     !is.na(source_id) &
-      infection_day > 14 &
+      infection_day > 28 &
       infection_day < (max(infection_day) - 14)
     # find infections to keep - the sources and those infected by these sources
   ) %>%
@@ -117,6 +117,56 @@ sources %>%
   )
 
 
+
+
+
+
 # check the CT delay (source isolation day to infectee isolation day, for
 # infectees found by contact tracing) has the same distribution as expected delays
+res %>%
+  filter(
+    case_found_by == "contact_tracing"
+  ) %>%
+  select(
+    id = source_id,
+    contact_id = id,
+    contact_isolation_day = isolation_day
+  ) %>%
+  left_join(
+    sources,
+    by = "id"
+  ) %>%
+  select(
+    source_isolation_day = isolation_day,
+    contact_isolation_day,
+    source_id = id,
+    contact_id
+  ) %>%
+  filter(
+    !is.na(source_isolation_day)
+  ) %>%
+  mutate(
+    contact_tracing_delay = contact_isolation_day - source_isolation_day
+  ) %>%
+  ggplot(
+    aes(
+      x = contact_tracing_delay
+    )
+  ) +
+  geom_histogram(
+    binwidth = 1,
+    colour = "white"
+  )
 
+tibble(
+  contact_tracing_delay = optimal_isol_interview_samples + rpois(length(optimal_isol_interview_samples), 0.5)
+) %>%
+  ggplot(
+    aes(
+      x = contact_tracing_delay
+    )
+  ) +
+  geom_histogram(
+    binwidth = 1,
+    colour = "white"
+  )
