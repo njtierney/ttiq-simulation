@@ -15,6 +15,7 @@ gg_vaccination_coverage <- function(vaccination_coverage) {
     geom_line() +
     facet_wrap(~age_band_id) + 
     scale_y_continuous(labels = label_percent())  +
-    scale_x_date(date_labels = "%b %C")
+    scale_x_date(date_labels = "%x",
+                 date_breaks = "4 months")
 
 }
