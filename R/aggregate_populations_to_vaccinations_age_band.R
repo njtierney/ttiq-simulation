@@ -52,11 +52,11 @@ aggregate_populations_to_vaccinations_age_band <- function(
       )
     )
     ) %>% 
-    group_by(sa4_code16,
+    group_by(ste_name16,
              vac_age_group) %>% 
     mutate(population = sum(population)) %>% 
     ungroup() %>% 
-    select(sa4_code16,
+    select(ste_name16,
            age_lower,
            age_upper,
            population,

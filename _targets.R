@@ -436,7 +436,8 @@ tar_plan(
                                    dim_age_band,
                                    dim_time,
                                    dim_vaccine,
-                                   aggregated_populations),
+                                   aggregated_populations,
+                                   sa4_lookup),
   
   vaccination_age_band = create_vaccination_age_band(vaccinations),
   

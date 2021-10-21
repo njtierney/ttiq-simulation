@@ -17,20 +17,23 @@ tidy_populations <- function(populations_raw, sa2_lookup) {
            -sa3_code16,
            -gcc_name16)
   
-  unique(populations_df$sa4_code16)
-  unique(populations_df$ste_name16)
-  
   # TODO
   # check that this table length seems about right
-  populations_df %>% 
+  populations_state <- populations_df %>% 
     group_by(ste_name16,
-             sa4_code16,
              age_lower,
              age_upper) %>% 
     summarise(population = sum(population),
-              .groups = "drop")
-    
+              .groups = "drop") 
   
+  populations_state
+    
+  # populations_state %>% 
+  #   group_by(ste_name16) %>% 
+  #   summarise(population = sum(population)) %>% 
+  #   pull(population) %>% 
+  #   sum() %>% 
+  #   comma()
   # unique(partial_df$age_band_id)
   # populations
 
