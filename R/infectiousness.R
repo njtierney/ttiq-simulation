@@ -27,8 +27,8 @@ infectiousness <- function(infections) {
   
   symptomatic_multiplier <- ifelse(
     infections$symptomatic,
-    .abm_parameters$asymptomatic_relative_infectiousness,
-    1
+    1,
+    .abm_parameters$asymptomatic_relative_infectiousness
   )
   
   .abm_parameters$R_star *
