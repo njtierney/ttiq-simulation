@@ -9,5 +9,6 @@
 #' @author Nick Golding
 #' @export
 isolated <- function(infections) {
-  (infections$isolation_day - .abm_globals$day) < 14
+  .abm_globals$day > infections$isolation_day &
+    ((.abm_globals$day - infections$isolation_day) <= 14)
 }
