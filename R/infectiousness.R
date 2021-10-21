@@ -10,7 +10,7 @@
 #' @export
 infectiousness <- function(infections) {
   # compute infectiousness from GI distribution, isolation status, vaccination_status etc.
-  
+
   day_diff <- .abm_globals$day - infections$infection_day
   
   isolation_multiplier <- ifelse(

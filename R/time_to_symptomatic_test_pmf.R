@@ -9,15 +9,10 @@
 #' @export
 time_to_symptomatic_test_pmf <- function(days_since_infection) {
 
-  # probability mass function for this being the date of test-seeking (one day
-  # after symptom onset)
-  mean <- 5.8
-  sd <- 2
-  # mean 5.8 days from parameters doc
-  
-  var <- sd ^ 2
-  meanlog <- log((mean ^ 2) / sqrt(var + mean ^ 2))
-  sdlog <- sqrt(log(1 + var / (mean ^ 2)))
+  # probability mass function for this being the date of test-seeking, for
+  # symptomatics that seek a test
+  meanlog <- log(5)
+  sdlog <- 0.5
   
   upper <- plnorm(days_since_infection + 1,
                   meanlog, sdlog)
