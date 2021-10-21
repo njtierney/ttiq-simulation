@@ -24,6 +24,7 @@ sim_abm <- function(
   for (day in days) {
     
     .abm_globals$day <<- day
+    .abm_globals$highest_id <<- nrow(infections)
     
     # infect people
     infections <- infect(infections)
