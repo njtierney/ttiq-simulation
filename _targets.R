@@ -357,7 +357,8 @@ tar_plan(
       plot = plot_infections_vax_symp,
       path = "figs/infections_to_cases_coverage.png",
       width = 9,
-      height = 4
+      height = 4,
+      dpi = 600
     )
   }),
     
