@@ -23,8 +23,8 @@ sample_optimal_delays <- function(derived_delay_distributions,
     mutate(
       time_to_swab = dpois(days, 0.5),
       # from optimal
-      test_turnaround_time = density(dist_test_turnaround_time, days),
-      time_to_interview = density(dist_time_to_interview, days),
+      test_turnaround_time = density(dist_test_turnaround_time, days)[[1]],
+      time_to_interview = density(dist_time_to_interview, days)[[1]],
       time_to_isolation = dpois(days, 0.5)
     )
   
