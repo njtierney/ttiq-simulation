@@ -4,21 +4,21 @@
 # R and vaccination coverage is specified in
 # get_valid_ABM_sample
 # simulation criteria are specified
-#future::plan(multisession(workers = 8))
+future::plan(multisession(workers = 8))
 # future::plan(transparent)
 sims <- expand_grid(
   vaccination_coverage = c(0.7, 0.8, 0.9),
   vaccination_test_seeking_multiplier = c(1, 0),
   passive_detection_given_symptoms = c(0.5),
-  #R = ,
+#  R = 2,
   do_ttiq = c(TRUE)
 ) %>%
   mutate(
     # tweak starting R to get optimal reproduction number at about 1
     R = case_when(
-      vaccination_coverage == 0.9 ~ 3.58, # fails <2.58
-      vaccination_coverage == 0.8 ~ 3,
-      vaccination_coverage == 0.7 ~ 3,
+      vaccination_coverage == 0.9 ~ 2.58, # fails <2.58
+      vaccination_coverage == 0.8 ~ 2, # fails < 1.9
+      vaccination_coverage == 0.7 ~ 1.99, # fails < 1.55
     )
   ) %>%
   rowwise() %>%
@@ -81,7 +81,7 @@ sims %>%
 
 plot_df <- sims %>%
   filter(
-    vaccination_coverage == 0.9,
+    vaccination_coverage == 0.8,
     #vaccination_test_seeking_multiplier == 0,
     passive_detection_given_symptoms == 0.5
   ) %>%
@@ -93,7 +93,7 @@ plot_df <- sims %>%
   ggplot(plot_df,
     aes(
       x = infection_day, 
-      colour = vaccination_test_seeking_multiplier
+      fill = factor(vaccination_test_seeking_multiplier)
     )
   ) +
   geom_histogram(
@@ -103,9 +103,12 @@ plot_df <- sims %>%
    # colour = "white"
   ) +
   facet_wrap(~simulation) +
-  ggtitle(paste0("R = ", plot_df$R,
-                 " Vacc. cov. = ", plot_df$vaccination_coverage,
-                 ", Test seek. multp. = ", plot_df$vaccination_test_seeking_multiplier) ) +
+  ggtitle(
+    paste0("R = ", plot_df$R,
+                 " Vacc. cov. = ",
+                 plot_df$vaccination_coverage)
+          ) +
+    labs(fill = "Test seeking\nmultiplier") +
   theme_minimal()
 
 
