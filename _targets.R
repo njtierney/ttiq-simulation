@@ -334,12 +334,12 @@ tar_plan(
     
     ),
   
-  age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-    scenario_clinical_fraction, 
-    oz_baseline_matrix
-  ),
+  # age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
+  #   scenario_clinical_fraction, 
+  #   oz_baseline_matrix
+  # ),
 
-  plot_infections_vax_symp = gg_infections_vax_symp(
+  prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
     ve_onward_transmission = 0.5,
     ve_susceptibility = 0.73,
@@ -347,6 +347,19 @@ tar_plan(
     vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1),
     vaccination_age_min = 12
   ),
+  
+  plot_infections_vax_symp = gg_infections_vax_symp(
+    prepared_infections_vax_symp
+  ),
+  
+  tar_file(plot_infections_vax_symp_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp,
+      path = "figs/infections_to_cases_coverage.png",
+      width = 9,
+      height = 4
+    )
+  }),
     
   age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
     scenario_clinical_fraction, 
@@ -354,7 +367,6 @@ tar_plan(
     detection_asymptomatic = 0.25,
     detection_symptomatic = 0.5
   ),
-
   
   
   fraction_cases_vaccinated = get_frac_vaccinated(
