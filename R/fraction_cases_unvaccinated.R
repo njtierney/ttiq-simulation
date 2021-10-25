@@ -9,9 +9,9 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-fraction_cases_unvaccinated <- function(efficacy_susceptibility,
-                                        efficacy_onward,
-                                        coverage_any_vaccine,
+fraction_cases_unvaccinated <- function(ve_susceptibility,
+                                        ve_onward_transmission,
+                                        vaccination_coverage,
                                         baseline_matrix) {
 
   stable_state <- get_stable_state(
