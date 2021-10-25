@@ -14,7 +14,7 @@ get_stable_state <- function(efficacy_susceptibility,
                              coverage_any_vaccine,
                              baseline_matrix) {
   
-  coverage_any_vaccine <- unlist(coverage_any_vaccine)
+  # coverage_any_vaccine <- unlist(coverage_any_vaccine)
   # transmission between unvaccinated people, no effect of vaccines and scale down
   # to vaccinated population
   unvax_unvax <- baseline_matrix %>%
@@ -48,3 +48,4 @@ get_stable_state <- function(efficacy_susceptibility,
   return(stable_state)
   
 }
+

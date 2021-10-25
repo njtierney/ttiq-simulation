@@ -31,6 +31,8 @@ coverage_milestones <- function(vaccination_coverage) {
           .x >= 0.90 ~ "over_90_pct",
           .x >= 0.80 ~ "over_80_pct",
           .x >= 0.70 ~ "over_70_pct",
+          .x >= 0.60 ~ "over_60_pct",
+          .x >= 0.70 ~ "over_60_pct",
           TRUE ~ NA_character_
         )
       )

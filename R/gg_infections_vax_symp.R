@@ -16,32 +16,40 @@
 #' @export
 gg_infections_vax_symp <- function(prepared_infections_vax_symp) {
 
+  prepared_infections_vax_symp %>%
+    mutate(
+      milestone = str_remove_all(milestone, "over_16_"),
+      milestone = str_remove_all(milestone, "over_"),
+      milestone = str_replace(milestone, "_pct", "%"),
+      milestone = str_replace(milestone, "terminal", "90%"),
+    ) %>%
     ggplot(
-      data = prepared_infections_vax_symp,
       aes(
-        x = vaccination_coverage_percent,
+        x = milestone,
         y = fraction, 
         fill = status
       )
     ) + 
-      scale_fill_manual(values = c(darken("#990000", 0.2), 
-                                   lighten("#990000", 0.3), 
-                                   darken("#000099", 0.2), 
-                                   lighten("#000099", 0.3))) +
+      scale_fill_manual(
+        values = c(
+          darken("#990000", 0.2), 
+          lighten("#990000", 0.3), 
+          darken("#000099", 0.2), 
+          lighten("#000099", 0.3)
+        )
+      ) +
     geom_col() +
-    facet_grid(which~milestone) +
+    facet_grid(~which) +
     labs(
-      x = "\nVaccination coverage (uniform across 12+ population)",
+      x = "\nVaccination coverage milestones",
       y = "Fraction",
       fill = "",
-      alpha = "Symptoms"
     ) +
     theme_minimal() +
     theme(
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
       strip.text = element_text(size = 12)
-      # aspect.ratio = 1
     ) 
   
 }

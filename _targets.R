@@ -360,11 +360,6 @@ tar_plan(
     
     ),
   
-  # age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-  #   scenario_clinical_fraction,
-  #   oz_baseline_matrix
-  # ),
-  
   age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
     scenario_clinical_fraction,
     oz_baseline_matrix,
@@ -377,10 +372,10 @@ tar_plan(
     ## unsure on what values to pass through
   ),
 
-
   prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
-    average_vaccine_efficacy
+    average_vaccine_efficacy,
+    vaccination_coverage_milestones
   ),
   
   plot_infections_vax_symp = gg_infections_vax_symp(
