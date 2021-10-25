@@ -39,7 +39,7 @@ aggregate_populations_to_vaccinations_age_band <- function(
    100,           999,             80,              NA
   )
   
-  df_sa4_popn <- populations %>% 
+  df_popn <- populations %>% 
     left_join(age_lookup,
               c("age_lower" = "pop_age_lower",
                 "age_upper" = "pop_age_upper")) %>% 
@@ -52,12 +52,10 @@ aggregate_populations_to_vaccinations_age_band <- function(
       )
     )
     ) %>% 
-    group_by(ste_name16,
-             vac_age_group) %>% 
+    group_by(vac_age_group) %>% 
     mutate(population = sum(population)) %>% 
     ungroup() %>% 
-    select(ste_name16,
-           age_lower,
+    select(age_lower,
            age_upper,
            population,
            vac_age_group)
@@ -72,6 +70,6 @@ aggregate_populations_to_vaccinations_age_band <- function(
   #   comma()
   #> "25,698,093"
 
-  df_sa4_popn
+  df_popn
 
 }

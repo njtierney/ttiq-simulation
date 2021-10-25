@@ -3,6 +3,7 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
+# debug(coverage_milestones)
 tar_plan(
   
   tar_file(cases_nsw_path, 
@@ -425,8 +426,7 @@ tar_plan(
   populations_raw = read_csv(populations_path),
   vaccinations_raw = read_csv(vaccinations_path),
   
-  populations = tidy_populations(populations_raw,
-                                 sa2_lookup),
+  populations = tidy_populations(populations_raw),
    
   aggregated_populations = aggregate_populations_to_vaccinations_age_band(
     populations
@@ -449,9 +449,14 @@ tar_plan(
   
   vaccination_coverage_age_group_at_milestone = 
     age_group_coverage_at_milestones(
-      vaccination_coverage,
+      vaccinations,
       vaccination_coverage_milestones
     ),
+  
+  vaccination_coverage_age_group_at_milestone_5_year = aggregate_5_years(
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   

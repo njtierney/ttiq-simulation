@@ -8,25 +8,14 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-tidy_populations <- function(populations_raw, sa2_lookup) {
+tidy_populations <- function(populations_raw) {
 
-  populations_df <- populations_raw %>% 
-    left_join(sa2_lookup,
-              by = "sa2_5dig16") %>% 
-    select(-sa2_5dig16,
-           -sa3_code16,
-           -gcc_name16)
-  
-  # TODO
-  # check that this table length seems about right
-  populations_state <- populations_df %>% 
-    group_by(ste_name16,
-             age_lower,
+  oz_population <- populations_raw %>% 
+    group_by(age_lower,
              age_upper) %>% 
-    summarise(population = sum(population),
-              .groups = "drop") 
+    summarise(population = sum(population))
   
-  populations_state
+  oz_population
     
   # populations_state %>% 
   #   group_by(ste_name16) %>% 

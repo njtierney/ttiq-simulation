@@ -8,68 +8,74 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-age_group_coverage_at_milestones <- function(vaccination_coverage,
+age_group_coverage_at_milestones <- function(vaccinations,
                                              vaccination_coverage_milestones) {
-
-  vaccination_coverage_milestones_12plus <- vaccination_coverage_milestones %>% 
-    filter(age_cutoff == "12+") 
   
-  vaccination_coverage_milestones_16plus <- vaccination_coverage_milestones %>% 
-    filter(age_cutoff == "16+") 
   
-  vaccination_coverage_milestones_12plus_70_pct <- 
-    vaccination_coverage_milestones_12plus %>% 
-    filter(milestone == "over_70_pct") 
-  
-  vaccination_coverage_milestones_12plus_80_pct <- 
-    vaccination_coverage_milestones_12plus %>% 
-    filter(milestone == "over_80_pct") 
-  
-  vaccination_coverage_milestones_16plus_70_pct <- 
-    vaccination_coverage_milestones_16plus %>% 
-    filter(milestone == "over_70_pct") 
-  
-  vaccination_coverage_milestones_16plus_80_pct <- 
-    vaccination_coverage_milestones_16plus %>% 
-    filter(milestone == "over_80_pct") 
-  
-  filter_to_milestone_time <- function(vaccination_coverage,
-                                       milestone_point){
-    vaccination_coverage %>% 
-    filter(
-      time_dose_2 %in% milestone_point[["time_dose_2"]]
+  vaccination_coverage_age_group_at_milestone <- 
+  vaccinations %>% 
+    pivot_longer(
+      cols = starts_with("time_"),
+      names_to = "dose",
+      values_to = "date",
+      names_prefix = "time_dose_"
     ) %>% 
-      arrange(time_dose_2) %>% 
-      group_by(age_band_id) %>% 
-      slice(1)
-  }
+    group_by(age_band_id,
+             vaccine,
+             dose,
+             date) %>% 
+    summarise(n_vaccinated = sum(n_vaccinated),
+              population = first(population),
+              .groups = "drop") %>% 
+    pivot_wider(
+      names_from = c(
+        vaccine, 
+        dose
+      ),
+      values_from = n_vaccinated,
+      values_fill = 0
+    ) %>% 
+    arrange(date) %>% 
+    group_by(age_band_id) %>% 
+    mutate(across(
+      .cols = c(starts_with("Astra"),
+                starts_with("Pfizer")),
+      .fns = cumsum
+    )) %>% 
+    full_join(
+      vaccination_coverage_milestones,
+      by = "date"
+    ) %>% 
+    filter(!is.na(milestone)) %>% 
+    arrange(
+      milestone,
+      age_band_id
+    ) %>% 
+    mutate(
+      AstraZeneca_1 = AstraZeneca_1 - AstraZeneca_2,
+      Pfizer_1 = Pfizer_1 - Pfizer_2,
+      across(
+        .cols = c(starts_with("Astra"),
+                  starts_with("Pfizer")),
+        .fns = list(
+          coverage = ~.x / population
+        ),
+      ),
+      any_vaccine = Reduce("+", 
+                           across(
+                             .cols = ends_with("coverage")
+                             )
+      ),
+      .before = date
+    ) %>% 
+    select(
+      age_band_id,
+      date,
+      milestone,
+      any_vaccine,
+      ends_with("coverage")
+    )
   
-  age_coverage_at_milestone_12plus_70pct <- filter_to_milestone_time(
-    vaccination_coverage,
-    vaccination_coverage_milestones_12plus_70_pct
-  )
+  vaccination_coverage_age_group_at_milestone
   
-  age_coverage_at_milestone_12plus_80pct <- filter_to_milestone_time(
-    vaccination_coverage,
-    vaccination_coverage_milestones_12plus_80_pct
-  )
-  
-  age_coverage_at_milestone_16plus_70_pct <- filter_to_milestone_time(
-    vaccination_coverage,
-    vaccination_coverage_milestones_16plus_70_pct
-  )
-  
-  age_coverage_at_milestone_16plus_80_pct <- filter_to_milestone_time(
-    vaccination_coverage,
-    vaccination_coverage_milestones_16plus_80_pct
-  )
-  
-  bind_rows(
-    "12_plus_70_pct" = age_coverage_at_milestone_12plus_70pct,
-    "12_plus_80_pct" = age_coverage_at_milestone_12plus_80pct,
-    "16_plus_70_pct" = age_coverage_at_milestone_16plus_70_pct,
-    "16_plus_80_pct" = age_coverage_at_milestone_16plus_80_pct,
-    .id = "age_vacc_category"
-  )
-
 }

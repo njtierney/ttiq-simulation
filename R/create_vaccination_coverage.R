@@ -21,8 +21,12 @@ create_vaccination_coverage <- function(vaccinations) {
            -Pfizer) %>% 
     relocate(population,
              .after = everything()) %>% 
-    group_by(age_band_id) %>% 
-    arrange(time_dose_2) %>% 
+    group_by(age_band_id,
+             time_dose_2) %>% 
+    summarise(n_vaccinated = sum(n_vaccinated),
+              population = first(population)) %>% 
+    arrange(time_dose_2,
+            .by_group = TRUE) %>% 
     mutate(cumulative_n_vac = cumsum(n_vaccinated),
            cumulative_prop_vac = cumulative_n_vac / population) %>% 
     ungroup() 
