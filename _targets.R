@@ -380,6 +380,7 @@ tar_plan(
 
   prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
+    average_vaccine_efficacy,
     ve_onward_transmission = 0.5,
     ve_susceptibility = 0.73,
     ve_symptoms = 0.78,

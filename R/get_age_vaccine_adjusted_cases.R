@@ -24,11 +24,12 @@ get_age_vaccine_adjusted_cases <- function(
 
 # baseline matrix or oz_baseline_matrix?
   stable_state_df <- scenario_clinical_fraction %>% 
+    # nexted within milestone are the parameters for each age bracket, 0-4, etc.)
     rowwise() %>% 
     mutate(stable_state = list(get_stable_state(
         efficacy_susceptibility = ve_susceptibility,
         efficacy_onward = ve_onward_transmission,
-        coverage_any_vaccine = vaccination_coverage_vec,
+        coverage_any_vaccine = unlist(vaccination_coverage_vec),
         baseline_matrix = baseline_matrix
     ))) %>% 
     # age_weight_unvax <- stable_state[1:17]
