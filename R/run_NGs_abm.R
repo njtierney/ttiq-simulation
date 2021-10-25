@@ -21,7 +21,7 @@ sims <- expand_grid(
   vaccination_coverage = c(0.7),
   #vaccination_test_seeking_multiplier = c(1),
   passive_detection_given_symptoms = c(0.5),
-  rel_active_detection_vaccinated_source = c(1,0),
+  rel_active_detection_vaccinated_source = c(1, 0.5, 0),
   rel_active_detection_vaccinated_contact = c(1, 0.5, 0),
   do_ttiq = c(TRUE)
 ) %>%
@@ -313,15 +313,8 @@ ggplot(plot_tps) +
              y=TP))
 
 
-# get growth rates
-# get_little_r <- function(x) {
-#   lm <- lm(formula = log(infections) ~ infection_day,
-#            data = x)  
-#   return(lm$coefficients[[2]])
-# } 
-
 # ratio of little rs
-ratio_r <- lm_0$coefficients[[2]]/lm_1$coefficients[[2]]
+#ratio_r <- lm_0$coefficients[[2]]/lm_1$coefficients[[2]]
 
 write.csv(sry_tps,
           'freyas_outputs/sry_tps_70pc_vax_R4.6_cf40.csv',
@@ -332,6 +325,83 @@ write.csv(full_tps,
           row.names=FALSE)
 
 
+pc_change <- full_tps %>% 
+  filter(passive_detection_given_symptoms==0.5) %>% 
+  group_by(simulation, rel_active_detection_vaccinated_contact, rel_active_detection_vaccinated_source) %>% 
+  summarise(tp_ratio=get_ratio(value, )) 
+
+
+sry_ratios <- sry_20 %>% 
+  rbind(sry_30, sry_40) %>% 
+  filter(passive_detection_given_symptoms==0.5,
+         metric=='TP',
+         statistic=='mean') %>% 
+  group_by(symp_frac) %>% 
+  summarise(tp_ratio=get_ratio(value, vaccination_test_seeking_multiplier)) 
+
+# loop over simulations calculating ratio between reference and others
+sims <- unique(full_tps$simulation)
+
+sim_final <- data.frame()
+
+for (i in sims){
+  
+  sim_dat <- full_tps %>% filter(simulation==i)
+  
+  ref_tp <- as.numeric(sim_dat %>% filter(rel_active_detection_vaccinated_source==1,
+                            rel_active_detection_vaccinated_contact==1) %>% 
+    select(TP))
+    
+  sim_sorted <- sim_dat %>% 
+    mutate(pc_change=(TP/ref_tp-1)*100) 
+  
+  sim_final <- rbind(sim_final, sim_sorted)
+  
+}
+
+sim_plot <- sim_final %>% 
+  mutate(strategy=paste0(rel_active_detection_vaccinated_source, 
+                          '_',
+                          rel_active_detection_vaccinated_contact)) %>% 
+  filter(strategy!='1_1') 
+  
+
+sim_sry <- sim_plot %>% 
+  group_by(rel_active_detection_vaccinated_source,
+           rel_active_detection_vaccinated_contact) %>% 
+  summarise(mean=mean(pc_change), sd=sd(pc_change))
+  
+
+# generate boxplots of TPs by scenarios
+ggplot(sim_plot) +
+  #geom_boxplot(aes(x=factor(strategy),
+  #                  y=pc_change)) +
+  geom_point(aes(x=factor(1),
+                 y=pc_change),
+             position=position_jitter(width=0.1),
+             colour='grey70',
+             size=1) +
+  geom_pointrange(aes(x=factor(1), y=mean, ymin = mean-sd, ymax = mean+sd), data = sim_sry) +
+  geom_hline(yintercept=0,
+             linetype='dashed') +
+  facet_grid(rel_active_detection_vaccinated_source ~ rel_active_detection_vaccinated_contact) +
+  theme_bw() + 
+  theme(panel.grid=element_blank(), 
+        panel.border = element_blank(),
+        axis.line = element_line(size=0.2, color = 'black'),
+        #axis.text.x = element_blank(),
+        #axis.ticks.x = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        aspect.ratio = 1) +
+  labs(x='strategy',
+       y='% increase')
+
+ggsave(
+  "freyas_outputs/vax70pc_vary_cf.png",
+  width = 6,
+  height = 4.5,
+  dpi = 500
+)
 
 
 
