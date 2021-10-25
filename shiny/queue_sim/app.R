@@ -72,6 +72,16 @@ priority_ranking_vaccine_new_swab <- function(x, sim_day, notification_time) {
         )
 }
 
+priority_ranking_new_swab_vaccine <- function(x, sim_day, notification_time) {
+    x %>%
+        arrange(
+            # Whether case is eligible to be interviewed
+            desc(eligible_for_interview),
+            # Priorities, in order of appearance
+            desc(swab_date), # newest first
+            vaccinated # vaccinated FALSE first
+        )
+}
 
 priority_ranking_priority_vaccine_old_swab <- function(x, sim_day, notification_time) {
     x %>%
@@ -189,7 +199,7 @@ ui <- fluidPage(
                         step = 0.05),
             radioButtons("ranking_function",
                          "Prioritise case interviews by",
-                         choices = c("priority_vaccine_new_swab", "vaccine_priority_new_swab", "vaccine_new_swab", "new_swab", "priority_vaccine_old", "random")),
+                         choices = c("priority_vaccine_new_swab", "vaccine_priority_new_swab", "vaccine_new_swab", "new_swab_vaccine", "new_swab", "priority_vaccine_old", "random")),
             radioButtons("priority_delay_function",
                          "Discovery of priority groups",
                          choices = c("Instantaneous", "Mean 1d", "Never"),
@@ -229,6 +239,8 @@ server <- function(input, output) {
             f = priority_ranking_priority_vaccine_new_swab
         } else if (input$ranking_function == "vaccine_new_swab") {
             f = priority_ranking_vaccine_new_swab
+        } else if (input$ranking_function == "new_swab_vaccine") {
+            f = priority_ranking_new_swab_vaccine
         } else if (input$ranking_function == "new_swab") {
             f = priority_ranking_new_swab
         } else if (input$ranking_function == "vaccine_priority_new_swab") {
