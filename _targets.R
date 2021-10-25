@@ -118,6 +118,13 @@ tar_plan(
     derived_delay_distributions
   ),
   
+  tar_file(scenario_test_turnaround_time_probs_path,{
+    write_csv_return_path(scenario_test_turnaround_time_probs,
+                          "outputs/scenario_test_turnaround_time_probs.csv")
+  }),
+  
+  
+  
   tar_file(scenario_test_turnaround_time_sims_path,{
     write_csv_return_path(scenario_test_turnaround_time_sims,
                           "outputs/scenario_test_turnaround_time_sims.csv")
