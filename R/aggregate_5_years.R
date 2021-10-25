@@ -36,17 +36,47 @@ aggregate_5_years <- function(vaccination_coverage_age_group_at_milestone,
     90,            94,              80,              NA,             "80+",
     95,            99,              80,              NA,             "80+",
     100,           999,             80,              NA,             "80+"
-  )
-  
-  vaccination_coverage_age_group_at_milestone
-  
-  age_lookup %>% 
+  ) %>% 
+    mutate(age_band_id = case_when(
+      is.na(vac_age_upper) ~ "80+",
+      TRUE ~ as.character(
+        glue(
+          "{vac_age_lower}-{vac_age_upper}"
+        )
+      )
+    )
+    ) %>% 
     left_join(populations,
               by = c("pop_age_lower" = "age_lower",
                      "pop_age_upper" = "age_upper"))
   
+  vaccination_coverage_age_group_at_milestone_5_year <-  vaccination_coverage_age_group_at_milestone  %>% 
+    left_join(
+      age_lookup,
+      by = "age_band_id"
+    ) %>% 
+    mutate(age_5_year = factor(age_5_year,
+                                   levels = str_sort(unique(age_5_year),
+                                                      numeric = TRUE))) %>% 
+    group_by(age_5_year,
+             milestone) %>% 
+    summarise(
+      across(
+        .cols = c(any_vaccine,
+                  ends_with("coverage")),
+        .fns = ~weighted.mean(
+          x = .x,
+          w = population
+        )
+      )
+    ) %>% 
+    arrange(age_5_year) 
+  
+  
+  vaccination_coverage_age_group_at_milestone_5_year
+  
   # use all oz popn data
-  #10-14 age bin - weigt of coverages on 0-11s, and 12-14s
+  # 10-14 age bin - weigt of coverages on 0-11s, and 12-14s
   # we need to know what fraction of population falls in each one
   # then aggregating the population at the 5 year age bin
   # then we do the same for the 15-19 year olds,

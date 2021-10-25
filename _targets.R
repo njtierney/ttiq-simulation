@@ -447,6 +447,11 @@ tar_plan(
   
   vaccination_coverage_milestones = coverage_milestones(vaccination_coverage),
   
+  tar_file(vaccination_coverage_milestones_path,{
+    write_csv_return_path(vaccination_coverage_milestones,
+                          "outputs/vaccination_coverage_milestones.csv")
+  }),
+  
   vaccination_coverage_age_group_at_milestone = 
     age_group_coverage_at_milestones(
       vaccinations,
@@ -457,6 +462,15 @@ tar_plan(
     vaccination_coverage_age_group_at_milestone,
     populations
   ),
+  
+  tar_file(vaccination_coverage_age_group_at_milestone_5_year_path,{
+    write_csv_return_path(vaccination_coverage_age_group_at_milestone_5_year,
+                          "outputs/vaccination_coverage_age_group_at_milestone_5_year.csv")
+  }),
+  
+  average_vaccine_efficacy = 
+    create_average_vaccine_efficacy(vaccination_coverage_age_group_at_milestone_5_year),
+  
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   

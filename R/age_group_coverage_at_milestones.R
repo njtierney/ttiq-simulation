@@ -46,6 +46,9 @@ age_group_coverage_at_milestones <- function(vaccinations,
       vaccination_coverage_milestones,
       by = "date"
     ) %>% 
+    select(
+      -starts_with("coverage")
+    ) %>% 
     filter(!is.na(milestone)) %>% 
     arrange(
       milestone,
