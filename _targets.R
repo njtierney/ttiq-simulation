@@ -3,6 +3,7 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
+# debug(coverage_milestones)
 tar_plan(
   
   user = case_when(
@@ -419,9 +420,90 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
+  tar_file(dim_age_band_path,
+           "data/rollout/dim_age_band.csv"),
+  
+  tar_file(sa2_lookup_path,
+           "data/rollout/dim_sa2.csv"),
+  
+  tar_file(sa4_lookup_path,
+           "data/rollout/dim_sa4.csv"),
+  
+  tar_file(dim_time_path,
+           "data/rollout/dim_time.csv"),
+  
+  tar_file(dim_vaccine_path,
+           "data/rollout/dim_vaccine.csv"),
+  
+  tar_file(populations_path,
+           "data/rollout/populations_sa2.csv"),
+  
+  tar_file(vaccinations_path,
+           "data/rollout/vaccinations.csv"),
+  
+  dim_age_band = read_csv(dim_age_band_path),
+  sa2_lookup = read_csv(sa2_lookup_path),
+  sa4_lookup = read_csv(sa4_lookup_path),
+  dim_time = read_csv(dim_time_path),
+  dim_vaccine = read_csv(dim_vaccine_path),
+  populations_raw = read_csv(populations_path),
+  vaccinations_raw = read_csv(vaccinations_path),
+  
+  populations = tidy_populations(populations_raw),
+   
+  aggregated_populations = aggregate_populations_to_vaccinations_age_band(
+    populations
+  ),
+  
+  vaccinations = tidy_vaccinations(vaccinations_raw,
+                                   dim_age_band,
+                                   dim_time,
+                                   dim_vaccine,
+                                   aggregated_populations,
+                                   sa4_lookup),
+  
+  vaccination_age_band = create_vaccination_age_band(vaccinations),
+  
+  vaccination_coverage = create_vaccination_coverage(vaccinations),
+  
+  plot_vaccination_coverage = gg_vaccination_coverage(vaccination_coverage),
+  
+  vaccination_coverage_milestones = coverage_milestones(vaccination_coverage),
+  
+  tar_file(vaccination_coverage_milestones_path,{
+    write_csv_return_path(vaccination_coverage_milestones,
+                          "outputs/vaccination_coverage_milestones.csv")
+  }),
+  
+  vaccination_coverage_age_group_at_milestone = 
+    age_group_coverage_at_milestones(
+      vaccinations,
+      vaccination_coverage_milestones
+    ),
+  
+  vaccination_coverage_age_group_at_milestone_5_year = aggregate_5_years(
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
+  
+  tar_file(vaccination_coverage_age_group_at_milestone_5_year_path,{
+    write_csv_return_path(vaccination_coverage_age_group_at_milestone_5_year,
+                          "outputs/vaccination_coverage_age_group_at_milestone_5_year.csv")
+  }),
+  
+  average_vaccine_efficacy = 
+    create_average_vaccine_efficacy(vaccination_coverage_age_group_at_milestone_5_year),
+  
+  
+  vaccintation_total = total_vaccinations(vaccinations_raw),
+  
+  age_lookup = create_age_lookup(dim_age_band_path),
   
 )
+
+
 
 
 # analyse NSW data to get distributions of these delays (blue + yellow graphs)
