@@ -49,6 +49,17 @@ random_swab <- function(x, sim_day, notification_time) {
         select(-ix)
 }
 
+priority_ranking_new_swab <- function(x, sim_day, notification_time) {
+    x %>%
+        arrange(
+            # Whether case is eligible to be interviewed
+            desc(eligible_for_interview),
+            # Priorities, in order of appearance
+            desc(notification_date >= sim_day), # notified today first (maximise day 0s)
+            desc(swab_date), # newest first
+        )
+}
+
 priority_ranking_vaccine_new_swab <- function(x, sim_day, notification_time) {
     x %>%
         arrange(
@@ -178,7 +189,7 @@ ui <- fluidPage(
                         step = 0.05),
             radioButtons("ranking_function",
                          "Prioritise case interviews by",
-                         choices = c("priority_vaccine_new_swab", "vaccine_priority_new_swab", "vaccine_new_swab", "priority_vaccine_old", "random")),
+                         choices = c("priority_vaccine_new_swab", "vaccine_priority_new_swab", "vaccine_new_swab", "new_swab", "priority_vaccine_old", "random")),
             radioButtons("priority_delay_function",
                          "Discovery of priority groups",
                          choices = c("Instantaneous", "Mean 1d", "Never"),
@@ -218,6 +229,8 @@ server <- function(input, output) {
             f = priority_ranking_priority_vaccine_new_swab
         } else if (input$ranking_function == "vaccine_new_swab") {
             f = priority_ranking_vaccine_new_swab
+        } else if (input$ranking_function == "new_swab") {
+            f = priority_ranking_new_swab
         } else if (input$ranking_function == "vaccine_priority_new_swab") {
             f = priority_ranking_priority_vaccine_new_swab
         } else if (input$ranking_function == "priority_vaccine_old") {
@@ -278,7 +291,7 @@ server <- function(input, output) {
     res = 108)
     
     output$tp_reduction <- renderText({
-        paste("Mean TP reduction:", mean(sim_tracing_output_processed()$tp_reduction))
+        paste("Mean TP reduction:", round(mean(sim_tracing_output_processed()$tp_reduction), 3))
     })
     
     # Useful print output for general debugging
