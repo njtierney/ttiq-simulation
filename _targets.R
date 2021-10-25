@@ -5,17 +5,42 @@ source("./packages.R")
 lapply(list.files("./R", full.names = TRUE), source)
 tar_plan(
   
-  tar_file(cases_nsw_path, 
-           "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  user = case_when(
+    Sys.info()["nodename"] == "6300L-148079-M.local" ~ "Nick G",
+    TRUE ~ "Sensible people"  
+  ),
   
-  tar_file(cases_vic_path, 
-           "data/Linelist_Cases_20210917.xlsx"),
+  data_path = case_when(
+    user == "Nick G" ~ "~/not_synced",
+    TRUE ~ "data"
+  ),
+  
+  tar_file(
+    cases_nsw_path, 
+    file.path(
+      data_path,
+      "CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"
+    )
+  ),
+  
+  tar_file(
+    cases_vic_path, 
+    file.path(
+      data_path,
+      "Linelist_Cases_20210917.xlsx"
+    )
+  ),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
-  tar_file(casual_vic_path, 
-           "data/vic/Linelist_casual_20210917.xlsx"),
+  tar_file(
+    casual_vic_path,
+    file.path(
+      data_path,
+      "vic/Linelist_casual_20210917.xlsx"
+    )
+  ),
   
   casual_vic = read_casual_vic(casual_vic_path),
   
@@ -83,6 +108,20 @@ tar_plan(
   # }),
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
+  scenario_test_turnaround_time_sims = simulate_test_turnaround_time(
+    derived_delay_distributions = derived_delay_distributions,
+    n_samples = 10000
+    ),
+  
+  scenario_test_turnaround_time_probs = parameters_test_turnaround_time(
+    derived_delay_distributions
+  ),
+  
+  tar_file(scenario_test_turnaround_time_sims_path,{
+    write_csv_return_path(scenario_test_turnaround_time_sims,
+                          "outputs/scenario_test_turnaround_time_sims.csv")
+  }),
+  
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
   
@@ -113,11 +152,12 @@ tar_plan(
   pr_symptoms = 0.6,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
-  samples_df =  generate_samples_df_delays(delay_dist_funs),
+  samples_df =  generate_samples_df_delays(delay_dist_funs,
+                                           n_samples = 10000),
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
-    n_iterations = 1000,
+    n_iterations = 10000,
     # parameters for sim_tracing
     # samples = samples_df,
     sim_tracing_funs = samples_df,

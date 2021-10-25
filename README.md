@@ -15,6 +15,12 @@ and contribute via a pull request - this will avoid issues with everyone working
 install.packages("capsule", repos = "https://milesmcbain.r-universe.dev")
 ```
 
+or
+
+```r
+remotes::install_github("milesmcbain/capsule")
+```
+
 ## Step 2: Reproduce the libraries used 
 
 ```r
