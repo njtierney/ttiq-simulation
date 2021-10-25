@@ -14,6 +14,16 @@ source("../../packages.R")
 lapply(list.files("../../R", full.names = TRUE), source)
 tar_load(derived_delay_distributions, store="../../_targets")
 
+# Define TP reductions
+csv_path = "../../data-public/testing_delay_kretzschmar_table_2_extended.csv"
+kretzschmar_tp_reduction = read_kretzschmar_tp_reduction(csv_path)
+vaccine_tp_reduction = tribble(
+    ~vaccine, ~vaccine_tp_reduction,
+    "AZ", 0.63,
+    "Pfizer", 0.82,
+    "None", 0
+)
+
 # Define arbitrary ranking functions
 priority_ranking_priority_new_swab <- function(x, sim_day, notification_time) {
     x %>%
@@ -176,7 +186,10 @@ ui <- fluidPage(
         # Show a plot of the generated distribution
         mainPanel(
             plotOutput("plot", width="100%", height="100%"),
-            downloadButton("download", "Download samples")
+            textOutput("tp_reduction"),
+            downloadButton("download", "Download samples"),
+            h4("Debug print"),
+            verbatimTextOutput("print")
         )
     )
 )
@@ -227,14 +240,31 @@ server <- function(input, output) {
                 proportion_cases_vaccinated = input$proportion_cases_vaccinated,
                 n_samples = input$n_samples
             )
+            
         },
         message = "Running queue simulation")
     })
     
+    sim_tracing_output_processed = reactive({
+        sim_tracing_output() %>%
+            unnest() %>%
+            # Calculate TP reductions
+            mutate(
+                samples_vaccinated = ifelse(samples_vaccinated, "Pfizer", "None")
+            ) %>%
+            left_join(vaccine_tp_reduction,
+                      by = c("samples_vaccinated" = "vaccine")) %>%
+            left_join(kretzschmar_tp_reduction,
+                      by = c("samples_test_turnaround_time" = "Testing.delay",
+                             "samples_time_to_interview" = "contact_tracing_delay")) %>%
+            mutate(tp_reduction = 1 - (1-vaccine_tp_reduction) * (1-kretzschmar_tp_reduction))
+    })
+    
+    
     output$download = downloadHandler(
         filename = function() "sim_output.csv",
         content = function(con) {
-            write.csv(sim_tracing_output() %>% unnest(), con, row.names=FALSE)
+            write.csv(sim_tracing_output_processed(), con, row.names=FALSE)
         }
     )
     
@@ -243,6 +273,18 @@ server <- function(input, output) {
     },
     height = 800,
     res = 108)
+    
+    output$tp_reduction <- renderText({
+        paste("Mean TP reduction:", mean(sim_tracing_output_processed()$tp_reduction))
+    })
+    
+    # Useful print output for general debugging
+    output$print = renderPrint({
+        sim_tracing_output_processed() %>%
+            select(ends_with("reduction")) %>%
+            sample_n(20) %>%
+            as.data.frame()
+    })
 }
 
 # Run the application 
