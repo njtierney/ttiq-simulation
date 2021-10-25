@@ -335,9 +335,22 @@ tar_plan(
     ),
   
   # age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-  #   scenario_clinical_fraction, 
+  #   scenario_clinical_fraction,
   #   oz_baseline_matrix
   # ),
+  
+  age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
+    scenario_clinical_fraction,
+    oz_baseline_matrix,
+    ## NOTE: original parameters here, currently changing to get function
+    ## to work but unsure which values align here to unvaccinated or vaccinated
+    detection_vaccinated_asymptomatic = 0.25,
+    detection_unvaccinated_asymptomatic = 0.25,
+    detection_vaccinated_symptomatic = 0.5,
+    detection_unvaccinated_symptomatic = 0.5
+    ## unsure on what values to pass through
+  ),
+
 
   prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
@@ -352,6 +365,11 @@ tar_plan(
     prepared_infections_vax_symp
   ),
   
+  plot_infections_vax_symp_infected_only = 
+    gg_infections_vax_symp_infections_only(
+      prepared_infections_vax_symp
+      ),
+  
   tar_file(plot_infections_vax_symp_path,{
     ggsave_write_path(
       plot = plot_infections_vax_symp,
@@ -362,17 +380,20 @@ tar_plan(
     )
   }),
     
-  age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-    scenario_clinical_fraction, 
-    oz_baseline_matrix,
-    detection_asymptomatic = 0.25,
-    detection_symptomatic = 0.5
-  ),
-  
-  
+  tar_file(plot_infections_vax_symp_infected_only_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp_infected_only,
+      path = "figs/infections_to_cases_coverage_infected_only.png",
+      width = 9,
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
   fraction_cases_vaccinated = get_frac_vaccinated(
     age_vacc_adjusted_cases, 
-    vaccination_coverage),
+    vaccination_coverage
+    ),
   
   fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
                                                     vaccination_coverage),
