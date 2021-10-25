@@ -167,6 +167,9 @@ ui <- fluidPage(
                         max = 1,
                         value = 0.05,
                         step = 0.05),
+            radioButtons("vaccine_type", NULL,
+                         choices = c("Pfizer", "AZ"),
+                         inline = TRUE),
             sliderInput("prop_priority",
                         "Proportion cases in a priority group (after discovery)",
                         min = 0,
@@ -213,7 +216,7 @@ server <- function(input, output) {
     ranking_function = reactive({
         if (input$ranking_function == "priority_vaccine_new_swab") {
             f = priority_ranking_priority_vaccine_new_swab
-        } else if (input$ranking_function == "vaccine__new_swab") {
+        } else if (input$ranking_function == "vaccine_new_swab") {
             f = priority_ranking_vaccine_new_swab
         } else if (input$ranking_function == "vaccine_priority_new_swab") {
             f = priority_ranking_priority_vaccine_new_swab
@@ -250,7 +253,7 @@ server <- function(input, output) {
             unnest() %>%
             # Calculate TP reductions
             mutate(
-                samples_vaccinated = ifelse(samples_vaccinated, "Pfizer", "None")
+                samples_vaccinated = ifelse(samples_vaccinated, input$vaccine_type, "None")
             ) %>%
             left_join(vaccine_tp_reduction,
                       by = c("samples_vaccinated" = "vaccine")) %>%
