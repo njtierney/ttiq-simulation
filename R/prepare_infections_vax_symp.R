@@ -13,39 +13,32 @@
 #' @author Nicholas Tierney
 #' @export
 prepare_infections_vax_symp <- function(oz_baseline_matrix,
-                                        average_vaccine_efficacy,
-                                        ve_onward_transmission = 0.5,
-                                        ve_susceptibility = 0.73, 
-                                        ve_symptoms =
-                                        0.78, 
-                                        vaccination_coverage = c(0.5,
-                                        0.6, 0.7, 0.8, 0.9, 0.95, 1),
-                                        vaccination_age_min = 12) {
+                                        average_vaccine_efficacy) {
 
   # average_vaccine_efficacy
-  scenarios_average_vaccine_efficacy <-
-  average_vaccine_efficacy %>% 
-    group_by(milestone, age_5_year) %>% 
-    mutate(result = list(get_clinical_fraction_scenarios(
-      ve_onward_transmission = ve_onward,
-      ve_susceptibility = ve_susceptibility,
-      ve_symptoms = ve_symptoms,
-      vaccination_coverage = any_vaccine,
-      # vaccination_age_min = parse_number(as.character(age_5_year))
-      vaccination_age_min = 12
-    ))) %>% 
-    ungroup() %>% 
-    mutate(
-      id = row_number()
-    ) %>% 
-    select(-ve_onward,
-           -ve_susceptibility,
-           -ve_susceptibility,
-           -ve_symptoms,
-           -any_vaccine) %>% 
-    unnest_wider(
-      col = result
-    )
+  scenarios_average_vaccine_efficacy <- average_vaccine_efficacy %>% 
+    rename(vaccination_coverage_vec = any_vaccine)
+    # group_by(milestone, age_5_year) %>% 
+    # mutate(result = list(get_clinical_fraction_scenarios(
+    #   ve_onward_transmission = ve_onward,
+    #   ve_susceptibility = ve_susceptibility,
+    #   ve_symptoms = ve_symptoms,
+    #   vaccination_coverage = any_vaccine,
+    #   # vaccination_age_min = parse_number(as.character(age_5_year))
+    #   vaccination_age_min = 12
+    # ))) %>% 
+    # ungroup() %>% 
+    # mutate(
+    #   id = row_number()
+    # ) 
+    # select(-ve_onward,
+    #        -ve_susceptibility,
+    #        -ve_susceptibility,
+    #        -ve_symptoms,
+    #        -any_vaccine) %>% 
+    # unnest_wider(
+    #   col = result
+    # )
   
   scenarios_average_vaccine_efficacy
     
@@ -75,7 +68,8 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
     scenarios_average_vaccine_efficacy %>% 
     group_by(milestone) %>% 
     nest() %>% 
-    ungroup() 
+    ungroup()  %>% 
+    rowid_to_column(var = "id")
   
   scenario_cases <- 
     nested_scenarios_average_vaccine_efficacy %>% 

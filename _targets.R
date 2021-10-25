@@ -380,12 +380,7 @@ tar_plan(
 
   prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
-    average_vaccine_efficacy,
-    ve_onward_transmission = 0.5,
-    ve_susceptibility = 0.73,
-    ve_symptoms = 0.78,
-    vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1),
-    vaccination_age_min = 12
+    average_vaccine_efficacy
   ),
   
   plot_infections_vax_symp = gg_infections_vax_symp(
