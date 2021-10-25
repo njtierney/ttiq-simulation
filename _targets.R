@@ -153,7 +153,7 @@ tar_plan(
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
   samples_df =  generate_samples_df_delays(delay_dist_funs,
-                                           n_samples = 10000),
+                                           n_samples = 1000),
   
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
@@ -183,7 +183,9 @@ tar_plan(
   ),
   
   queue_scenarios = run_queue_scenarios(derived_delay_distributions,
-                                          n_samples = 100),
+                                          n_samples = 20000),
+  
+  queue_tp_reductions = queue_scenario_tp_reduction(queue_scenarios),
   
   plot_queue_scenarios = gg_queue_scenarios(queue_scenarios),
   

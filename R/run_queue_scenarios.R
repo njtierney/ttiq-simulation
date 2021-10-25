@@ -32,6 +32,17 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
       select(-ix)
   }
   
+  priority_ranking_new_swab <- function(x, sim_day, notification_time) {
+    x %>%
+      arrange(
+        # Whether case is eligible to be interviewed
+        desc(eligible_for_interview),
+        # Priorities, in order of appearance
+        desc(notification_date >= sim_day), # notified today first (maximise day 0s)
+        desc(swab_date), # newest first
+      )
+  }
+  
   
   priority_ranking_priority_vaccine_old_swab <- function(x, sim_day, notification_time) {
     x %>%
@@ -113,33 +124,41 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
   ranking_functions = list(
     # 'priority_new_swab'  = priority_ranking_priority_new_swab,
     # 'priority_vaccine_old_swab' = priority_ranking_priority_vaccine_old_swab,
-    'vaccine_new_swab' = priority_ranking_vaccine_new_swab,
-    'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
+    'random' = random_swab,
+    'new_swab' = priority_ranking_new_swab,
+    'vaccine_new_swab' = priority_ranking_vaccine_new_swab#,
+    # 'priority_vaccine_new_swab' = priority_ranking_priority_vaccine_new_swab,
     # 'vaccine_priority_old_swab' = priority_ranking_vaccine_priority_old_swab,
-    'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab#,
+    # 'vaccine_priority_new_swab' = priority_ranking_vaccine_priority_new_swab#,
     # 'random_swab' = random_swab
     # 'vaccine_priority_old_notification_old_swab' = priority_ranking_vaccine_priority_old_notification_old_swab
   )
   
   priority_delay_function = list(
-    delayzero = function(n) rep(0, n),
+    # delayzero = function(n) rep(0, n),
     delaypoisson1 = function(n) rpois(n, 1)
   )
   
-  capacity_ratios = c(capacity40pc=0.4, capacity70pc=0.7, capacity100pc=1)
+  capacity_ratios = c(capacity0pc=0, capacity20pc=0.2, capacity50pc=0.5, capacity80pc=0.8)
   
   max_days = c(max_5d=5)
+  
+  cases_vaccinated = c(casesvaccinated25pc=0.25, casesvaccinated50pc=0.5)
   
   # Create a list crossing combinations of input parameters for each run
   sim_params = lapply(ranking_functions, function(x) {
     lapply(priority_delay_function, function(y) {
       lapply(capacity_ratios, function(z) {
         lapply(max_days, function(w) {
-          list(f = x,
-               priority_delay_fn = y,
-               capacity_ratio = z,
-               max_interview_delay = w)
-        })
+          lapply(cases_vaccinated, function(v) {
+            list(f = x,
+                 priority_delay_fn = y,
+                 capacity_ratio = z,
+                 proportion_cases_vaccinated = v,
+                 max_interview_delay = w)
+          })
+        }) %>%
+          unlist(recursive=FALSE)
       }) %>%
         unlist(recursive=FALSE)
     }) %>%
@@ -147,27 +166,6 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
   }) %>%
     unlist(recursive=FALSE)
   
-  # Add a couple custom ones manually
-  sim_params$random_swab.delaypoisson1.capacity80pct.max_14d = list(
-    f = random_swab,
-    priority_delay_fn = priority_delay_function$delaypoisson1,
-    capacity_ratio = 0.8,
-    max_interview_delay = 14
-  )
-  
-  sim_params$random_swab.delaypoisson1.capacity80pct.max_5d = list(
-    f = random_swab,
-    priority_delay_fn = priority_delay_function$delaypoisson1,
-    capacity_ratio = 0.8,
-    max_interview_delay = 5
-  )
-  
-  sim_params$old_swab.delaypoisson1.capacity80pct.max_5d = list(
-    f = priority_ranking_priority_vaccine_old_swab,
-    priority_delay_fn = priority_delay_function$delaypoisson1,
-    capacity_ratio = 0.8,
-    max_interview_delay = 5
-  )
   
   message("Iterating over ", length(sim_params), " elements of `sim_params`")
   
@@ -182,7 +180,7 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
       max_interview_delay = x$max_interview_delay,
       priority_delay_distribution = x$priority_delay_fn,
       f_priority = x$f,
-      proportion_cases_vaccinated = 0.05,
+      proportion_cases_vaccinated = x$proportion_cases_vaccinated,
       n_samples = n_samples
     )
   })
