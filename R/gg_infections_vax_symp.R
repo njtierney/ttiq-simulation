@@ -29,7 +29,7 @@ gg_infections_vax_symp <- function(prepared_infections_vax_symp) {
                                    darken("#000099", 0.2), 
                                    lighten("#000099", 0.3))) +
     geom_col() +
-    facet_wrap(~which) +
+    facet_grid(which~milestone) +
     labs(
       x = "\nVaccination coverage (uniform across 12+ population)",
       y = "Fraction",
@@ -40,8 +40,8 @@ gg_infections_vax_symp <- function(prepared_infections_vax_symp) {
     theme(
       panel.grid.major = element_blank(),
       panel.grid.minor = element_blank(),
-      strip.text = element_text(size = 12),
-      aspect.ratio = 1
+      strip.text = element_text(size = 12)
+      # aspect.ratio = 1
     ) 
   
 }

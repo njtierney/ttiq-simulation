@@ -82,46 +82,90 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
     mutate(
       age_vaccine_adjusted_cases = map(
         .x = data,
-        .f = ~get_age_vaccine_adjusted_cases(
-          scenario_clinical_fraction = .x,
+        .f = function(x){
+          get_age_vaccine_adjusted_cases(
+          scenario_clinical_fraction = x,
           baseline_matrix = oz_baseline_matrix,
           detection_unvaccinated_asymptomatic = active_prob,
           detection_vaccinated_asymptomatic = active_prob,
           detection_unvaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob)),
           detection_vaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob))
-        )
+        ) %>% 
+            left_join(
+              select(
+                x,
+                id,
+                vaccination_coverage
+              ),
+              by = c(scenario_id = "id")
+            )
+        }
       )
-      ) 
-  
-  cases <- get_age_vaccine_adjusted_cases(
-    scenarios,
-    baseline_matrix = oz_baseline_matrix,
-    detection_unvaccinated_asymptomatic = active_prob,
-    detection_vaccinated_asymptomatic = active_prob,
-    detection_unvaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob)),
-    detection_vaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob))
-  ) %>%
-    left_join(
-      select(
-        scenarios,
-        id,
-        vaccination_coverage
-      ),
-      by = c(scenario_id = "id")
+      ) %>% 
+    select(-data) %>% 
+    unnest(
+      cols = age_vaccine_adjusted_cases
     )
   
-  infections <- get_age_vaccine_adjusted_cases(
-    scenarios,
-    baseline_matrix = oz_baseline_matrix
-  ) %>%
-    left_join(
-      select(
-        scenarios,
-        id,
-        vaccination_coverage
-      ),
-      by = c(scenario_id = "id")
+  # cases <- get_age_vaccine_adjusted_cases(
+  #   scenarios,
+  #   baseline_matrix = oz_baseline_matrix,
+  #   detection_unvaccinated_asymptomatic = active_prob,
+  #   detection_vaccinated_asymptomatic = active_prob,
+  #   detection_unvaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob)),
+  #   detection_vaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob))
+  # ) %>%
+  #   left_join(
+  #     select(
+  #       scenarios,
+  #       id,
+  #       vaccination_coverage
+  #     ),
+  #     by = c(scenario_id = "id")
+  #   )
+  
+  scenario_cases
+  
+  ###
+  scenario_infections <- 
+    nested_scenarios_average_vaccine_efficacy %>% 
+    mutate(
+      age_vaccine_adjusted_cases = map(
+        .x = data,
+        .f = function(x){
+          get_age_vaccine_adjusted_cases(
+            scenario_clinical_fraction = x,
+            baseline_matrix = oz_baseline_matrix
+            ) %>% 
+            left_join(
+              select(
+                x,
+                id,
+                vaccination_coverage
+              ),
+              by = c(scenario_id = "id")
+            )
+        }
+      )
+    ) %>% 
+    select(-data) %>% 
+    unnest(
+      cols = age_vaccine_adjusted_cases
     )
+  ###
+  
+  # infections <- get_age_vaccine_adjusted_cases(
+  #   scenarios,
+  #   baseline_matrix = oz_baseline_matrix
+  # ) %>%
+  #   left_join(
+  #     select(
+  #       scenarios,
+  #       id,
+  #       vaccination_coverage
+  #     ),
+  #     by = c(scenario_id = "id")
+  #   )
   
   labels <- tibble::tribble(
     ~status, ~label, ~colour, ~vaccinated, ~symptomatic,
@@ -131,12 +175,11 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
     "frac_vax_asymptomatic", "vaccinated & asymptomatic", "light blue", TRUE, FALSE
   )
   
-  df_vac_coverage <- bind_rows(
-    `All infections` = infections,
-    `Cases` = cases,
+  df_vac_coverage_scenario <- bind_rows(
+    `All infections` = scenario_infections,
+    `Cases` = scenario_cases,
     .id = "which"
-  ) %>%
-    # infections %>%
+  ) %>% 
     left_join(
       labels,
       by = "status"
@@ -163,7 +206,43 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
                                  "Vaccinated & Asymptomatic"),
                       ordered = TRUE)
     )
+    
+  df_vac_coverage_scenario
   
-  df_vac_coverage
+  
+  # df_vac_coverage <- bind_rows(
+  #   `All infections` = infections,
+  #   `Cases` = cases,
+  #   .id = "which"
+  # ) %>%
+  #   # infections %>%
+  #   left_join(
+  #     labels,
+  #     by = "status"
+  #   ) %>%
+  #   mutate(
+  #     vaccination_coverage_percent = paste0(100 * vaccination_coverage, "%"),
+  #     vaccination_coverage_percent = factor(
+  #       vaccination_coverage_percent,
+  #       levels = str_sort(
+  #         unique(vaccination_coverage_percent),
+  #         numeric = TRUE
+  #       )
+  #     ),
+  #     status = case_when(
+  #       vaccinated & symptomatic ~ "Vaccinated & Symptomatic",
+  #       !vaccinated & symptomatic ~ "Unvaccinated & Symptomatic",
+  #       vaccinated & !symptomatic ~ "Vaccinated & Asymptomatic",
+  #       !vaccinated & !symptomatic ~ "Unvaccinated & Asymptomatic",
+  #     ),
+  #     status = factor(status, 
+  #                     levels = c("Unvaccinated & Symptomatic",
+  #                                "Unvaccinated & Asymptomatic",
+  #                                "Vaccinated & Symptomatic",
+  #                                "Vaccinated & Asymptomatic"),
+  #                     ordered = TRUE)
+  #   )
+  # 
+  # df_vac_coverage
 
 }
