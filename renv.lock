@@ -209,8 +209,8 @@
       "RemoteRepo": "conmat",
       "RemoteUsername": "njtierney",
       "RemoteRef": "HEAD",
-      "RemoteSha": "2cd517cd4c210b482407e7020103b7fd8ffc25d9",
-      "Hash": "d5db379cab5863cd34d6a2a64f03243f"
+      "RemoteSha": "08bfcd22b39f449f330c27e7a59f7009854250de",
+      "Hash": "9cb78efba61a1bd58ecea4cac7ad035b"
     },
     "countrycode": {
       "Package": "countrycode",
@@ -569,10 +569,10 @@
     },
     "lubridate": {
       "Package": "lubridate",
-      "Version": "1.7.10",
+      "Version": "1.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "1ebfdc8a3cfe8fe19184f5481972b092"
+      "Hash": "2ff5eedb6ee38fb1b81205c73be1be5a"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -660,10 +660,10 @@
     },
     "pillar": {
       "Package": "pillar",
-      "Version": "1.6.3",
+      "Version": "1.6.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "3323bc1a0988d63b5c65771ba0d3935d"
+      "Hash": "60200b6aa32314ac457d3efbb5ccbd98"
     },
     "pkgconfig": {
       "Package": "pkgconfig",
@@ -861,10 +861,10 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.7.4",
+      "Version": "1.7.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "ebaccb577da50829a3bb1b8296f318a5"
+      "Hash": "cd50dc9b449de3d3b47cdc9976886999"
     },
     "stringr": {
       "Package": "stringr",

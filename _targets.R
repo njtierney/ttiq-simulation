@@ -3,19 +3,45 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
+# debug(coverage_milestones)
 tar_plan(
   
-  tar_file(cases_nsw_path, 
-           "data/CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"),
+  user = case_when(
+    Sys.info()["nodename"] == "6300L-148079-M.local" ~ "Nick G",
+    TRUE ~ "Sensible people"  
+  ),
   
-  tar_file(cases_vic_path, 
-           "data/Linelist_Cases_20210917.xlsx"),
+  data_path = case_when(
+    user == "Nick G" ~ "~/not_synced",
+    TRUE ~ "data"
+  ),
+  
+  tar_file(
+    cases_nsw_path, 
+    file.path(
+      data_path,
+      "CASES_FROM_20200701_0000_TO_20210913_1115.xlsx"
+    )
+  ),
+  
+  tar_file(
+    cases_vic_path, 
+    file.path(
+      data_path,
+      "Linelist_Cases_20210917.xlsx"
+    )
+  ),
   
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
-  tar_file(casual_vic_path, 
-           "data/vic/Linelist_casual_20210917.xlsx"),
+  tar_file(
+    casual_vic_path,
+    file.path(
+      data_path,
+      "vic/Linelist_casual_20210917.xlsx"
+    )
+  ),
   
   casual_vic = read_casual_vic(casual_vic_path),
   
@@ -316,43 +342,74 @@ tar_plan(
   ),
   
   # What is the age- and vaccine adjusted clinical fraction of cases
+  prepared_infections_vax_symp = prepare_infections_vax_symp(
+    oz_baseline_matrix,
+    average_vaccine_efficacy,
+    vaccination_coverage_milestones
+  ),
   
-  scenario_clinical_fraction = get_clinical_fraction_scenarios(
-    # VE for onward transmission with sensitivity test for 50% lower effect
-    # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = ve_onward_transmission,
-    
-    ve_susceptibility = ve_susceptibility,
-    
-    # VE for symptoms in breakthrough infections
-    ve_symptoms = ve_symptoms,
-
-    # what is the vaccination coverage
-    vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1)
-    
-    ),
+  mini_abm_parameters = get_mini_abm_parameters(
+    prepared_infections_vax_symp,
+    oz_baseline_matrix,
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
   
-  age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-    scenario_clinical_fraction, 
-    oz_baseline_matrix
-    ),
-
-  fraction_cases_vaccinated = get_frac_vaccinated(
-    age_vacc_adjusted_cases, 
-    vaccination_coverage),
+  tar_file(mini_abm_parameters_path, {
+    saveRDS_write_path(
+      object = mini_abm_parameters,
+      path = "outputs/mini_abm_parameters.RDS",
+    )
+  }),
   
-  fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
-                                                    vaccination_coverage),
+  plot_infections_vax_symp = gg_infections_vax_symp(
+    prepared_infections_vax_symp
+  ),
   
-  plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
+  # output coverage for Eamon
   
-  tar_file(plot_clinical_fraction_path, {
+  # plot_infections_vax_symp_infected_only = 
+  #   gg_infections_vax_symp_infections_only(
+  #     prepared_infections_vax_symp
+  #     ),
+  
+  tar_file(plot_infections_vax_symp_path,{
     ggsave_write_path(
-      plot = plot_adjusted_clinical_fraction,
-      path = "figs/age_vaccine_clinical_fraction.png",
+      plot = plot_infections_vax_symp,
+      path = "figs/infections_to_cases_coverage.png",
       width = 9,
-      height = 3.5)
-    }),
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
+  tar_file(plot_infections_vax_symp_infected_only_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp_infected_only,
+      path = "figs/infections_to_cases_coverage_infected_only.png",
+      width = 9,
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
+  # fraction_cases_vaccinated = get_frac_vaccinated(
+  #   age_vacc_adjusted_cases, 
+  #   vaccination_coverage
+  #   ),
+  # 
+  # fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
+  #                                                   vaccination_coverage),
+  # 
+  # plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
+  
+  # tar_file(plot_clinical_fraction_path, {
+  #   ggsave_write_path(
+  #     plot = plot_adjusted_clinical_fraction,
+  #     path = "figs/age_vaccine_clinical_fraction.png",
+  #     width = 9,
+  #     height = 3.5)
+  #   }),
   
   tar_file(plot_scenario_vaccination_isolation_path, {
     ggsave_write_path(
@@ -440,9 +497,110 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
+  tar_file(dim_age_band_path,
+           "data/rollout/dim_age_band.csv"),
+  
+  tar_file(sa2_lookup_path,
+           "data/rollout/dim_sa2.csv"),
+  
+  tar_file(sa4_lookup_path,
+           "data/rollout/dim_sa4.csv"),
+  
+  tar_file(dim_time_path,
+           "data/rollout/dim_time.csv"),
+  
+  tar_file(dim_vaccine_path,
+           "data/rollout/dim_vaccine.csv"),
+  
+  tar_file(populations_path,
+           "data/rollout/populations_sa2.csv"),
+  
+  tar_file(vaccinations_path,
+           "data/rollout/vaccinations.csv"),
+  
+  dim_age_band = read_csv(dim_age_band_path),
+  sa2_lookup = read_csv(sa2_lookup_path),
+  sa4_lookup = read_csv(sa4_lookup_path),
+  dim_time = read_csv(dim_time_path),
+  dim_vaccine = read_csv(dim_vaccine_path),
+  populations_raw = read_csv(populations_path),
+  vaccinations_raw = read_csv(vaccinations_path),
+  
+  populations = tidy_populations(populations_raw),
+   
+  aggregated_populations = aggregate_populations_to_vaccinations_age_band(
+    populations
+  ),
+  
+  vaccinations = tidy_vaccinations(vaccinations_raw,
+                                   dim_age_band,
+                                   dim_time,
+                                   dim_vaccine,
+                                   aggregated_populations,
+                                   sa4_lookup),
+  
+  vaccination_age_band = create_vaccination_age_band(vaccinations),
+  
+  vaccination_coverage = create_vaccination_coverage(vaccinations),
+  
+  plot_vaccination_coverage = gg_vaccination_coverage(vaccination_coverage),
+  
+  vaccination_coverage_milestones = coverage_milestones(vaccination_coverage),
+  
+  tar_file(vaccination_coverage_milestones_path,{
+    write_csv_return_path(vaccination_coverage_milestones,
+                          "outputs/vaccination_coverage_milestones.csv")
+  }),
+  
+  vaccination_coverage_age_group_at_milestone = 
+    age_group_coverage_at_milestones(
+      vaccinations,
+      vaccination_coverage_milestones
+    ),
+  
+  vaccination_coverage_age_group_at_milestone_5_year = aggregate_5_years(
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
+  
+  tar_file(vaccination_coverage_age_group_at_milestone_5_year_path,{
+    write_csv_return_path(vaccination_coverage_age_group_at_milestone_5_year,
+                          "outputs/vaccination_coverage_age_group_at_milestone_5_year.csv")
+  }),
+  
+  average_vaccine_efficacy = 
+    create_average_vaccine_efficacy(vaccination_coverage_age_group_at_milestone_5_year),
+  
+  
+  vaccintation_total = total_vaccinations(vaccinations_raw),
+  
+  # age_lookup = create_age_lookup(dim_age_band_path),
+  
+  # output some things for Eamon
+  eamon_terminal_coverage = get_eamon_terminal_coverage(vaccination_coverage_age_group_at_milestone),
+
+  eamon_populations = get_eamon_populations(populations),
+  
+  tar_file(eamon_terminal_coverage_path,{
+    write_csv_return_path(
+      eamon_terminal_coverage,
+      "outputs/eamon_terminal_coverage.csv"
+    )
+  }),
+  
+  tar_file(eamon_populations_path,{
+    write_csv_return_path(
+      eamon_populations,
+      "outputs/eamon_populations.csv"
+    )
+  }),
+  
   
 )
+
+
 
 
 # analyse NSW data to get distributions of these delays (blue + yellow graphs)

@@ -12,6 +12,16 @@
 #' @export
 get_clinical_fraction_scenarios <- function(...) {
 
-  expand_grid(...)
+  expand_grid(...) %>%
+    rowwise() %>%
+    # compute age coverage of vaccination
+    mutate(
+      # why encode the fractional coverage of vaccine age groups with clear,
+      # readable code, when you can use obscure mathematics?
+      min_age_bracket = vaccination_age_min %/% 5 + 1,
+      vaccination_coverage_vec = list(
+        vaccination_coverage * (sign(1:17 - min_age_bracket) + 1) / 2
+      )
+    )
 
 }
