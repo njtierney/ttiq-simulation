@@ -299,8 +299,6 @@ tar_plan(
   # next generation matrix for australia, for static analysis
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
-
-    
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
@@ -452,6 +450,24 @@ tar_plan(
     create_average_vaccine_efficacy(vaccination_coverage_age_group_at_milestone_5_year),
   
   
+  # output some things for Eamon
+  eamon_terminal_coverage = get_eamon_terminal_coverage(vaccination_coverage_age_group_at_milestone),
+
+  eamon_populations = get_eamon_populations(populations),
+  
+  tar_file(eamon_terminal_coverage_path,{
+    write_csv_return_path(
+      eamon_terminal_coverage,
+      "outputs/eamon_terminal_coverage.csv"
+    )
+  }),
+  
+  tar_file(eamon_populations_path,{
+    write_csv_return_path(
+      eamon_populations,
+      "outputs/eamon_populations.csv"
+    )
+  }),
   
   
   
