@@ -3,6 +3,12 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
+pkg_list <- extract_pkg_names("packages.R")
+tar_option_set(
+  packages = c("conmat"), 
+  imports = c("conmat")
+)
+
 # debug(coverage_milestones)
 tar_plan(
   
