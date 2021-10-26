@@ -55,16 +55,11 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
         y = tp_reduction
       )
     ) +
-    geom_hline(
-      yintercept = c(0.54, 0.42),
-      linetype = 2
-    ) +
     geom_col(
       width = 0.8,
       fill = "steelblue2"
     ) +
     scale_y_continuous(
-      breaks = c(0, 0.20, 0.42, 0.54),
       label = scales::percent
     ) +
     facet_wrap( ~ capacity, nrow = 1) +
@@ -74,27 +69,7 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
     theme(
       strip.background = element_rect(fill = "white"),
       axis.text.x = element_text(size = 9)
-    ) +
-    geom_text(
-      aes(
-        label = line_label
-      ),
-      data = tibble(
-        capacity = "20% capacity",
-        vaccination = c("30% of cases vaccinated",
-                        "30% of cases vaccinated",
-                        "45% of cases vaccinated",
-                        "45% of cases vaccinated"),
-        priority_type = "Random",
-        line_label = c("Partial TTIQ",
-                  "Optimal TTIQ",
-                  "Partial TTIQ",
-                  "Optimal TTIQ"),
-        tp_reduction = c(0.42, 0.54, 0.42, 0.54) + 0.03
-      ),
-      nudge_x = -0.4,
-      size = 4,
-      hjust = 0
     )
+
   
 }
