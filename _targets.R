@@ -248,6 +248,17 @@ tar_plan(
     ve_onward = 0.639
   ),
   
+  plot_queue_tp_reduction = gg_queue_tp_reduction(scenario_df_run_tp_multiplier_queue),
+  
+  tar_file(plot_queue_tp_reduction_path, {
+    ggsave_write_path(
+      plot = plot_queue_tp_reduction,
+      path = "figs/queue_tp_reduction.png",
+      width = 9,
+      height = 8
+    )
+  }),
+  
   plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
   
   plot_simple_tp_queue = gg_simple_tp(scenario_df_run_tp_multiplier_queue),
