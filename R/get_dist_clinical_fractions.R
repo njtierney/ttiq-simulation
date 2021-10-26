@@ -7,21 +7,21 @@
 #' @param ve_susceptibility
 #' @param ve_onward_transmission
 #' @param vaccination_coverage
-#' @param baseline_matrix
+#' @param oz_baseline_matrix
 #' @return
 #' @author dhduncan
 #' @export
 get_dist_clinical_fraction <- function(ve_symptoms = ve_symptoms, 
                                   ve_susceptibility = ve_susceptibility,
                                   ve_onward_transmission = ve_onward_transmission,           vaccination_coverage = vaccination_coverage,
-                                  baseline_matrix) {
+                                  oz_baseline_matrix) {
 
 
   stable_state <- get_stable_state(
     efficacy_susceptibility = ve_susceptibility,
     efficacy_onward = ve_onward_transmission,
     coverage_any_vaccine = vaccination_coverage,
-    baseline_matrix = baseline_matrix
+    oz_baseline_matrix = oz_baseline_matrix
     )
   
   # sum((n_cases_per_age/total_N_cases * pr_symptomatic_per_age)...)

@@ -7,32 +7,29 @@
 #' @param ve_susceptibility
 #' @param ve_onward
 #' @param vaccination_coverage
-#' @param baseline_matrix
+#' @param oz_baseline_matrix
 #' @return
 #' @author dhduncan
 #' @export
 get_age_vaccine_adjusted_cases <- function(
   scenario_clinical_fraction,
-  baseline_matrix,
+  oz_baseline_matrix,
   detection_vaccinated_asymptomatic = 1,
   detection_vaccinated_symptomatic = 1,
   detection_unvaccinated_asymptomatic = 1,
   detection_unvaccinated_symptomatic = 1
 ) {
   
-  # baseline matrix or oz_baseline_matrix?
   stable_state_df <- scenario_clinical_fraction %>% 
     nest(data = everything()) %>%
     rowwise() %>%
-    # nexted within milestone are the parameters for each age bracket, 0-4, etc.)
-    # rowwise() %>% 
     mutate(
       stable_state = list(
         get_stable_state(
           efficacy_susceptibility = data$ve_susceptibility,
           efficacy_onward = data$ve_onward,
           coverage_any_vaccine = data$vaccination_coverage,
-          baseline_matrix = baseline_matrix
+          oz_baseline_matrix = oz_baseline_matrix
         )
       )
     ) %>% 
@@ -72,6 +69,12 @@ get_age_vaccine_adjusted_cases <- function(
   
   # applying one 
   frac_vax_symptomatic_df <- stable_state_df %>% 
+    # mutate(
+    #   across(
+    #     starts_with("age_weight"),
+    #     ~.x * sign(.x[1])
+    #   )
+    # ) %>%
     left_join(
       clinical_fraction_unvax,
       by = "age_5_year"

@@ -7,7 +7,7 @@
 #' @return
 #' @author Nicholas Tierney
 #' @export
-run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, baseline_matrix) {
+run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, oz_baseline_matrix) {
 
   # some notes on the variables
   
@@ -47,7 +47,7 @@ run_ttiq_vaccination_isolation <- function(scenario_vaccination_isolation, basel
         ve_susceptibility = ve_susceptibility,
         ve_onward_transmission = ve_onward_transmission,
         vaccination_coverage = vaccination_coverage,
-        baseline_matrix = baseline_matrix
+        oz_baseline_matrix = oz_baseline_matrix
       )
     ) %>%
     ungroup() %>%

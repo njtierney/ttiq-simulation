@@ -32,17 +32,23 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
     group_by(milestone) %>%
     nest() %>%
     filter(
-      milestone %in% c("over_16_over_60_pct",
-                       "over_16_over_70_pct",
-                       "over_16_over_80_pct",
-                       "terminal")
+      milestone %in% c(
+        "over_16_over_20_pct",
+        "over_16_over_30_pct",
+        "over_16_over_40_pct",
+        "over_16_over_50_pct",
+        "over_16_over_60_pct",
+        "over_16_over_70_pct",
+        "over_16_over_80_pct",
+        "terminal"
+      )
     )
   
   scenario_cases <- nested_scenarios_average_vaccine_efficacy %>%
     summarise(
       get_age_vaccine_adjusted_cases(
         scenario_clinical_fraction = data[[1]],
-        baseline_matrix = oz_baseline_matrix,
+        oz_baseline_matrix = oz_baseline_matrix,
         detection_unvaccinated_asymptomatic = active_prob,
         detection_vaccinated_asymptomatic = active_prob,
         detection_unvaccinated_symptomatic = 1 - ((1- test_seeking) * (1 - active_prob)),
@@ -55,7 +61,7 @@ prepare_infections_vax_symp <- function(oz_baseline_matrix,
     summarise(
       get_age_vaccine_adjusted_cases(
         scenario_clinical_fraction = data[[1]],
-        baseline_matrix = oz_baseline_matrix
+        oz_baseline_matrix = oz_baseline_matrix
       ),
       .groups = "drop"
     )

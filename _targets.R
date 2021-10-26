@@ -342,36 +342,6 @@ tar_plan(
   ),
   
   # What is the age- and vaccine adjusted clinical fraction of cases
-  
-  scenario_clinical_fraction = get_clinical_fraction_scenarios(
-    # VE for onward transmission with sensitivity test for 50% lower effect
-    # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = ve_onward_transmission,
-    
-    ve_susceptibility = ve_susceptibility,
-    
-    # VE for symptoms in breakthrough infections
-    ve_symptoms = ve_symptoms,
-
-    # what is the vaccination coverage
-    vaccination_coverage = c(0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 1),
-    
-    vaccination_age_min = 12
-    
-    ),
-  
-  age_vacc_adjusted_cases  =  get_age_vaccine_adjusted_cases(
-    scenario_clinical_fraction,
-    oz_baseline_matrix,
-    ## NOTE: original parameters here, currently changing to get function
-    ## to work but unsure which values align here to unvaccinated or vaccinated
-    detection_vaccinated_asymptomatic = 0.25,
-    detection_unvaccinated_asymptomatic = 0.25,
-    detection_vaccinated_symptomatic = 0.5,
-    detection_unvaccinated_symptomatic = 0.5
-    ## unsure on what values to pass through
-  ),
-
   prepared_infections_vax_symp = prepare_infections_vax_symp(
     oz_baseline_matrix,
     average_vaccine_efficacy,
@@ -382,10 +352,10 @@ tar_plan(
     prepared_infections_vax_symp
   ),
   
-  plot_infections_vax_symp_infected_only = 
-    gg_infections_vax_symp_infections_only(
-      prepared_infections_vax_symp
-      ),
+  # plot_infections_vax_symp_infected_only = 
+  #   gg_infections_vax_symp_infections_only(
+  #     prepared_infections_vax_symp
+  #     ),
   
   tar_file(plot_infections_vax_symp_path,{
     ggsave_write_path(
@@ -407,23 +377,23 @@ tar_plan(
     )
   }),
     
-  fraction_cases_vaccinated = get_frac_vaccinated(
-    age_vacc_adjusted_cases, 
-    vaccination_coverage
-    ),
+  # fraction_cases_vaccinated = get_frac_vaccinated(
+  #   age_vacc_adjusted_cases, 
+  #   vaccination_coverage
+  #   ),
+  # 
+  # fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
+  #                                                   vaccination_coverage),
+  # 
+  # plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
   
-  fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
-                                                    vaccination_coverage),
-  
-  plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
-  
-  tar_file(plot_clinical_fraction_path, {
-    ggsave_write_path(
-      plot = plot_adjusted_clinical_fraction,
-      path = "figs/age_vaccine_clinical_fraction.png",
-      width = 9,
-      height = 3.5)
-    }),
+  # tar_file(plot_clinical_fraction_path, {
+  #   ggsave_write_path(
+  #     plot = plot_adjusted_clinical_fraction,
+  #     path = "figs/age_vaccine_clinical_fraction.png",
+  #     width = 9,
+  #     height = 3.5)
+  #   }),
   
   tar_file(plot_scenario_vaccination_isolation_path, {
     ggsave_write_path(
@@ -590,7 +560,7 @@ tar_plan(
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
-  age_lookup = create_age_lookup(dim_age_band_path),
+  # age_lookup = create_age_lookup(dim_age_band_path),
   
 )
 
