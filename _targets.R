@@ -226,12 +226,26 @@ tar_plan(
     passive_distribution = list(get_passive_distribution())
   ),
   
-  scenario_df_run_queue = run_ttiq_scenario(
-    scenario_df_queue
-  ),
+  samples_df_queue_prepped = samples_df_queue %>%
+    mutate(
+      n_iterations = 1000,
+      gi_meanlog = 1.375738,
+      gi_sdlog = 0.5665299,
+      passive_detection_given_symptoms = passive_detection_given_symptoms,
+      pr_symptoms = pr_symptoms,
+      p_active_detection = p_active_detection,
+      p_passive_detection = p_passive_detection,
+      passive_distribution = list(get_passive_distribution()),
+      r_start = 7.82
+    ),
   
-  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier(
-    scenario_df_run_queue
+  scenario_df_run_queue = run_ttiq_scenario(
+    samples_df_queue_prepped
+  ),
+
+  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier_queue(
+    scenario_df_run_queue,
+    ve_onward = 0.639
   ),
   
   plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),

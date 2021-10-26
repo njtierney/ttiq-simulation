@@ -24,9 +24,15 @@ run_ttiq_scenario <- function(scenario_df) {
       )
     ) %>% 
     # unpack these simulations into their own list columns
-    unnest(cols = time_to_isolation_sims) %>% 
-    mutate(time_to_isolation_sims = map(time_to_isolation_sims, c)) %>% 
-    mutate(names = names(time_to_isolation_sims)) %>% 
+    unnest(
+      cols = time_to_isolation_sims
+    ) %>% 
+    mutate(
+      time_to_isolation_sims = map(time_to_isolation_sims, c)
+    ) %>% 
+    mutate(
+      names = names(time_to_isolation_sims)
+    ) %>% 
     pivot_wider(
       names_from = names,
       values_from = time_to_isolation_sims
