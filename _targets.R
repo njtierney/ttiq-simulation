@@ -3,9 +3,16 @@ source("./packages.R")
 
 ## Load all R files in R/ folder
 lapply(list.files("./R", full.names = TRUE), source)
+pkg_list <- extract_pkg_names("packages.R")
+tar_option_set(
+  packages = c("conmat"), 
+  imports = c("conmat")
+)
+
 # debug(coverage_milestones)
 tar_plan(
   
+  # handle data ingress for delay distributions
   user = case_when(
     Sys.info()["nodename"] == "6300L-148079-M.local" ~ "Nick G",
     TRUE ~ "Sensible people"  
@@ -82,7 +89,10 @@ tar_plan(
     prop_current_case_zero = seq(from = 0.2, to = 0.8, by = 0.2)
   ),
   
-  # independently sample from component delay distributions, from Eamon
+  
+  # output delay distributions for other analyses
+  
+  # independently sample from component delay distributions, for Eamon
   
   # get the probabilities of every number of days for each delay
   optimal_delay_samples = sample_optimal_delays(
@@ -98,15 +108,6 @@ tar_plan(
     }
   ),
   
-  # NOTE: need to check how parameters are used
-  # derived_delay_distributions_df = dist_params_to_df(derived_delay_distributions),
-  
-  # tar_file(derived_delay_distributions_csv, {
-  #   write_csv_return_path(
-  #     derived_delay_distributions_df, 
-  #     here("outputs-public/derived_delay_distributions.csv")
-  #     )
-  # }),
   delay_dist_funs = create_dist_sim_fun(derived_delay_distributions),
   
   scenario_test_turnaround_time_sims = simulate_test_turnaround_time(
@@ -123,13 +124,13 @@ tar_plan(
                           "outputs/scenario_test_turnaround_time_probs.csv")
   }),
   
-  
-  
   tar_file(scenario_test_turnaround_time_sims_path,{
     write_csv_return_path(scenario_test_turnaround_time_sims,
                           "outputs/scenario_test_turnaround_time_sims.csv")
   }),
   
+  
+  # plot delay distributions
   delay_samples = generate_delay_samples(derived_delay_distributions,
                                          n_samples = 100000),
   
@@ -154,8 +155,14 @@ tar_plan(
     )
   }),
   
-  p_active_detection = 0.9,
+  
+  
+  
+  # set some global parameters for simulations
+  
+  p_active_detection = 0.95,
   passive_detection_given_symptoms = 0.5,
+  
   # (this will change as a function of vaccination coverage)
   pr_symptoms = 0.6,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
@@ -163,6 +170,8 @@ tar_plan(
   samples_df =  generate_samples_df_delays(delay_dist_funs,
                                            n_samples = 10000),
   
+  
+  # run scenarios on the impact of contact tracing delays on TP
   scenario_df = create_scenario_df(
     # these terms are fixed for each simulation
     n_iterations = 10000,
@@ -190,6 +199,45 @@ tar_plan(
     scenario_df_run
   ),
   
+  plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
+  
+  ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
+  
+  tar_file(scenario_df_run_tp_multiplier_csv,{
+    write_csv_return_path(
+      x = ttiq_scenario_prepared,
+      file = "outputs/ttiq_scenario_run.csv"
+    )
+  }),
+  
+  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
+                                      scenario_parameters),
+  
+  plot_tp_reduction_over_prop_zeros = gg_tp_reduction_prop_zeros(
+    scenario_df_run_tp_multiplier,
+    scenario_parameters
+  ),
+  
+  tar_file(plot_tp_reduction_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction,
+      path = "figs/nsw_ttiq_model_hist.png",
+      width = 9,
+      height = 6
+    )
+  }),
+  
+  tar_file(plot_tp_reduction_zeros_path, {
+    ggsave_write_path(
+      plot = plot_tp_reduction_over_prop_zeros,
+      path = "figs/ttiq_model_hist_zeros.png",
+      width = 10,
+      height = 10
+    )
+  }),
+  
+  
+  # simulate prioritisation strategies
   queue_scenarios = run_queue_scenarios(derived_delay_distributions,
                                           n_samples = 100),
   
@@ -240,202 +288,17 @@ tar_plan(
     scenario_df_run_queue
   ),
   
-  plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
   
   plot_simple_tp_queue = gg_simple_tp(scenario_df_run_tp_multiplier_queue),
   
-  ttiq_scenario_prepared = prepare_ttiq_for_csv(scenario_df_run_tp_multiplier),
+
   
-  tar_file(scenario_df_run_tp_multiplier_csv,{
-    write_csv_return_path(
-      x = ttiq_scenario_prepared,
-      file = "outputs/ttiq_scenario_run.csv"
-    )
-  }),
   
-  plot_tp_reduction = gg_tp_reduction(scenario_df_run_tp_multiplier,
-                                      scenario_parameters),
   
-  plot_tp_reduction_over_prop_zeros = gg_tp_reduction_prop_zeros(
-    scenario_df_run_tp_multiplier,
-    scenario_parameters
-    ),
   
-  tar_file(plot_tp_reduction_path, {
-    ggsave_write_path(
-      plot = plot_tp_reduction,
-      path = "figs/nsw_ttiq_model_hist.png",
-      width = 9,
-      height = 6
-    )
-  }),
-  
-  tar_file(plot_tp_reduction_zeros_path, {
-    ggsave_write_path(
-      plot = plot_tp_reduction_over_prop_zeros,
-      path = "figs/ttiq_model_hist_zeros.png",
-      width = 10,
-      height = 10
-    )
-  }),
-  
+  # next generation matrix for australia, for static analysis
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
-  ve_onward_transmission = 0.5 * c(1, 0.5),
-  
-  ve_susceptibility = 0.73,
-  
-  # VE for symptoms in breakthrough infections
-  ve_symptoms = 0.78,
-  
-  scenario_vaccination_isolation = create_scenario_vaccination_isolation(
-    
-    # VE for onward transmission with sensitivity test for 50% lower effect
-    # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = ve_onward_transmission,
-    
-    ve_susceptibility = ve_susceptibility,
-
-    # VE for symptoms in breakthrough infections
-    ve_symptoms = ve_symptoms,
-    
-    # the reduction in test seeking for vaccinated symptomatic infections
-    # relative to unvaccinated symptomatic infections
-    rel_test_seeking_vaccinated = 1,
-    
-    # whether to remove all passive detection for the vaccinated?
-    no_passive_detection_vaccinated = c(FALSE, TRUE),
-
-    # the fraction of contacts of known cases that are found by downstream
-    # contact tracing from the source case
-    p_active_detection = p_active_detection,
-    
-    # the cases that are found by by presenting for a test due to showing
-    # symptoms (if not found by contact tracing first)
-    p_passive_detection = p_passive_detection,
-    
-    # baseline TP multiplier - if we treated vaccinated people the same as
-    # unvaccinated ppl
-    tp_multiplier = 0.46,
-    
-    # isolation stringency for the vaccinated
-    isolation_stringency_vaccinated = seq(0, 1, by = 0.2),
-    
-    # what fraction of vaccinated cases are considered low-risk (as opposed to
-    # high-risk) and therefore have this reduced stringency?
-    fraction_vaccinated_low_risk = c(0, 0.5, 1),
-    
-    # what is the ratio of TP between low risk (those where vaccinated cases are
-    # allowed lower stringency) and high risk (those where they are not)
-    # settings? expressed as fraction = TP_low/TP_high
-    vacc_setting_risk_ratio = c(1, 0.75, 0.5, 0.25),
-    
-    # what is the vaccination coverage
-    vaccination_coverage = seq(0.7, 0.9, by = 0.1)
-    
-  ), 
-  
-  scenario_run_vaccination_isolation = run_ttiq_vaccination_isolation(
-    scenario_vaccination_isolation,
-    oz_baseline_matrix
-  ),
-  
-  plot_scenario_vaccination_isolation = gg_scenario_vacc_iso(
-    scenario_run_vaccination_isolation
-  ),
-  
-  plot_scenario_vaccination_isolation_unfaceted = gg_scenario_vacc_iso_unfaceted(
-    scenario_run_vaccination_isolation
-  ),
-  
-  # What is the age- and vaccine adjusted clinical fraction of cases
-  prepared_infections_vax_symp = prepare_infections_vax_symp(
-    oz_baseline_matrix,
-    average_vaccine_efficacy,
-    vaccination_coverage_milestones
-  ),
-  
-  mini_abm_parameters = get_mini_abm_parameters(
-    prepared_infections_vax_symp,
-    oz_baseline_matrix,
-    vaccination_coverage_age_group_at_milestone,
-    populations
-  ),
-  
-  tar_file(mini_abm_parameters_path, {
-    saveRDS_write_path(
-      object = mini_abm_parameters,
-      path = "outputs/mini_abm_parameters.RDS",
-    )
-  }),
-  
-  plot_infections_vax_symp = gg_infections_vax_symp(
-    prepared_infections_vax_symp
-  ),
-  
-  # output coverage for Eamon
-  
-  # plot_infections_vax_symp_infected_only = 
-  #   gg_infections_vax_symp_infections_only(
-  #     prepared_infections_vax_symp
-  #     ),
-  
-  tar_file(plot_infections_vax_symp_path,{
-    ggsave_write_path(
-      plot = plot_infections_vax_symp,
-      path = "figs/infections_to_cases_coverage.png",
-      width = 9,
-      height = 4,
-      dpi = 600
-    )
-  }),
-    
-  tar_file(plot_infections_vax_symp_infected_only_path,{
-    ggsave_write_path(
-      plot = plot_infections_vax_symp_infected_only,
-      path = "figs/infections_to_cases_coverage_infected_only.png",
-      width = 9,
-      height = 4,
-      dpi = 600
-    )
-  }),
-    
-  # fraction_cases_vaccinated = get_frac_vaccinated(
-  #   age_vacc_adjusted_cases, 
-  #   vaccination_coverage
-  #   ),
-  # 
-  # fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
-  #                                                   vaccination_coverage),
-  # 
-  # plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
-  
-  # tar_file(plot_clinical_fraction_path, {
-  #   ggsave_write_path(
-  #     plot = plot_adjusted_clinical_fraction,
-  #     path = "figs/age_vaccine_clinical_fraction.png",
-  #     width = 9,
-  #     height = 3.5)
-  #   }),
-  
-  tar_file(plot_scenario_vaccination_isolation_path, {
-    ggsave_write_path(
-      plot = plot_scenario_vaccination_isolation,
-      path = "figs/plot_scenario_vaccination_isolation.png",
-      width = 10,
-      height = 10
-    )
-  }),
-  
-  tar_file(plot_scenario_vaccination_isolation_unfaceted_path, {
-    ggsave_write_path(
-      plot = plot_scenario_vaccination_isolation_unfaceted,
-      path = "figs/plot_scenario_vaccination_isolation_unfaceted.png",
-      width = 10,
-      height = 10
-    )
-  }),
-
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
@@ -504,7 +367,13 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
+  
+  
+  
+  
+  
+  # vaccination rollout formatting
   
   tar_file(dim_age_band_path,
            "data/rollout/dim_age_band.csv"),
@@ -581,10 +450,6 @@ tar_plan(
     create_average_vaccine_efficacy(vaccination_coverage_age_group_at_milestone_5_year),
   
   
-  vaccintation_total = total_vaccinations(vaccinations_raw),
-  
-  # age_lookup = create_age_lookup(dim_age_band_path),
-  
   # output some things for Eamon
   eamon_terminal_coverage = get_eamon_terminal_coverage(vaccination_coverage_age_group_at_milestone),
 
@@ -605,59 +470,9 @@ tar_plan(
   }),
   
   
+  
+  
+  # a doc to view plots etc
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
 )
-
-
-
-
-# analyse NSW data to get distributions of these delays (blue + yellow graphs)
-
-# 1. Swab
-# 2. Notification
-# 3. Interview
-
-# (assuming the infector isolates on date of swab)
-# (assuming infectees isolate on date of interview)
-
-# difference of 1-2 is test turnaround time
-# simulate random draw from this distribution
-# difference of 2-3 is time to interview ()
-# simulate random draw from this distribution
-
-# sum these random draws together
-# this gives you the full contact tracing delay
-# this ^^ returns what we currently have in the sim_tracing function
-
-## optimal is this time period from July 2020 to Feb 2021
-
-## Current is from the last month
-
-## current + case initiated
-# same as current, but we randomly set the notification to interview to 0
-
-# difference of 1-3 is swab to interview (full contact tracing delay)
-
-# change this so we can provide our own distribution
-
-## optimal
-## current
-## current + case initiated contract tracing
-# some fraction of these the fraction of them is 0
-# mixture of current + fraction where time = 0
-
-## idependent assumption
-
-# delay from speciman collection to notification - this is test turaround time
-# time from notification to interview
-
-# earliest confirmed or probable (notification date) - pretend this is 
-# interviewed date (date of interview)
-# difference of these is delay to interview - THIS IS sim tracing delay
-# time to interview
-
-# test turnaround time IS:
-# difference of swab date and earliest confirmed or probable
-
-# speciman collection date to earliest confirmed or probably
-
-# bootstrap sample from observed
