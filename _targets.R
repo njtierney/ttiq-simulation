@@ -281,16 +281,23 @@ tar_plan(
   
   oz_baseline_matrix = get_oz_baseline_matrix(),
   
+  ve_onward_transmission = 0.5 * c(1, 0.5),
+  
+  ve_susceptibility = 0.73,
+  
+  # VE for symptoms in breakthrough infections
+  ve_symptoms = 0.78,
+  
   scenario_vaccination_isolation = create_scenario_vaccination_isolation(
     
     # VE for onward transmission with sensitivity test for 50% lower effect
     # need to replace this with the real assumptions based on fractions of each type!
-    ve_onward_transmission = 0.5 * c(1, 0.5),
+    ve_onward_transmission = ve_onward_transmission,
     
-    ve_susceptibility = 0.73,
+    ve_susceptibility = ve_susceptibility,
 
     # VE for symptoms in breakthrough infections
-    ve_symptoms = 0.78,
+    ve_symptoms = ve_symptoms,
     
     # the reduction in test seeking for vaccinated symptomatic infections
     # relative to unvaccinated symptomatic infections
@@ -341,6 +348,76 @@ tar_plan(
     scenario_run_vaccination_isolation
   ),
   
+  # What is the age- and vaccine adjusted clinical fraction of cases
+  prepared_infections_vax_symp = prepare_infections_vax_symp(
+    oz_baseline_matrix,
+    average_vaccine_efficacy,
+    vaccination_coverage_milestones
+  ),
+  
+  mini_abm_parameters = get_mini_abm_parameters(
+    prepared_infections_vax_symp,
+    oz_baseline_matrix,
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
+  
+  tar_file(mini_abm_parameters_path, {
+    saveRDS_write_path(
+      object = mini_abm_parameters,
+      path = "outputs/mini_abm_parameters.RDS",
+    )
+  }),
+  
+  plot_infections_vax_symp = gg_infections_vax_symp(
+    prepared_infections_vax_symp
+  ),
+  
+  # output coverage for Eamon
+  
+  # plot_infections_vax_symp_infected_only = 
+  #   gg_infections_vax_symp_infections_only(
+  #     prepared_infections_vax_symp
+  #     ),
+  
+  tar_file(plot_infections_vax_symp_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp,
+      path = "figs/infections_to_cases_coverage.png",
+      width = 9,
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
+  tar_file(plot_infections_vax_symp_infected_only_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp_infected_only,
+      path = "figs/infections_to_cases_coverage_infected_only.png",
+      width = 9,
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
+  # fraction_cases_vaccinated = get_frac_vaccinated(
+  #   age_vacc_adjusted_cases, 
+  #   vaccination_coverage
+  #   ),
+  # 
+  # fraction_cases_symptomatic = get_frac_symptomatic(age_vacc_adjusted_cases,
+  #                                                   vaccination_coverage),
+  # 
+  # plot_adjusted_clinical_fraction = gg_adjusted_clinical_fraction(age_vacc_adjusted_cases),
+  
+  # tar_file(plot_clinical_fraction_path, {
+  #   ggsave_write_path(
+  #     plot = plot_adjusted_clinical_fraction,
+  #     path = "figs/age_vaccine_clinical_fraction.png",
+  #     width = 9,
+  #     height = 3.5)
+  #   }),
+  
   tar_file(plot_scenario_vaccination_isolation_path, {
     ggsave_write_path(
       plot = plot_scenario_vaccination_isolation,
@@ -358,7 +435,7 @@ tar_plan(
       height = 10
     )
   }),
-  
+
   # How many casual cases get covid?
   
   casual_cases = filter_casual_cases(cases_vic),
@@ -506,7 +583,27 @@ tar_plan(
   
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
-  age_lookup = create_age_lookup(dim_age_band_path),
+  # age_lookup = create_age_lookup(dim_age_band_path),
+  
+  # output some things for Eamon
+  eamon_terminal_coverage = get_eamon_terminal_coverage(vaccination_coverage_age_group_at_milestone),
+
+  eamon_populations = get_eamon_populations(populations),
+  
+  tar_file(eamon_terminal_coverage_path,{
+    write_csv_return_path(
+      eamon_terminal_coverage,
+      "outputs/eamon_terminal_coverage.csv"
+    )
+  }),
+  
+  tar_file(eamon_populations_path,{
+    write_csv_return_path(
+      eamon_populations,
+      "outputs/eamon_populations.csv"
+    )
+  }),
+  
   
 )
 

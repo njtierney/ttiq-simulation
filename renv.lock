@@ -158,6 +158,13 @@
       "Repository": "CRAN",
       "Hash": "f61dbaec772ccd2e17705c1e872e9e7c"
     },
+    "chk": {
+      "Package": "chk",
+      "Version": "0.7.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "939568bb61a614bff3eb00249f102b85"
+    },
     "cli": {
       "Package": "cli",
       "Version": "3.0.1",
@@ -202,8 +209,8 @@
       "RemoteRepo": "conmat",
       "RemoteUsername": "njtierney",
       "RemoteRef": "HEAD",
-      "RemoteSha": "2cd517cd4c210b482407e7020103b7fd8ffc25d9",
-      "Hash": "d5db379cab5863cd34d6a2a64f03243f"
+      "RemoteSha": "08bfcd22b39f449f330c27e7a59f7009854250de",
+      "Hash": "9cb78efba61a1bd58ecea4cac7ad035b"
     },
     "countrycode": {
       "Package": "countrycode",
@@ -377,6 +384,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "9c56382c3e53f0b4fc0fc16d88fc3974"
+    },
+    "future.apply": {
+      "Package": "future.apply",
+      "Version": "1.8.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "f568ce73d3d59582b0f7babd0eb33d07"
     },
     "gargle": {
       "Package": "gargle",
@@ -555,10 +569,10 @@
     },
     "lubridate": {
       "Package": "lubridate",
-      "Version": "1.7.10",
+      "Version": "1.8.0",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "1ebfdc8a3cfe8fe19184f5481972b092"
+      "Hash": "2ff5eedb6ee38fb1b81205c73be1be5a"
     },
     "magrittr": {
       "Package": "magrittr",
@@ -646,10 +660,10 @@
     },
     "pillar": {
       "Package": "pillar",
-      "Version": "1.6.3",
+      "Version": "1.6.4",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "3323bc1a0988d63b5c65771ba0d3935d"
+      "Hash": "60200b6aa32314ac457d3efbb5ccbd98"
     },
     "pkgconfig": {
       "Package": "pkgconfig",
@@ -772,10 +786,10 @@
     },
     "rlang": {
       "Package": "rlang",
-      "Version": "0.4.11",
+      "Version": "0.4.12",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "515f341d3affe0de9e4a7f762efb0456"
+      "Hash": "0879f5388fe6e4d56d7ef0b7ccb031e5"
     },
     "rmarkdown": {
       "Package": "rmarkdown",
@@ -847,10 +861,10 @@
     },
     "stringi": {
       "Package": "stringi",
-      "Version": "1.7.4",
+      "Version": "1.7.5",
       "Source": "Repository",
       "Repository": "CRAN",
-      "Hash": "ebaccb577da50829a3bb1b8296f318a5"
+      "Hash": "cd50dc9b449de3d3b47cdc9976886999"
     },
     "stringr": {
       "Package": "stringr",
@@ -914,6 +928,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "fc4c72b6ae9bb283416bd59a3303bbab"
+    },
+    "tinter": {
+      "Package": "tinter",
+      "Version": "0.1.0",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "7fa9bbcbcfc8a7f8bf2e1cf16bb14313"
     },
     "tinytex": {
       "Package": "tinytex",
