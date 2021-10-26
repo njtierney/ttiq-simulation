@@ -348,6 +348,20 @@ tar_plan(
     vaccination_coverage_milestones
   ),
   
+  mini_abm_parameters = get_mini_abm_parameters(
+    prepared_infections_vax_symp,
+    oz_baseline_matrix,
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
+  
+  tar_file(mini_abm_parameters_path, {
+    saveRDS_write_path(
+      object = mini_abm_parameters,
+      path = "outputs/mini_abm_parameters.RDS",
+    )
+  }),
+  
   plot_infections_vax_symp = gg_infections_vax_symp(
     prepared_infections_vax_symp
   ),
