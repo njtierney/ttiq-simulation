@@ -146,10 +146,10 @@ tar_plan(
     )
   }),
   
-  p_active_detection = 0.9,
+  p_active_detection = 0.95,
   passive_detection_given_symptoms = 0.5,
   # (this will change as a function of vaccination coverage)
-  pr_symptoms = 0.6,
+  pr_symptoms = 0.3,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
   samples_df =  generate_samples_df_delays(delay_dist_funs,
@@ -254,8 +254,8 @@ tar_plan(
     ggsave_write_path(
       plot = plot_queue_tp_reduction,
       path = "figs/queue_tp_reduction.png",
-      width = 9,
-      height = 8
+      width = 12,
+      height = 5
     )
   }),
   

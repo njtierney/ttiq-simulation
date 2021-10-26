@@ -11,7 +11,8 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
 
   df_plot <- scenario_df_run_tp_multiplier_queue %>%
     filter(
-      capacity != "capacity0pc"
+      capacity != "capacity0pc",
+      vaccination == "casesvaccinated45pc",
     ) %>%
     mutate(
       priority_type = factor(
@@ -34,17 +35,11 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
                    "50% capacity",
                    "80% capacity")
         
-      ),
-      vaccination = factor(
-        vaccination,
-        levels = c("casesvaccinated25pc", "casesvaccinated50pc"),
-        labels = c("25% of cases vaccinated", "50% of cases vaccinated"),
       )
     ) %>%
     select(
       priority_type,
       capacity,
-      vaccination,
       tp_multiplier,
       tp_multiplier_if_found
     ) %>%
@@ -66,18 +61,19 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
     ) +
     geom_col(
       width = 0.8,
-      fill = "skyblue"
+      fill = "steelblue2"
     ) +
     scale_y_continuous(
       breaks = c(0, 0.20, 0.42, 0.54),
       label = scales::percent
     ) +
-    facet_grid(vaccination ~ capacity) +
-    ylab("Reduction in onward transmission due to contact tracing") +
+    facet_wrap( ~ capacity, nrow = 1) +
+    ylab("Reduction in TP") +
     xlab("Tracing prioritisation strategy") +
     theme_cowplot() +
     theme(
-      strip.background = element_rect(fill = "white")
+      strip.background = element_rect(fill = "white"),
+      axis.text.x = element_text(size = 9)
     ) +
     geom_text(
       aes(
@@ -85,10 +81,10 @@ gg_queue_tp_reduction <- function(scenario_df_run_tp_multiplier_queue) {
       ),
       data = tibble(
         capacity = "20% capacity",
-        vaccination = c("25% of cases vaccinated",
-                        "25% of cases vaccinated",
-                        "50% of cases vaccinated",
-                        "50% of cases vaccinated"),
+        vaccination = c("30% of cases vaccinated",
+                        "30% of cases vaccinated",
+                        "45% of cases vaccinated",
+                        "45% of cases vaccinated"),
         priority_type = "Random",
         line_label = c("Partial TTIQ",
                   "Optimal TTIQ",
