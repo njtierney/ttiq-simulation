@@ -352,6 +352,8 @@ tar_plan(
     prepared_infections_vax_symp
   ),
   
+  # output coverage for Eamon
+  
   # plot_infections_vax_symp_infected_only = 
   #   gg_infections_vax_symp_infections_only(
   #     prepared_infections_vax_symp
@@ -561,6 +563,26 @@ tar_plan(
   vaccintation_total = total_vaccinations(vaccinations_raw),
   
   # age_lookup = create_age_lookup(dim_age_band_path),
+  
+  # output some things for Eamon
+  eamon_terminal_coverage = get_eamon_terminal_coverage(vaccination_coverage_age_group_at_milestone),
+
+  eamon_populations = get_eamon_populations(populations),
+  
+  tar_file(eamon_terminal_coverage_path,{
+    write_csv_return_path(
+      eamon_terminal_coverage,
+      "outputs/eamon_terminal_coverage.csv"
+    )
+  }),
+  
+  tar_file(eamon_populations_path,{
+    write_csv_return_path(
+      eamon_populations,
+      "outputs/eamon_populations.csv"
+    )
+  }),
+  
   
 )
 
