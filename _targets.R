@@ -155,9 +155,6 @@ tar_plan(
     )
   }),
   
-  
-  
-  
   # set some global parameters for simulations
   
   p_active_detection = 0.95,
@@ -298,6 +295,9 @@ tar_plan(
   
   # next generation matrix for australia, for static analysis
   oz_baseline_matrix = get_oz_baseline_matrix(),
+  
+  
+  
   
   # How many casual cases get covid?
   
@@ -471,6 +471,19 @@ tar_plan(
   
   
   
+  # a simple plot of TTIQ effect for cases, ascertainment, and TTIQ effect
+  ttiq_ascertainment_plot = gg_ttiq_ascertainment(
+    scenario_parameters
+  ),
+  
+  tar_file(ttiq_ascertainment_plot_path, {
+    ggsave_write_path(
+      plot = ttiq_ascertainment_plot,
+      path = "figs/ttiq_ascertainment.png",
+      width = 6,
+      height = 5
+    )
+  }),
   
   # a doc to view plots etc
   tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
