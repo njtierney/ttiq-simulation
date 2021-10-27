@@ -15,8 +15,8 @@ gg_hist_delay_samples_against_data <- function(
   # also plot them as an ecdf
   # we wanted to know the "all" (total delay time) distribution looks the same 
   # as the expected all, which is the sum of 1 and 2
-  
   prepared_cases_for_plots %>%
+    # rename various
     ggplot() + 
     # Don't go to positive/negative infinity
     geom_col(
@@ -34,7 +34,7 @@ gg_hist_delay_samples_against_data <- function(
                     data_type == "data",
                     fraction > 0.005)
     ) + 
-    facet_grid(scenario ~ delay_type) +
+    facet_grid(scenario_renamed ~ delay_type) +
     theme_bw() +
     theme(aspect.ratio = 1,
           strip.background = element_blank()) + 

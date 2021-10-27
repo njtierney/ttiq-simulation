@@ -138,8 +138,7 @@ tar_plan(
                                                          cases_scenario),
   
   prepared_cases_for_plots = prepare_case_samples_for_plots(
-    delay_samples_against_data,
-    scenario_parameters
+    delay_samples_against_data
   ),
   
   plot_hist_delay_samples_v_data = gg_hist_delay_samples_against_data(
@@ -150,6 +149,23 @@ tar_plan(
     ggsave_write_path(
       plot = plot_hist_delay_samples_v_data,
       path = "figs/hist_delay_samples_v_data.png",
+      width = 8,
+      height = 8
+    )
+  }),
+  
+  plot_hist_delay_samples_v_data_original_scenarios = 
+    gg_hist_delay_samples_against_data(
+      filter(prepared_cases_for_plots,
+             scenario %in% c("current_nsw",
+                               "optimal",
+                               "current_nsw_case_init_0.8"))
+    ),
+  
+  tar_file(plot_hist_delay_samples_v_data_original_scenarios_path, {
+    ggsave_write_path(
+      plot = plot_hist_delay_samples_v_data_original_scenarios,
+      path = "figs/plot_hist_delay_samples_v_data_original_scenarios.png",
       width = 8,
       height = 8
     )
