@@ -4,12 +4,11 @@
 #'
 #' @title
 #' @param nsw_delay_samples_against_data
-#' @param scenario_parameters Dataframe of scenario (display) name, value in data,
 #' and color.
 #' @return
 #' @author Nicholas Tierney
 #' @export
-prepare_case_samples_for_plots <- function(delay_samples_against_data, scenario_parameters) {
+prepare_case_samples_for_plots <- function(delay_samples_against_data) {
 
   delay_samples_against_data %>% 
     # remove the extra scenarios with extra zeros being 0.2, 0.4, 0.6
@@ -34,8 +33,6 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data, scenario_
     drop_na() %>%
     filter(delay_type != "full_contact_delay") %>% 
     filter(delay_type != "test_to_interview") %>% 
-    left_join(scenario_parameters, by=c("scenario"="value")) %>%
-    mutate(scenario = name) %>%
     mutate(
       delay_type = str_replace_all(delay_type, "_", " "),
       delay_type = as_factor(delay_type),
@@ -58,5 +55,27 @@ prepare_case_samples_for_plots <- function(delay_samples_against_data, scenario_
     ) %>%
     mutate(
       fraction = count / sum(count)
-    )
+    ) %>% 
+    ungroup() %>% 
+    mutate(
+      scenario_renamed = case_when(
+        scenario == "current_nsw" ~ "NSW Current\nwithout case-initiated",
+        scenario == "current_nsw_case_init_0.8" ~ "NSW Current\nwith case-initiated",
+        scenario == "current_vic" ~ "VIC Current\nwithout case-initiated",
+        scenario == "current_vic_case_init_0.8" ~ "VIC Current\nwith case-initiated",
+        scenario == "optimal" ~ "NSW Optimal",
+        scenario == "partial" ~ "Partial",
+      ),
+      scenario_renamed = factor(scenario_renamed),
+      scenario_renamed = fct_relevel(
+        .f = scenario_renamed,
+          "NSW Optimal",
+          "NSW Current\nwithout case-initiated",
+          "NSW Current\nwith case-initiated",
+          "VIC Current\nwithout case-initiated",
+          "VIC Current\nwith case-initiated",
+          "Partial"
+      )
+    ) 
+    
 }
