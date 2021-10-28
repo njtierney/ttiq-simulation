@@ -419,7 +419,20 @@ tar_plan(
   # histogram of times to isolation from simulations
   scenario_df_run_plots = add_gg_hist_tti(scenario_df_run),
   
-  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./")
+  tar_render(explore, "doc/explore.Rmd", intermediates_dir="./"),
+  
+  epi_curve_example_sims = sim_epi_curve_examples(),
+  
+  plot_epi_curve_example = gg_epi_curve_example(epi_curve_example_sims),
+  
+  tar_file(plot_epi_curve_example_path, {
+    ggsave_write_path(
+      plot = plot_epi_curve_example,
+      path = "figs/epi_curve_example.png",
+      width = 8,
+      height = 6
+    )
+  }),
   
 )
 

@@ -8,11 +8,11 @@
 #' @author Nick Golding
 #' @export
 get_valid_abm_sample <- function(parameters,
-                                 initial_infections = 100,
+                                 initial_infections = 1000,
                                  min_infections = 100,
                                  min_days = 0, #20,
                                  max_infections = Inf,#min_infections * 100,
-                                 max_days = 50, #min_days * 5,
+                                 max_days = 100, #min_days * 5,
                                  exclude_days_start = 7,
                                  exclude_days_end = 14,
                                  max_tries = 20) {
