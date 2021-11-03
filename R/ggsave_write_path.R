@@ -8,14 +8,15 @@
 #' @return
 #' @author dhduncan
 #' @export
-ggsave_write_path <- function(plot, path, width = 5, height = 5) {
+ggsave_write_path <- function(plot, path, width = 5, height = 5, dpi = 300) {
 
   ggsave(
     plot = plot,
     filename = path,
     bg = "white",
     height = height,
-    width = width
+    width = width,
+    dpi = dpi
   )
 
   path  

@@ -49,7 +49,9 @@ gg_hist_tp_reductions <- function(tp_reductions, tti_distributions, scenario_par
     scale_x_continuous(
       breaks = seq(0, 15, by = 5),
     ) +
-    scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+    scale_y_continuous(
+      labels = scales::percent_format(accuracy = 1)
+    ) +
     scale_fill_identity() +
     xlab("Days since infection") +
     ylab("Cases isolated") +
