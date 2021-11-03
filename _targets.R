@@ -167,11 +167,11 @@ tar_plan(
   passive_detection_given_symptoms = 0.5,
   
   # (this will change as a function of vaccination coverage)
-  pr_symptoms = 0.6,
+  pr_symptoms = 0.3,
   p_passive_detection = passive_detection_given_symptoms * pr_symptoms,
   
   samples_df =  generate_samples_df_delays(delay_dist_funs,
-                                           n_samples = 10000),
+                                           n_samples = 1000),
   
   
   # run scenarios on the impact of contact tracing delays on TP
@@ -242,7 +242,9 @@ tar_plan(
   
   # simulate prioritisation strategies
   queue_scenarios = run_queue_scenarios(derived_delay_distributions,
-                                          n_samples = 100),
+                                          n_samples = 20000),
+  
+  queue_tp_reductions = queue_scenario_tp_reduction(queue_scenarios),
   
   plot_queue_scenarios = gg_queue_scenarios(queue_scenarios),
   
@@ -283,14 +285,40 @@ tar_plan(
     passive_distribution = list(get_passive_distribution())
   ),
   
+  samples_df_queue_prepped = samples_df_queue %>%
+    mutate(
+      n_iterations = 1000,
+      gi_meanlog = 1.375738,
+      gi_sdlog = 0.5665299,
+      passive_detection_given_symptoms = passive_detection_given_symptoms,
+      pr_symptoms = pr_symptoms,
+      p_active_detection = p_active_detection,
+      p_passive_detection = p_passive_detection,
+      passive_distribution = list(get_passive_distribution()),
+      r_start = 7.82
+    ),
+  
   scenario_df_run_queue = run_ttiq_scenario(
-    scenario_df_queue
+    samples_df_queue_prepped
+  ),
+
+  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier_queue(
+    scenario_df_run_queue,
+    ve_onward = 0.639
   ),
   
-  scenario_df_run_tp_multiplier_queue = calculate_tp_multiplier(
-    scenario_df_run_queue
-  ),
+  plot_queue_tp_reduction = gg_queue_tp_reduction(scenario_df_run_tp_multiplier_queue),
   
+  tar_file(plot_queue_tp_reduction_path, {
+    ggsave_write_path(
+      plot = plot_queue_tp_reduction,
+      path = "figs/queue_tp_reduction.png",
+      width = 12,
+      height = 5
+    )
+  }),
+  
+  plot_simple_tp = gg_simple_tp(scenario_df_run_tp_multiplier),
   
   plot_simple_tp_queue = gg_simple_tp(scenario_df_run_tp_multiplier_queue),
   
