@@ -2,10 +2,10 @@ future::plan(multisession(workers = 8))
 # future::plan(transparent)
 
 sims <- expand_grid(
-  vaccination_coverage = c(0.7, 0.8, 0.9),
+  vaccination_coverage = c(0.74),
   vaccination_test_seeking_multiplier = c(1, 0),
-  passive_detection_given_symptoms = c(0.5, 0.8),
-  R = 2,
+  passive_detection_given_symptoms = c(0.5),
+  R = 3,
   do_ttiq = c(TRUE)
 ) %>%
   # mutate(

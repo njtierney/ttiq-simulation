@@ -38,6 +38,7 @@ new_infections <- function(infections, vaccinated = FALSE) {
       source_id = rep(infections$id, onward_infections),
       infection_day = .abm_globals$day,
       isolation_day = Inf,
+      isolated = FALSE,
       case_found_by = NA,
       vaccinated = vaccinated,
       symptomatic = rbinom(n_new, 1, p_symptoms)
