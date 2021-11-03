@@ -8,11 +8,11 @@
 #' @author Nick Golding
 #' @export
 get_valid_abm_sample <- function(parameters,
-                                 initial_infections = 1000,
+                                 initial_infections = 1000, #100 for 70 and 80%, 1000 for 90%
                                  min_infections = 100,
                                  min_days = 0, #20,
-                                 max_infections = Inf,#min_infections * 100,
-                                 max_days = 100, #min_days * 5,
+                                 max_infections = Inf, #min_infections * 100,
+                                 max_days = 300, #min_days * 5, max_days 70% 20-50 days, 80% 50-80, 90% 10-300 
                                  exclude_days_start = 7,
                                  exclude_days_end = 14,
                                  max_tries = 20) {
@@ -32,7 +32,7 @@ get_valid_abm_sample <- function(parameters,
       max_days = max_days
     )
     
-    # count the number of useful infections and days there are
+    # count the number of usful infections and days there are
     sim_valid <- sim %>%
       filter(
         infection_day > exclude_days_start &
@@ -54,7 +54,7 @@ get_valid_abm_sample <- function(parameters,
   }
   
   if (try >= max_tries) {
-    stop ("insufficient samples")
+    stop ("insufficient samples", valid_infections, " infections", valid_days, " days")
   }
   
   # return *all* the samples, since new infections in end period count toward
