@@ -42,16 +42,6 @@ tar_plan(
   cases_nsw = read_cases_nsw(cases_nsw_path),
   cases_vic = read_cases_vic(cases_vic_path),
   
-  tar_file(
-    casual_vic_path,
-    file.path(
-      data_path,
-      "vic/Linelist_casual_20210917.xlsx"
-    )
-  ),
-  
-  casual_vic = read_casual_vic(casual_vic_path),
-  
   cases_nsw_delays = case_add_delays(
     cases = cases_nsw,
     swab_date_var = earliest_detected,
@@ -314,26 +304,41 @@ tar_plan(
   
   
   
-  
-  # How many casual cases get covid?
-  
-  casual_cases = filter_casual_cases(cases_vic),
-  
-  vic_casual_cases_covid_monthly = casual_cases_get_covid_monthly(cases_vic,
-                                                                  casual_cases),
-  
-  plot_vic_casual_cases_monthly = gg_casual_cases_covid_monthly(
-    vic_casual_cases_covid_monthly
+  # What is the age- and vaccine adjusted clinical fraction of cases
+  prepared_infections_vax_symp = prepare_infections_vax_symp(
+    oz_baseline_matrix,
+    average_vaccine_efficacy,
+    vaccination_coverage_milestones
   ),
   
-  vic_casual_cases_get_covid = how_many_casual_cases_get_covid(cases_vic,
-                                                               casual_cases,
-                                                               casual_vic),
+  mini_abm_parameters = get_mini_abm_parameters(
+    prepared_infections_vax_symp,
+    oz_baseline_matrix,
+    vaccination_coverage_age_group_at_milestone,
+    populations
+  ),
   
-  vic_statement_on_casual_cases = generate_statement_on_casual_cases(
-    vic_casual_cases_get_covid
-    ),
+  tar_file(mini_abm_parameters_path, {
+    saveRDS_write_path(
+      object = mini_abm_parameters,
+      path = "outputs/mini_abm_parameters.RDS",
+    )
+  }),
   
+  plot_infections_vax_symp = gg_infections_vax_symp(
+    prepared_infections_vax_symp
+  ),
+  
+  tar_file(plot_infections_vax_symp_path,{
+    ggsave_write_path(
+      plot = plot_infections_vax_symp,
+      path = "figs/infections_to_cases_coverage.png",
+      width = 9,
+      height = 4,
+      dpi = 600
+    )
+  }),
+    
   nsw_delays = read_nsw_delays(cases_nsw_path),
   
   plot_nsw_delays_optimal = gg_nsw_delays_hist(nsw_delays),
