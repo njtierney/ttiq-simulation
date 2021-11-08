@@ -1,6 +1,6 @@
 # ttiq-simulation
 
-Exploring scenarios around TTIQ
+Various models for assessment of test, trace, isolation and quarantine (TTIQ), used in [modelling for National Cabinet in October/November 2021](https://www.doherty.edu.au/our-work/institute-themes/viral-infectious-diseases/covid-19/covid-19-modelling/modelling)
 
 # Contributing to this repo?
 
