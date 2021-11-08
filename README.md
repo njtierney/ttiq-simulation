@@ -2,6 +2,8 @@
 
 Various models for assessment of test, trace, isolation and quarantine (TTIQ), used in [modelling for National Cabinet in October/November 2021](https://www.doherty.edu.au/our-work/institute-themes/viral-infectious-diseases/covid-19/covid-19-modelling/modelling)
 
+Unfortunately it is not possible for anyone to run the code because it uses confidential health data. We aim to get approval to share summary or synthetic data for publication. More context is in the umbrella repository [here](https://github.com/aus-covid-modelling/NationalCabinetModelling-OctNov21).
+
 # Contributing to this repo?
 
 If you are contributing to this repo, please create a branch or fork of the project
