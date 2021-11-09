@@ -6,8 +6,8 @@ queue_scenario_tp_reduction <- function(queue_scenarios) {
   kretzschmar_tp_reduction = read_kretzschmar_tp_reduction(csv_path)
   vaccine_tp_reduction = tribble(
     ~vaccine, ~vaccine_tp_reduction,
-    "AZ", 0.63,
-    "Pfizer", 0.82,
+    "AZ", 0.505,
+    "Pfizer", 0.505,
     "None", 0
   )
   

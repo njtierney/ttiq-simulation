@@ -19,8 +19,8 @@ csv_path = "../../data-public/testing_delay_kretzschmar_table_2_extended.csv"
 kretzschmar_tp_reduction = read_kretzschmar_tp_reduction(csv_path)
 vaccine_tp_reduction = tribble(
     ~vaccine, ~vaccine_tp_reduction,
-    "AZ", 0.63,
-    "Pfizer", 0.82,
+    "AZ", 0.36,
+    "Pfizer", 0.65,
     "None", 0
 )
 
