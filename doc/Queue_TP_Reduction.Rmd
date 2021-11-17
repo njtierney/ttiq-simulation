@@ -1,0 +1,189 @@
+---
+title: "Queue TP Reduction"
+author: "Logan Wu"
+date: "`r format(lubridate::today(), '%B %e, %Y')`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+```
+
+> This RMarkdown illustrates the effectiveness of queueing strategy on transmission potential (TP) reduction in a contact tracing context.
+
+# Introduction
+
+In a pandemic, a contact tracing team uses interviews to minimize public health impact from onward transmission of disease, but interviews often cannot be conducted instantaneously. The process where cases are notified to the team, prioritised, and interviewed by a member of the tracing team can be modelled as a queue. While the contact tracing team cannot control the rate of case notification, incoming cases have information that can be used for prioritisation such as vaccination status, occupation, and demographic. Incoming case notifications can also be tagged with timestamps from other parts of the positive case pathway, such as when they were swabbed and when their lab result was processed -- although contact tracers maintain their own queue, they form a single stage of a multi-stage pathway.
+
+Modelling the contact tracing interview queue allows us to modify parameters such as team capacity or interview prioritisation heuristics on the resulting interview delays and overall delays in the full multi-stage system. When coupled with a model of transmission potential (TP) reduction as a function of notification and interview delays, the queue model can inform desirable strategies for the necessary size/capacity of the team and prioritisation heuristics.
+
+# Background
+
+## Queue
+
+In Kendall's notation, the true queue can be represented as an $A/S/c$ queue:
+
+- **Arrival process**: Cases are notified to the team at a rate $\lambda(t)$.
+- **Service time**: Each member of the contact tracing team conducts interviews at a rate $\mu(t)$.
+- **Servers**: There are $c$ contact tracers.
+
+The arrival and service process are both time-dependent. Cases are only notified when workers are on shift to confirm positive lab results (e.g., 8am to 8pm) and interviews are only conducted if both an interviewer and the interviewee are available.
+
+Datasets have been obtained from NSW Health and the Victorian Department of Health. Although the above representation may be closer to the true process, there are data limitations. For instance, arrival and actual interview times are only known by discrete date, not by continuous date-time. The queue is modelled as a $D^X/D^Y/1$ queue to simplify the simulation.
+
+- **Arrival process**: Cases are notified in batches of size $X$, a Poisson random variable, where the inter-arrival time is deterministic (daily).
+- **Service time**: Interviews are conducted in a daily batch after case notification.
+- **Servers**: The contact tracing team is considered as a single server, with a daily capacity $Y$.
+
+Further modifications are included to match real-world considerations, and are calibrated to observed data.
+
+- **Close-of-business limit**: A portion of notifications arriving on a given day cannot be processed that day because they arrive after hours, even if the queue happens to be empty.
+- **Expiration**: Notifications are discarded from the queue and not interviewed if they exceed a certain age. This is both a practical consideration and stops the queue from reaching an infinite length instead of a queue capacity.
+
+## Prioritisation
+
+Interview prioritisation is not necessary when the rate of incoming notifications is less than the maximum interview rate of the contact tracing team, because there is always an interviewer able to conduct interviews for incoming notifications immediately or with a negligible delay (i.e., same day). However, once incoming notifications exceed interviews on average or by daily random variation, some interviews will necessarily be delayed and/or dropped completely.
+
+## Transmission Potential Reduction
+
+# Methods
+
+```{r}
+capacity_ratio = 0.8
+max_interview_delay = 5
+prop_priority = 0.4
+prop_time_delay = 0.2
+priority_delay_distribution = NULL
+f_priority = NULL
+proportion_cases_vaccinated = 0.05
+n_samples = 1e4
+
+mean_rate = 20
+capacity = capacity_ratio * mean_rate
+```
+
+## Arrivals
+
+Cases are swabbed as a Poisson process with a mean rate of `mean_rate` (the final queue distribution is invariant to rate).
+
+```{r}
+# Generate a sample case rate with a Poisson process
+swab_date = numeric(0)
+i = 1
+while (length(swab_date) < n_samples) {
+  swab_date = c(swab_date, rep(i, rpois(1, mean_rate)))
+  i = i + 1
+}
+swab_date = swab_date[seq_len(n_samples)]
+```
+
+They are then notified to the Department after a delay, which is modelled by a fitted Poisson distribution (censored to a maximum of 8). Notification time is just a random uniform variable to make it easy to extract a percentage.
+
+```{r}
+notification_date = swab_date + pmin(rpois(n_samples, 1), 8)
+notification_time = runif(n_samples)
+```
+
+A proportion of people are randomly vaccinated.
+
+```{r}
+vaccinated = runif(n_samples) <= proportion_cases_vaccinated
+```
+
+## Queue simulation
+
+Now we define our priority function.
+
+```{r}
+f_priority = function(x) {
+  x %>%
+    arrange(
+      # Whether case is eligible to be interviewed
+      desc(eligible_for_interview),
+      # Priorities, in order of appearance
+      desc(swab_date), # newest first
+      vaccinated # vaccinated FALSE first
+    )
+}
+```
+
+Create a dataframe representing the linelist and process the queue day by day.
+
+```{r}
+samples = tibble(
+  swab_date,
+  notification_date,
+  notification_time,
+  vaccinated,
+  interview_date = NA_integer_
+)
+# pb = txtProgressBar(min = 1, max = max(samples$notification_date), initial = 1)
+for (sim_day in seq_len(max(notification_date))) {
+  # setTxtProgressBar(pb, sim_day)
+  samples = samples %>%
+    mutate(eligible_for_interview = notification_date <= sim_day & is.na(interview_date) & notification_date >= (sim_day-max_interview_delay) & !(notification_date==sim_day & notification_time < prop_time_delay)) %>%
+    f_priority() %>%
+    mutate(interview_date = ifelse(
+      row_number() <= capacity & eligible_for_interview,
+      sim_day,         # Interview
+      interview_date)) # No interview
+}
+```
+
+# TP reduction
+
+Read in estimates for TP reduction by lab/interview delays.
+
+```{r}
+# Define TP reductions
+kretzschmar_tp_reduction = read.csv("../data-public/testing_delay_kretzschmar_table_2_extended.csv") %>%
+  pivot_longer(-Testing.delay,
+               names_to = "contact_tracing_delay",
+               values_to = "kretzschmar_tp_reduction") %>%
+  mutate(contact_tracing_delay = contact_tracing_delay %>%
+           str_remove_all("[^[0-9]]") %>%
+           as.numeric() %>%
+           replace_na(-2))
+vaccine_tp_reduction = tribble(
+  ~vaccine, ~vaccine_tp_reduction,
+  "AZ", 0.505,
+  "Pfizer", 0.505,
+  "None", 0
+)
+```
+
+Apply TP reductions to each case
+
+```{r}
+processed = samples %>%
+  # Calculate TP reductions
+  mutate(
+    vaccinated = ifelse(vaccinated, "Pfizer", "None"),
+    test_turnaround_time = notification_date - swab_date,
+    time_to_interview = replace_na(interview_date - notification_date, -2)
+  ) %>%
+  left_join(vaccine_tp_reduction,
+            by = c("vaccinated" = "vaccine")) %>%
+  left_join(kretzschmar_tp_reduction,
+            by = c("test_turnaround_time" = "Testing.delay",
+                   "time_to_interview" = "contact_tracing_delay")) %>%
+  mutate(tp_reduction = 1 - (1-vaccine_tp_reduction) * (1-kretzschmar_tp_reduction))
+
+mean_tp_reduction = mean(processed$tp_reduction)
+```
+
+# Results
+
+```{r}
+ggplot(processed, aes(x=test_turnaround_time, y=tp_reduction)) +
+  geom_jitter()
+
+ggplot(processed, aes(x=time_to_interview, y=tp_reduction)) +
+  geom_jitter()
+
+processed %>%
+  select(test_turnaround_time, time_to_interview, tp_reduction) %>%
+  pairs()
+```
