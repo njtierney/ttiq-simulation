@@ -9,6 +9,17 @@
 #' @author Nick Golding
 #' @export
 isolated <- function(infections) {
-  .abm_globals$day > infections$isolation_day &
-    ((.abm_globals$day - infections$isolation_day) <= 14)
-}
+   
+  start_day <- switch(.abm_parameters$isolation_start_day, 
+                      infection=infections$infection_day,
+                      isolation=infections$isolation_day)
+  
+  isolation_days <- ifelse(infections$vaccinated, .abm_parameters$isolation_days_vax, 14)
+  
+ infections$isolated & 
+    .abm_globals$day > start_day &
+    ((.abm_globals$day - start_day) <= isolation_days)
+  
+ }
+
+

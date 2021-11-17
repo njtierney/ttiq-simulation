@@ -18,7 +18,8 @@ tidy_queue_scenario <- function(queue_scenarios) {
       into = c("priority_type",
                "priority_growth_rate",
                "capacity",
-               "max"),
+               "max",
+               "vaccination"),
       sep = "\\."
     ) %>% 
     mutate(
@@ -26,7 +27,7 @@ tidy_queue_scenario <- function(queue_scenarios) {
                                              "delay",
                                              "delay_"),
       scenario = glue(
-        "{scenario}_{priority_type}_{priority_growth_rate}_{capacity}_{max}"
+        "{scenario}_{priority_type}_{priority_growth_rate}_{capacity}_{max}_{vaccination}"
       )
     ) %>% 
   # only `samples_time_to_interview` contains negative values (-2), which 
@@ -46,11 +47,11 @@ tidy_queue_scenario <- function(queue_scenarios) {
                                  samples_priority_group)),
            .after = scenario) %>% 
     select(
-      - samples_isol_swab,
-      - samples_test_turnaround_time,
-      - samples_time_to_interview,
-      - samples_vaccinated,
-      - samples_priority_group
+      -samples_isol_swab,
+      -samples_test_turnaround_time,
+      -samples_time_to_interview,
+      -samples_vaccinated,
+      -samples_priority_group
     ) %>% 
     select(scenario,
            samples) %>% 
@@ -75,6 +76,7 @@ tidy_queue_scenario <- function(queue_scenarios) {
            priority_type,
            priority_growth_rate,
            capacity,
+           vaccination,
            max,
            capacity_ratio) %>% 
     left_join(

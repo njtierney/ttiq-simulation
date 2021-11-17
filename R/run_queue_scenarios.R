@@ -155,7 +155,7 @@ run_queue_scenarios <- function(derived_delay_distributions, n_samples = 1e4) {
   
   max_days = c(max_5d=5)
   
-  cases_vaccinated = c(casesvaccinated25pc=0.25, casesvaccinated50pc=0.5)
+  cases_vaccinated = c(casesvaccinated30pc=0.30, casesvaccinated45pc=0.45)
   
   # Create a list crossing combinations of input parameters for each run
   sim_params = lapply(ranking_functions, function(x) {
