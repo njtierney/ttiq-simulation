@@ -9,6 +9,16 @@
 #' @export
 do_screening <- function(infections) {
 
+  # rename this one to make it clear that its about the symptomatic presentation (passive surveillance)
+  
+ # make another one that's actually about he workplace kind of screening to pick up undetected cases
+  
+   #subset of new infections that are screenable
+  # can't be in isolation
+  # some prob of being screened (0 in isolation else the prob e.g 5/7 work days) 
+  # test positive on days 4-7 post infection (assuming RATs)
+  # new type of case_found_by
+  
   # apply passive detection to infections, and put them in isolation as soon as
   # they are detected
   

@@ -42,16 +42,16 @@ source("./packages.R")
 future::plan(multisession(workers = 8))
 #future::plan(sequential, split=TRUE)
 sims <- expand_grid(
-  vaccination_coverage = 0.94, #0.740,
+  vaccination_coverage = 0.74, #0.740,
   vaccination_test_seeking_multiplier = c(1),
-  passive_detection_given_symptoms = c(0.2),
+  passive_detection_given_symptoms = c(0.5),
   rel_active_detection_vaccinated_source = c(1),
   rel_active_detection_vaccinated_contact = c(1),
   #ve_onward=0.639*c(0.9, 1, 1.1),
   ve_onward=0.639,
   isolation_days_vax=c(14),
   isolation_start_day=c('isolation'),
-  contact_tracing=FALSE,
+  contact_tracing=TRUE,
   screening=TRUE
 ) %>%
   mutate(
@@ -83,7 +83,7 @@ sims <- expand_grid(
   ) %>%
   mutate(
     simulations = list(
-      get_valid_abm_samples(parameters, n_samples = 10)
+      get_valid_abm_samples(parameters, n_samples = 100)
     )
   )  
 
@@ -202,7 +202,7 @@ correction_factor <- 1/(0.307*0.2)
 case_ascertainment <- trim_sims %>% 
   group_by(case_found_by,
            simulation) %>% # groups by detected/screening and simulation
-  summarise(infections_by_sim_mode=sum(infections)) %>% # total infections by detection mode and sim
+  summarise(infections_by_sim_mode=sum(infections)) %>% # total infections by detection mode and sim over the time period
   group_by(simulation) %>% 
   mutate(all_infections=sum(infections_by_sim_mode)) %>% # total infections by sim
   filter(case_found_by=='screening') %>% 
