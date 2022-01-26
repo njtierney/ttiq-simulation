@@ -46,13 +46,14 @@ sims <- expand_grid(
   vaccination_test_seeking_multiplier = c(1),
   passive_detection_given_symptoms = c(0.5),
   rel_active_detection_vaccinated_source = c(1),
-  rel_active_detection_vaccinated_contact = c(1),
+  rel_active_detection_vaccinated_contact = c(1,0),
   #ve_onward=0.639*c(0.9, 1, 1.1),
   ve_onward=0.639,
   isolation_days_vax=c(14),
   isolation_start_day=c('isolation'),
+  passive_detections=TRUE, # old do_screening
   contact_tracing=TRUE,
-  screening=TRUE
+  workplace_screening=TRUE # revised do_screening
 ) %>%
   mutate(
     # tweak starting R to get optimal reproduction number at about 1
@@ -76,14 +77,15 @@ sims <- expand_grid(
         ve_onward=ve_onward,
         isolation_days_vax=isolation_days_vax,
         isolation_start_day=isolation_start_day,
+        passive_detections=passive_detections, # this is always on though, yeah?
         contact_tracing = contact_tracing,
-        screening = screening
+        workplace_screening = workplace_screening
       )
     )
   ) %>%
   mutate(
     simulations = list(
-      get_valid_abm_samples(parameters, n_samples = 100)
+      get_valid_abm_samples(parameters, n_samples = 200)
     )
   )  
 
@@ -148,7 +150,7 @@ ggplot(trim_sims) +
     group=simulation) + 
   facet_wrap(
     ~case_found_by,
-    ncol=3
+    ncol=4
   ) +
   theme_cowplot() +
   geom_line(aes(color=simulation)) +
@@ -179,7 +181,8 @@ ggplot(sry_sims) +
            )+
   scale_fill_manual(values = c('#b3cde3',
                                '#ccebc5',
-                               '#decbe4')) +
+                               '#decbe4',
+                               "grey")) +
   theme_cowplot() +
   ylab('Fraction') +
   xlab("Infection day") 
@@ -202,10 +205,10 @@ correction_factor <- 1/(0.307*0.2)
 case_ascertainment <- trim_sims %>% 
   group_by(case_found_by,
            simulation) %>% # groups by detected/screening and simulation
-  summarise(infections_by_sim_mode=sum(infections)) %>% # total infections by detection mode and sim over the time period
+  summarise(infections_by_sim_mode=sum(infections)) %>% # total infections by detection mode and sim
   group_by(simulation) %>% 
   mutate(all_infections=sum(infections_by_sim_mode)) %>% # total infections by sim
-  filter(case_found_by=='screening') %>% 
+  filter(case_found_by=='passive_surveillance') %>% 
   mutate(estimated_infections=infections_by_sim_mode*correction_factor) %>% 
   rename(detected_infections=infections_by_sim_mode) %>% 
   mutate(case_ascertainment=detected_infections/estimated_infections) %>% 
@@ -228,13 +231,20 @@ metrics <- trim_sims %>%
   group_by(simulation) %>% 
   mutate(all_infections=sum(sim_infections))
   
-case_ascertainment <- metrics %>% 
+case_ascertainment <- metrics %>%  
   summarise(detected_infections=all_infections-sim_infections[case_found_by=='undetected']) %>%
   distinct() %>% 
   left_join(metrics, 
             by='simulation') %>% 
-  mutate(estimated_infections=sim_infections[case_found_by=='contact_tracing']+
-           (sim_infections[case_found_by=='screening']*correction_factor)) %>% 
+  # do some pivot_wider here
+  pivot_wider(
+    names_from = case_found_by,
+    values_from = sim_infections
+  ) %>%
+  mutate(
+    estimated_infections = contact_tracing + workplace_screening + (passive_surveillance * correction_factor)) %>% 
+  # mutate(estimated_infections=sim_infections[case_found_by=='contact_tracing']+
+  #          (sim_infections[case_found_by=='screening']*correction_factor)) %>% 
   mutate(case_ascertainment=detected_infections/estimated_infections) %>% 
   mutate(true_case_ascertainment=detected_infections/all_infections) %>% 
   distinct(simulation, case_ascertainment, true_case_ascertainment) %>% 

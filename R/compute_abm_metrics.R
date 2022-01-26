@@ -43,7 +43,8 @@ compute_abm_metrics <- function(abm_result) {
       transmissions = replace_na(transmissions, 0),
       found = !is.na(case_found_by),
       traced = found & case_found_by == "contact_tracing",
-      screened = found & case_found_by == "screening",
+      screened = found & case_found_by == "workplace_screening",
+      symptomatic = found & case_found_by == "passive_surveillance",
       infection_to_isolation = isolation_day - infection_day
     )
   
@@ -54,10 +55,11 @@ compute_abm_metrics <- function(abm_result) {
       ascertainment = mean(found),
       tracing = mean(traced),
       screening = mean(screened),
+      surveillance = mean(symptomatic)
     ) %>%
     summarise(
        across(
-         c(TP, ascertainment, tracing, screening),
+         c(TP, ascertainment, tracing, screening, symptomatic),
          .fns = list(
            mean = ~mean(.x),
            variance = ~var(.x)
@@ -109,7 +111,8 @@ compute_abm_metrics_full <- function(abm_result) {
       transmissions = replace_na(transmissions, 0),
       found = !is.na(case_found_by),
       traced = found & case_found_by == "contact_tracing",
-      screened = found & case_found_by == "screening",
+      screened = found & case_found_by == "workplace_screening",
+      symptomatic = found & case_found_by == "passive_surveillance",
       infection_to_isolation = isolation_day - infection_day
     )
   
