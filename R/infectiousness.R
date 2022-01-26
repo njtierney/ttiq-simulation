@@ -31,7 +31,7 @@ infectiousness <- function(infections) {
     .abm_parameters$asymptomatic_relative_infectiousness
   )
   
-  .abm_parameters$R_star *
+  .abm_parameters$R_star *  # NG plans make this time varying at some point 
     gi_pmf_discrete(day_diff) *
     isolation_multiplier *
     vaccination_multiplier *
